@@ -1,0 +1,147 @@
+
+.jumbotron-home {
+    height: 400px;
+    margin: 0;
+    padding: 50px 0 0 0 ;
+    /*background-image: url('/static/mytravelog/imgs/default/home-cover.jpg');*/
+    /*background-position: center center;*/
+    /*background-repeat: no-repeat;*/
+    /*background-size: cover;*/
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#563d7c),to(#6f5499));
+}
+
+.jumbotron-home .mask {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+    text-align: center;
+    /*background-color: rgba(0,0,0,0.1);*/
+}
+
+.jumbotron-home .mask .title-and-search-container {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.jumbotron-home .mask .title-and-search-container .title {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    padding-bottom: 10px;
+}
+
+.jumbotron-home .mask .title-and-search-container .explore-popular-cities {
+    color: rgba(255,255,255,0.9);
+    font-size: 100%;
+    display: inline-block;
+    margin-top: 15px;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    cursor: pointer;
+}
+
+.jumbotron-home .mask .title-and-search-container .explore-popular-cities:hover {
+    border-bottom: 1px solid #13E4A1;
+    color: #13E4A1;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .input-city-text {
+    height: 50px;
+    width: 380px;
+    padding: 10px;
+    background-color: transparent;
+    font-size: 120%;
+    color: #ffffff;
+    border: solid 4px #ffffff;
+    /*border-radius: 3px 0 0 3px;*/
+    outline: none;
+    transition: 500ms;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .input-city-text:focus {
+    border-color: #13E4A1;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .input-city-text:focus + .input-city-button{
+    border-color: #13E4A1;
+    background-color: #13E4A1;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .input-city-button {
+    background-color: #ffffff;
+    width: 50px;
+    font-size: 120%;
+    border: solid 1px #ffffff;
+    height: 50px;
+    outline: none;
+    /*border-radius: 0 3px 3px 0;*/
+    transition: 500ms;
+}
+
+.introduction-container {
+    text-align: center;
+    margin: 40px auto 40px auto;
+}
+
+.introduction-container .title {
+    display: inline-block;
+    margin: 0;
+}
+
+.introduction-container .subtitle {
+    margin: 0 0 20px 0;
+    font-size: 120%;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.popular-cities-container {
+    text-align: center;
+    margin: 40px auto 40px auto;
+}
+
+.popular-cities-container .title {
+    margin: 0;
+    display: inline-block;
+}
+
+.popular-cities-container .subtitle {
+    margin: 0 0 30px 0;
+    font-size: 120%;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+.popular-cities-container .popular-cities .popular-city {
+    background-image: url('/static/mytravelog/imgs/default/city-default.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /*background-color: darkgray;*/
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    border: 1px solid;
+    margin-bottom: 25px;
+    border-radius: 5px;
+    display: inline-block;
+    width: 100%;
+    text-decoration: none;
+}
+
+.popular-cities-container .popular-cities .popular-city .mask {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 55px 15px;
+    transition: 150ms;
+}
+
+.popular-cities-container .popular-cities .popular-city .mask:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.popular-cities-container .popular-cities .popular-city .city-name {
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    font-size: 140%;
+}
+
+.popular-cities-container .popular-cities .popular-city .country-name {
+    font-size: 90%;
+}

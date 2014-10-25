@@ -1,0 +1,81 @@
+{% extends 'mytravelog/master/base_main.html' %}
+{% load static %}
+
+{% block head_block %}
+    <title>Home - MyTravelog</title>
+    <link href="{% static 'mytravelog/css/home.css' %}" type="text/css" rel="stylesheet">
+{% endblock %}
+
+{% block body_block %}
+    <!-- Main jumbotron -->
+    <div class="jumbotron jumbotron-home">
+        <div class="mask">
+            <div class="title-and-search-container">
+                <h1 class="title">Weclome to MyTravelog</h1>
+                <div class="search">
+                    <form class="form-city-search">
+                        {% csrf_token %}
+                        <input class="input-city-text" id="city-text" name="term" placeholder="Where do you want to go?" autocomplete="off"><!--
+                        --><input class="input-city-button" id="city-submit" name="submit" value="GO" type="submit">
+                    </form>
+                    <p class="explore-popular-cities">Explore popular cities</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Introduction -->
+    <div class="container introduction-container">
+        <div class="row">
+            <h1 class="title">How it works</h1>
+            <p class="subtitle">Plan your next trip with MyTravelog</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4">
+                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <h2>Search</h2>
+                <p>Explore cities and get inspired my like-minded travellers</p>
+            </div><!-- /.col-lg-4 -->
+            <div class="col-lg-4">
+                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <h2>Plan</h2>
+                <p>Create wish lists with friends and family of places you visit in your next adventure</p>
+            </div><!-- /.col-lg-4 -->
+            <div class="col-lg-4">
+                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <h2>Share</h2>
+                <p>Log and share your beautiful travel moments to help others plan their trips</p>
+            </div><!-- /.col-lg-4 -->
+        </div><!-- /.row -->
+    </div>
+
+    <hr>
+
+    <!-- popular cities -->
+    <div class="container popular-cities-container">
+        <div class="row">
+            <h1 class="title">Popular Cities</h1>
+            <p class="subtitle">Explore the top cities of the work</p>
+        </div>
+        <div class="popular-cities">
+            <div class="row">
+                {% for city in popular_cities %}
+                    <div class="col-lg-4">
+                        <a href="/mytravelog/city/{{ city.url_name }}" class="popular-city">
+                            <div class="mask">
+                                <p class="city-name">{{ city.name }}</p>
+                                <p class="country-name">{{ city.country_name }}</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% if forloop.counter|divisibleby:3 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                {% endfor %}
+                </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
