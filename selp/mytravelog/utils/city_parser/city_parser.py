@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from django.utils.encoding import smart_str, smart_unicode
+from django.utils.encoding import smart_str
 import urllib
 import re
 import pickle
@@ -35,7 +35,11 @@ def get_city_stats():
             country_name = smart_str(columns[1].text)
             tourist_count = int(float(re.sub(r"[^a-zA-Z0-9\.]", '', smart_str(columns[3].text))) * 1000)
             growth = float(re.sub(r"[^a-zA-Z0-9\.-]", '', smart_str(columns[4].text)))
-            cities.append(City(name=name, url_name=url_name, country_name=country_name, tourist_count=tourist_count, tourist_growth=growth))
+            cities.append(City(name=name,
+                               url_name=url_name,
+                               country_name=country_name,
+                               tourist_count=tourist_count,
+                               tourist_growth=growth))
         return cities
     except Exception as e:
         print repr(e)
@@ -71,10 +75,10 @@ def get_city_info(cities, base_link):
 
 
 # serializes the provided list of cities in a file named filename, within the same directory
-def serialize(cities, fileName):
+def serialize(cities, file_name):
     outfile = None
     try:
-        info_path = os.path.join(os.path.dirname(__file__), fileName)
+        info_path = os.path.join(os.path.dirname(__file__), file_name)
         outfile = open(info_path, 'wb')
         pickle.dump(cities, outfile)
     except Exception as e:
@@ -84,10 +88,10 @@ def serialize(cities, fileName):
 
 
 # deserializes the list of cities from a file named filename, within the same directory
-def deserialize(fileName):
+def deserialize(file_name):
     infile = None
     try:
-        info_path = os.path.join(os.path.dirname(__file__), fileName)
+        info_path = os.path.join(os.path.dirname(__file__), file_name)
         infile = open(info_path, 'rb')
         cities = pickle.load(infile)
         return cities
