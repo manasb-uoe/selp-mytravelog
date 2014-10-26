@@ -1,0 +1,63 @@
+
+body {
+    background-color: #f2f2f2;
+}
+
+.form-container {
+    margin: 100px auto 50px auto;
+}
+
+.form-container .form-signin {
+    width: 600px;
+    /*box-shadow: 3px 3px 16px -5px rgba(0,0,0,0.75);*/
+    background-color: #ffffff;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.form-container .form-signin .title {
+    margin: 0;
+}
+
+.form-container .form-signin .divider {
+    border-color: #ccc;
+    margin: 15px 0 25px 0;
+}
+
+.form-container .form-signin .form-label {
+    display: inline-block;
+    color: #000;
+    text-align: right;
+    margin-right: 15px;
+    width: 20%;
+    font-weight: 500;
+}
+
+.form-container .form-signin .form-input {
+    display: inline-block;
+    width: 76%;
+    margin-top: 10px;
+}
+
+.form-container .form-signin .checkbox-terms {
+    padding-top: 10px;
+    float: right;
+}
+
+.form-container .form-signin .button-signup {
+    float: right;
+    clear: both;
+    background-color: #8ecf6c;
+    border: 2px solid #8ecf6c;
+    border-radius: 3px;
+    color: #ffffff;
+}
+
+.form-container .form-signin .button-signup:hover {
+    background-color: #71a556;
+    border-color: #71a556;
+}
