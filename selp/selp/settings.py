@@ -92,3 +92,6 @@ TEMPLATE_DIRS = (
     TEMPLATE_DIR,
 )
 
+# development static media server
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_DIR, 'media')
