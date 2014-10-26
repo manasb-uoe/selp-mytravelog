@@ -1,0 +1,47 @@
+
+.navbar-shadow {
+    box-shadow: 0 10px 10px -8px #a3a3a3;
+}
+
+.navbar-brand-custom {
+    color: gray !important;
+    font-size: 150%;
+    font-family: "Verdana";
+}
+
+.navbar .a-signin {
+    border: 2px solid #c2c9d4;
+    border-radius: 3px;
+    padding: 5px 15px;
+    margin: 9px 5px;
+}
+
+.navbar .a-signin:hover {
+    border-color: gray;
+}
+
+.navbar .a-signup {
+    background-color: #8ecf6c;
+    border: 2px solid #8ecf6c;
+    border-radius: 3px;
+    padding: 5px 15px;
+    margin: 9px 5px;
+    color: #ffffff !important;
+}
+
+.navbar .a-signup:hover {
+    background-color: #71a556 !important;
+    border-color: #71a556 !important;
+}
+
+.navbar .a-signup:focus {
+    background-color: #71a556 !important;
+}
+
+.footer-container .footer-divider {
+    border-color: #ccc;
+}
+
+.footer-container .footer-text {
+    display: inline-block;
+}
