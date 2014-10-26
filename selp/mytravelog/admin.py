@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import city
+from mytravelog.models import city, user_profile
+
 
 # Register your models here.
 admin.site.register(city.City)
+admin.site.register(user_profile.UserProfile)
