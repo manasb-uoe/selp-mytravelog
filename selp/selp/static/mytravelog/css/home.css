@@ -3,11 +3,11 @@
     height: 400px;
     margin: 0;
     padding: 50px 0 0 0 ;
-    /*background-image: url('/static/mytravelog/imgs/default/home-cover.jpg');*/
-    /*background-position: center center;*/
-    /*background-repeat: no-repeat;*/
-    /*background-size: cover;*/
-    background-image: -webkit-gradient(linear,left top,left bottom,from(#563d7c),to(#6f5499));
+    background-image: url('/static/mytravelog/imgs/default/sky-cover.jpg');
+    background-position: center 75%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /*background-image: -webkit-gradient(linear,left top,left bottom,from(#563d7c),to(#6f5499));*/
 }
 
 .jumbotron-home .mask {
@@ -16,7 +16,7 @@
     width: 100%;
     display: table;
     text-align: center;
-    /*background-color: rgba(0,0,0,0.1);*/
+    background-color: rgba(0,0,0,0.2);
 }
 
 .jumbotron-home .mask .title-and-search-container {
@@ -48,7 +48,7 @@
     height: 50px;
     width: 380px;
     padding: 10px;
-    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.3);
     font-size: 120%;
     color: #ffffff;
     border: solid 4px #ffffff;

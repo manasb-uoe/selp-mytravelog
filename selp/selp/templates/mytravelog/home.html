@@ -32,24 +32,24 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/search.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
                 <h2>Search</h2>
                 <p>Explore cities and get inspired my like-minded travellers</p>
             </div><!-- /.col-lg-4 -->
             <div class="col-lg-4">
-                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/plan.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
                 <h2>Plan</h2>
                 <p>Create wish lists with friends and family of places you visit in your next adventure</p>
             </div><!-- /.col-lg-4 -->
             <div class="col-lg-4">
-                <img class="img-circle" src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/share.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
                 <h2>Share</h2>
                 <p>Log and share your beautiful travel moments to help others plan their trips</p>
             </div><!-- /.col-lg-4 -->
         </div><!-- /.row -->
     </div>
 
-    <hr>
+    <hr class="divider">
 
     <!-- popular cities -->
     <div class="container popular-cities-container">
@@ -78,4 +78,8 @@
     </div>
     </div>
 
+{% endblock %}
+
+{% block load_js_block %}
+    <script src="{% static 'mytravelog/js/home.js' %}" type="application/javascript"></script>
 {% endblock %}
