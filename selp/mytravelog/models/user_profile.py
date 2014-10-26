@@ -13,4 +13,4 @@ class UserProfile(models.Model):
     profile_picture = models.ImageField(upload_to='mytravelog/profile_pictures', blank=True, default='/media/mytravelog/profile_pictures/default_profile_picture.png')
 
     def __unicode__(self):
-        return self.full_name
+        return self.user.username
