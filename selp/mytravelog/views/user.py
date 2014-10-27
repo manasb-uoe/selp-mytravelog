@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
@@ -83,6 +83,13 @@ def sign_in(request):
 
         return render(request, 'mytravelog/sign_in.html', data_dict)
 
+
+def sign_out(request):
+    if request.user.is_authenticated():
+        logout(request)
+        return HttpResponseRedirect('/mytravelog/')
+    else:
+        return HttpResponseRedirect('/mytravelog/sign_in')
 
 # ----------------------Helper functions------------------------
 
