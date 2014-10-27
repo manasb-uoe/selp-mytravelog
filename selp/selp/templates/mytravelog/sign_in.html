@@ -1,0 +1,32 @@
+{% extends 'mytravelog/master/base_main.html' %}
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/sign_in.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body_block %}
+    <div class="container form-container">
+        <form class="form-signin" method="POST" action="/mytravelog/sign_in/">
+            {% csrf_token %}
+            <h3 class="title">Sign in</h3>
+            <hr class="divider">
+
+            <div class="wrapper">
+                {% if error %}
+                    <div class="alert alert-danger alert-custom" role="alert"><strong>Error!</strong> {{ error }}</div>
+                {% endif %}
+
+                <label class="form-label" for="username">Username:</label>
+                <input type="text" class="form-control form-input" name="username" required="" value="{{ previous_post_data.username }}"/>
+
+                <label class="form-label" for="password">Password:</label>
+                <input type="password" class="form-control form-input" name="password" required="" pattern=".{6,50}" title="Must be at least 6 characters"/>
+
+                <button class="btn btn-sm button-signin" type="submit">Sign in</button>
+
+                <a class="create-account-text" href="/mytravelog/sign_up/">Need an account? Sign up here</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

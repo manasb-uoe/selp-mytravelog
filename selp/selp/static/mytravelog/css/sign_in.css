@@ -1,0 +1,77 @@
+
+body {
+    background-color: #f2f2f2;
+}
+
+.form-container {
+    margin: 100px auto 50px auto;
+}
+
+.form-container .form-signin {
+    width: 550px;
+    /*box-shadow: 3px 3px 16px -5px rgba(0,0,0,0.75);*/
+    background-color: #ffffff;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 30px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.form-container .form-signin .title {
+    margin: 0;
+}
+
+.form-container .form-signin .divider {
+    border-color: #ccc;
+    margin: 15px 0 25px 0;
+}
+
+.form-container .form-signin .wrapper {
+    overflow: hidden;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.form-container .form-signin .wrapper .alert-custom {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.form-container .form-signin .form-label {
+    display: inline-block;
+    color: #000;
+    text-align: right;
+    width: 15%;
+    margin-right: 8px;
+    font-weight: 500;
+}
+
+.form-container .form-signin .form-input {
+    display: inline-block;
+    width: 82%;
+    margin-top: 10px;
+}
+
+.form-container .form-signin .button-signin {
+    float: right;
+    margin-top: 10px;
+    display: block;
+    background-color: #8ecf6c;
+    border: 2px solid #8ecf6c;
+    border-radius: 3px;
+    color: #ffffff;
+}
+
+.form-container .form-signin .button-signin:hover {
+    background-color: #71a556;
+    border-color: #71a556;
+}
+
+.form-container .form-signin .create-account-text {
+    float: right;
+    clear: both;
+    display: inline-block;
+    padding-top: 10px;
+}
