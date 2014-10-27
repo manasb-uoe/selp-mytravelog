@@ -14,11 +14,11 @@ def sign_up(request):
         data_dict = {}
         if request.method == "POST":
             post_data = request.POST
-            first_name = post_data.get('first_name', None)
-            last_name = post_data.get('last_name', None)
-            email = post_data.get('email', None)
-            username = post_data.get('username', None)
-            password = post_data.get('password', None)
+            first_name = post_data.get('first_name', "")
+            last_name = post_data.get('last_name', "")
+            email = post_data.get('email', "")
+            username = post_data.get('username', "")
+            password = post_data.get('password', "")
             profile_picture = request.FILES.get('profile_picture', None)
 
             # validate user input
@@ -54,7 +54,38 @@ def sign_up(request):
         return render(request, 'mytravelog/sign_up.html', data_dict)
 
 
+def sign_in(request):
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/mytravelog/')
+    else:
+        data_dict = {}
+        if request.method == "POST":
+            post_data = request.POST
+            username = post_data.get('username', "")
+            password = post_data.get('password', "")
+            # validate user input
+            if len(username) == 0:
+                data_dict['error'] = "Username is required"
+            elif len(password) == 0:
+                data_dict['error'] = "Password is required"
+            else:
+                data_dict['previous_post_data'] = post_data
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    if user.is_active:
+                        # now, sign in in the user
+                        login(request, user)
+                        return HttpResponseRedirect('/mytravelog/')
+                    else:
+                        data_dict['error'] = "Your account is disabled"
+                else:
+                    data_dict['error'] = "Incorrect username or password"
+
+        return render(request, 'mytravelog/sign_in.html', data_dict)
+
+
 # ----------------------Helper functions------------------------
+
 def validate_sign_up_form(first_name, last_name, email, username, password):
     if len(first_name) == 0:
         return "First name is required"
