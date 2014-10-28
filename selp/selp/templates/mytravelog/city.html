@@ -53,7 +53,7 @@
     <div class="container main-city-container">
         <div class="col-lg-3">
             <div class="country-flag-container">
-                <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:requested_city.country_name_url|add:'.jpg' %}">
+                <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:requested_city.country_url_name|add:'.jpg' %}">
             </div>
             <p class="city-name">{{ requested_city.name }}</p>
             <p class="country-name">{{ requested_city.country_name }}</p>
