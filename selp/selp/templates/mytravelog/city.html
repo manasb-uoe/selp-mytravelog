@@ -1,0 +1,71 @@
+{% extends 'mytravelog/master/base_main.html' %}
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/city.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body_block %}
+    <!-- Main jumbotron -->
+    <div class="jumbotron jumbotron-home">
+        <div class="mask">
+            <div class="name-container">
+                <h1 class="city-name">{{ requested_city.name }}</h1>
+                <p class="country-name">{{ requested_city.country_name }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- stats container -->
+    <div class="stats-bar">
+        <div class="container">
+            <div class="col-lg-3">
+                <div class="row">
+
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="stats-container">
+                        <div class="stat">
+                            <p class="stat-name">Rank</p>
+                            <p class="stat-value">4</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-name">Tourists in 2012</p>
+                            <p class="stat-value">{{ requested_city.tourist_count }}M</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-name">Growth since 2011</p>
+                            <p class="stat-value">{{ requested_city.tourist_growth }}%</p>
+                        </div>
+                        <div class="stat">
+                            <p class="stat-name">Logs</p>
+                            <p class="stat-value">15</p>
+                        </div>
+                        <button class="btn btn-primary add-to-wishlist-button">Add to Wishlist</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container main-city-container">
+        <div class="col-lg-3">
+            <div class="country-flag-container">
+                <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:requested_city.country_name_url|add:'.jpg' %}">
+            </div>
+            <p class="city-name">{{ requested_city.name }}</p>
+            <p class="country-name">{{ requested_city.country_name }}</p>
+        </div>
+        <div class="col-lg-9">
+            <div class="row">
+                <div class="info-container">
+                    <p class="title">Information</p>
+                    <p class="info-text">{{ requested_city.description }}</p>
+                </div>
+            </div>
+            <!-- logs container will go here -->
+        </div>
+    </div>
+{% endblock %}

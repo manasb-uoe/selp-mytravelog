@@ -1,0 +1,140 @@
+body {
+    background-color: #f5f8fa;
+}
+
+.jumbotron-home {
+    height: 400px;
+    margin: 0;
+    padding: 50px 0 0 0 ;
+    background-image: url('/static/mytravelog/imgs/default/city-default.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.jumbotron-home .mask {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.jumbotron-home .mask .name-container {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.jumbotron-home .mask .name-container .city-name {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    font-size: 300%;
+    margin: 0;
+    padding-bottom: 5px;
+}
+
+.jumbotron-home .mask .name-container .country-name {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    font-size: 140%;
+}
+
+.stats-bar {
+    border-bottom: 1px solid #e1e8ed;
+    height: 60px;
+    background-color: #ffffff;
+    position: relative;
+}
+
+.stats-bar .stats-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.stats-bar .stats-container .stat {
+    height: 100%;
+    padding: 10px 15px;
+    display: inline-block;
+}
+
+.stats-bar .stats-container .stat .stat-name {
+    margin: 0;
+    color: #66757f;
+    font-size: 80%;
+    text-transform: uppercase;
+}
+
+.stats-bar .stats-container .stat .stat-value {
+    margin: 0;
+    color: #0084B4;
+    font-size: 120%;
+}
+
+.stats-bar .stats-container .add-to-wishlist-button {
+    height: 100%;
+    display: inline-block;
+    float: right;
+    margin-top: 12px;
+}
+
+.main-city-container {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.main-city-container .info-container {
+    margin-top: 15px;
+}
+
+.main-city-container .info-container .title {
+    margin: 0 0 10px 5px;
+    font-size: 110%;
+    color: #66757f;
+    display: inline-block;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.main-city-container .info-container .info-text {
+    background-color: #ffffff;
+    border: 1px solid #e1e8ed;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.main-city-container .info-container .divider {
+    margin: 15px 0;
+}
+
+.main-city-container .country-flag-container {
+    border: 5px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 1px rgba(136,153,166,0.15);
+    height: 150px;
+    width: 200px;
+    margin-top: -150px;
+}
+
+.main-city-container .country-flag-container .country-flag {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.main-city-container .city-name {
+    font-size: 170%;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+}
+
+.main-city-container .country-name {
+    font-size: 120%;
+    margin-top: -5px;
+    padding: 0;
+}
+
+.main-city-container .test-container {
+    width: 600px;
+    margin-top: 20px;
+}
