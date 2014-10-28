@@ -20,7 +20,8 @@ if __name__ == "__main__":
         City.objects.create(name=city.name,
                             url_name=city.url_name,
                             country_name=city.country_name,
+                            country_url_name=city.country_url_name,
                             tourist_count=city.tourist_count,
                             tourist_growth=city.tourist_growth,
-                            description = city.info)
+                            description=city.info)
     print "End of city population script."

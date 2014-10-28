@@ -33,11 +33,13 @@ def get_city_stats():
             else:
                 url_name = re.sub(r'\s', '_', name)
             country_name = smart_str(columns[1].text)
+            country_url_name = re.sub(r'\s', "_", country_name)
             tourist_count = int(float(re.sub(r"[^a-zA-Z0-9\.]", '', smart_str(columns[3].text))) * 1000)
             growth = float(re.sub(r"[^a-zA-Z0-9\.-]", '', smart_str(columns[4].text)))
             cities.append(City(name=name,
                                url_name=url_name,
                                country_name=country_name,
+                               country_url_name=country_url_name,
                                tourist_count=tourist_count,
                                tourist_growth=growth))
         return cities
@@ -66,7 +68,7 @@ def get_city_info(cities, base_link):
                     if len(p_text.split(" ")) > 15:  # only consider paragraphs with more than 15 words
                         info += p_text
             city.info = info
-            print city.name
+            print city.name + ", " + city.country_url_name
         return cities
     except Exception as e:
         print repr(e)
