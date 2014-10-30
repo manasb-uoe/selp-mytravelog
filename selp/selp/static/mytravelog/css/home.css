@@ -2,26 +2,23 @@
 .jumbotron-home {
     height: 400px;
     margin: 0;
-    padding: 50px 0 0 0 ;
-    background-image: url('/static/mytravelog/imgs/default/sky-cover.jpg');
-    background-position: center 75%;
+    padding: 0;
+    background-image: url('/static/mytravelog/imgs/default/home-cover.jpg');
+    background-position: center 30%;
     background-repeat: no-repeat;
     background-size: cover;
-    /*background-image: -webkit-gradient(linear,left top,left bottom,from(#563d7c),to(#6f5499));*/
 }
 
 .jumbotron-home .mask {
-    margin: 0;
+    margin: 53px 0 0 0;
+    padding-top: 60px;
     height: 100%;
     width: 100%;
-    display: table;
     text-align: center;
     background-color: rgba(0,0,0,0.2);
 }
 
 .jumbotron-home .mask .title-and-search-container {
-    display: table-cell;
-    vertical-align: middle;
 }
 
 .jumbotron-home .mask .title-and-search-container .title {
@@ -44,17 +41,28 @@
     color: #13E4A1;
 }
 
+.jumbotron-home .mask .title-and-search-container .form-city-search {
+    height: 60px;
+    width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .jumbotron-home .mask .title-and-search-container .form-city-search .input-city-text {
-    height: 50px;
-    width: 380px;
-    padding: 10px;
-    background-color: rgba(0, 0, 0, 0.3);
-    font-size: 120%;
-    color: #ffffff;
-    border: solid 4px #ffffff;
-    /*border-radius: 3px 0 0 3px;*/
-    outline: none;
     transition: 500ms;
+    width: 88%;
+    height: 100%;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    background-image: url('/static/mytravelog/imgs/default/icon_airplane.png');
+    background-size: 28px 28px;
+    background-position: 15px 12px;
+    background-repeat: no-repeat;
+    padding-left: 58px;
+    font-size: 140%;
+    color: #ffffff;
+    border: solid 5px #ffffff;
+    outline: none;
 }
 
 .jumbotron-home .mask .title-and-search-container .form-city-search .input-city-text:focus {
@@ -67,14 +75,49 @@
 }
 
 .jumbotron-home .mask .title-and-search-container .form-city-search .input-city-button {
+    transition: 500ms;
     background-color: #ffffff;
-    width: 50px;
-    font-size: 120%;
-    border: solid 1px #ffffff;
-    height: 50px;
+    width: 12%;
+    height: 100%;
+    font-size: 140%;
+    border: solid 5px #ffffff;
     outline: none;
     /*border-radius: 0 3px 3px 0;*/
-    transition: 500ms;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .autocomplete-suggestions-container {
+    z-index: 9000;
+    width: 85%;
+    box-shadow: 10px 10px 13px -5px rgba(0,0,0,0.36);
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search  .suggestion-light {
+    transition: 200ms;
+    background-color: #0FB680;
+    padding: 10px;
+    text-align: left;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    font-size: 120%;
+    position: relative;
+    cursor: pointer;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .suggestion-dark {
+    transition: 200ms;
+    background-color: #0da373;
+    padding: 10px;
+    font-size: 120%;
+    text-align: left;
+    text-shadow: 0 0 20px rgba(0,0,0,.5);
+    position: relative;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.jumbotron-home .mask .title-and-search-container .form-city-search .suggestion-light:hover,
+.jumbotron-home .mask .title-and-search-container .form-city-search .suggestion-dark:hover {
+    background-color: #13E4A1;
 }
 
 .introduction-container {
@@ -91,6 +134,11 @@
     margin: 0 0 20px 0;
     font-size: 120%;
     color: rgba(0, 0, 0, 0.7);
+}
+
+.introduction-container .intro-image {
+    width: 140px;
+    height: 140px;
 }
 
 .popular-cities-container {

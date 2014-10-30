@@ -17,6 +17,7 @@
                         {% csrf_token %}
                         <input class="input-city-text" id="city-text" name="term" placeholder="Where do you want to go?" autocomplete="off"><!--
                         --><input class="input-city-button" id="city-submit" name="submit" value="GO" type="submit">
+                        <div class="autocomplete-suggestions-container"></div>
                     </form>
                     <p class="explore-popular-cities">Explore popular cities</p>
                 </div>
@@ -32,17 +33,17 @@
         </div>
         <div class="row">
             <div class="col-lg-4">
-                <img src="{% static 'mytravelog/imgs/default/search.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/search.PNG' %}" alt="Generic placeholder image" class="intro-image">
                 <h2>Search</h2>
                 <p>Explore cities and get inspired my like-minded travellers</p>
             </div><!-- /.col-lg-4 -->
             <div class="col-lg-4">
-                <img src="{% static 'mytravelog/imgs/default/plan.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/plan.PNG' %}" alt="Generic placeholder image" class="intro-image">
                 <h2>Plan</h2>
                 <p>Create wish lists with friends and family of places you visit in your next adventure</p>
             </div><!-- /.col-lg-4 -->
             <div class="col-lg-4">
-                <img src="{% static 'mytravelog/imgs/default/share.PNG' %}" alt="Generic placeholder image" style="width: 140px; height: 140px;">
+                <img src="{% static 'mytravelog/imgs/default/share.PNG' %}" alt="Generic placeholder image" class="intro-image">
                 <h2>Share</h2>
                 <p>Log and share your beautiful travel moments to help others plan their trips</p>
             </div><!-- /.col-lg-4 -->
