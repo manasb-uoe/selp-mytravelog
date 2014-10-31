@@ -1,0 +1,72 @@
+{% extends 'mytravelog/master/base_main.html' %}
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/search.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{%  block body_block %}
+    <div class="container search-container">
+        <form class="search-form" action="/mytravelog/search/">
+            <input class="input-search" type="text" name="query" placeholder="Search" value="{{ query }}">
+            <button class="button-search" type="submit"><img class="image-search" src="{% static 'mytravelog/imgs/default/icon_search_2.png' %}"></button>
+            <p class="results-count-text">{{ results_count }} results for <span style="font-weight: bold">{{ query }}</span>:</p>
+        </form>
+        <div class="results-container">
+            {% if cities|length != 0 %}
+                <p class="results-title">Cities</p>
+                <hr class="divider">
+                <div class="city-results">
+                    <div class="row">
+                        {% for city in cities %}
+                            <div class="col-lg-4">
+                                <a href="/mytravelog/city/{{ city.url_name }}" class="city">
+                                    <div class="mask">
+                                        <p class="city-name">{{ city.name }}</p>
+                                        <p class="country-name">{{ city.country_name }}</p>
+                                    </div>
+                                </a>
+                            </div>
+                            {% if forloop.counter|divisibleby:3 %}
+                                </div>
+                                <div class="row">
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                </div>
+            {% endif %}
+
+            {% if user_profiles|length != 0 %}
+                <p class="results-title">People</p>
+                <hr class="divider">
+                <div class="user-results">
+                    <div class="row">
+                        {% for user_profile in user_profiles %}
+                            <div class="col-lg-4">
+                                <div class="user">
+                                    <div class="cover-picture"></div>
+                                    <div class="info-container">
+                                        <div class="profile-picture-container">
+                                            <img class="profile-picture" src="{{ user_profile.profile_picture.url }}">
+                                        </div>
+
+                                        <a href="/mytravelog/user/{{ user_profile.user.username }}" class="full-name">{{ user_profile.user.get_full_name }}</a>
+                                        <button class="btn btn-default follow-button">Follow</button>
+                                        <br>
+                                        <a href="/mytravelog/user/{{ user_profile.user.username }}" class="username">@{{ user_profile.user.username }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% if forloop.counter|divisibleby:3 %}
+                                </div>
+                                <div class="row">
+                            {% endif %}
+                        {% endfor %}
+                        </div>
+                </div>
+            {% endif %}
+            {% if user_profiles|length == 0 and cities|length == 0 %}
+                <p class="no-results-text">No results found</div>
+            {% endif %}
+    </div>
+{% endblock %}
