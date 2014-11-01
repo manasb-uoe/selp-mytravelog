@@ -125,6 +125,9 @@ body {
     background-color: #0084b4;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
 }
 
 .search-container .results-container .user-results .user .info-container {

@@ -44,7 +44,7 @@
                         {% for user_profile in user_profiles %}
                             <div class="col-lg-4">
                                 <div class="user">
-                                    <div class="cover-picture"></div>
+                                    <div class="cover-picture" style="background-image: url({{ user_profile.cover_picture.url }})"></div>
                                     <div class="info-container">
                                         <div class="profile-picture-container">
                                             <img class="profile-picture" src="{{ user_profile.profile_picture.url }}">
