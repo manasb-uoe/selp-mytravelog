@@ -14,12 +14,14 @@ def sign_up(request):
         data_dict = {}
         if request.method == "POST":
             post_data = request.POST
+            file_data = request.FILES
             first_name = post_data.get('first_name', "")
             last_name = post_data.get('last_name', "")
             email = post_data.get('email', "")
             username = post_data.get('username', "")
             password = post_data.get('password', "")
-            profile_picture = request.FILES.get('profile_picture', None)
+            profile_picture = file_data.get('profile_picture', None)
+            cover_picture = file_data.get('cover_picture', None)
 
             # validate user input
             error = validate_sign_up_form(first_name, last_name, email, username, password)
@@ -41,6 +43,8 @@ def sign_up(request):
                 new_user_profile.total_score = 0
                 if profile_picture is not None:
                     new_user_profile.profile_picture = profile_picture
+                if cover_picture is not None:
+                    new_user_profile.cover_picture = cover_picture
                 new_user_profile.user = new_user
                 new_user_profile.save()
 
