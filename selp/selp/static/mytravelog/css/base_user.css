@@ -1,0 +1,101 @@
+
+/*----------------base_user----------------*/
+body {
+    background-color: #f5f8fa;
+}
+
+.cover-picture {
+    height: 350px;
+    margin: 0;
+    padding: 50px 0 0 0 ;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.tabs-bar {
+    border-bottom: 1px solid #e1e8ed;
+    height: 60px;
+    background-color: #ffffff;
+    position: relative;
+}
+
+.tabs-bar .tabs-container {
+    height: 60px;
+    overflow: hidden;
+    position: relative;
+}
+
+.tabs-bar .tabs-container .tab {
+    height: 60px;
+    padding: 12px 15px;
+    display: inline-block;
+    cursor: pointer;
+    text-align: center;
+    box-sizing: border-box;
+    border-bottom: none;
+    text-decoration: none;
+    transition: all .15s ease-in-out;
+}
+
+.tabs-bar .tabs-container .tab:hover,
+.tabs-bar .tabs-container .tab-active {
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+    border-bottom-color: #0084B4;
+}
+
+.tabs-bar .tabs-container .tab .tab-name {
+    margin: 0;
+    color: #66757f;
+    font-size: 85%;
+    text-transform: uppercase;
+}
+
+.tabs-bar .tabs-container .tab .count {
+    margin: -2px;
+    color: #0084B4;
+    font-size: 130%;
+}
+
+.tabs-bar .tabs-container .edit-profile-button {
+    display: inline-block;
+    float: right;
+    margin-top: 12px;
+}
+
+.main-user-container {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.main-user-container .profile-picture-container {
+    border: 5px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 1px rgba(136,153,166,0.15);
+    height: 200px;
+    width: 200px;
+    margin-top: -180px;
+}
+
+.main-user-container .profile-picture-container .profile-picture {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.main-user-container .full-name {
+    font-size: 150%;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+}
+
+.main-user-container .username {
+    font-size: 110%;
+    margin-top: -5px;
+    color: gray;
+    padding: 0;
+}
+
+/*----------------user_albums----------------*/
+
