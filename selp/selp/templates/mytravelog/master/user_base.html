@@ -73,5 +73,9 @@
 {% endblock %}
 
 {% block load_js_block %}
+    <!-- gloval vars -->
+    <script type="application/javascript">
+        var csrf_token = "{{ csrf_token }}";
+    </script>
     <script src="{% static 'mytravelog/js/user.js' %}" type="application/javascript"></script>
 {% endblock %}
