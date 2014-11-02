@@ -97,5 +97,77 @@ body {
     padding: 0;
 }
 
+/*----------------popup----------------*/
+.form-container {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-container .error-container {
+    display: none;
+    padding: 10px;
+}
+
+.modal-footer-wrapper {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal-footer-wrapper .button-negative {
+    width: 15%;
+}
+
+.modal-footer-wrapper .button-positive {
+    width: 15%;
+}
 /*----------------user_albums----------------*/
 
+.button-add-album {
+    margin-top: 15px;
+    width: 200px;
+}
+
+.albums-container .custom-column {
+    margin-bottom: 20px;
+}
+
+.albums-container .album {
+    width: 100%;
+    height: 190px;
+    display: inline-block;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.albums-container .album .cover-picture {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border-radius: 5px;
+}
+
+.albums-container .album .cover-picture .mask {
+    width: 100%;
+    height: 100%;
+    transition: 150ms;
+}
+
+.albums-container .album .cover-picture .mask:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.albums-container .album .name {
+    margin: 10px 0 0 0;
+    color: #000000;
+    font-weight: bold;
+}
+
+.albums-container .album .duration {
+    margin: 0;
+    color: gray;
+}

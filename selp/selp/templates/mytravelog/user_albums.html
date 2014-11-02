@@ -1,0 +1,68 @@
+{% extends 'mytravelog/master/user_base.html' %}
+{% load static %}
+
+{% block left_column_block %}
+    {% if authenticated_to_edit_profile %}
+        <button class="btn btn-primary button-add-album">Add new album</button>
+    {% endif %}
+{% endblock %}
+
+{% block right_column_block %}
+    <div class="albums-container">
+        <div class="row">
+            {% for album in requested_user_albums %}
+                <div class="col-lg-4 custom-column">
+                    <a class="album">
+                        <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
+                            <div class="mask"></div>
+                        </div>
+                        <p class="name">{{ album.name }}</p>
+                        <p class="duration">{{ album.duration }} days</p>
+                    </a>
+                </div>
+                {% if forloop.counter|divisibleby:3%}
+                    </div>
+                    <div class="row">
+                {% endif %}
+            {% endfor %}
+            </div>
+    </div>
+{% endblock %}
+
+{% block popup_block %}
+    <div class="modal fade" id="add-album-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Add new album</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-container form-group" id="add-album-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="alert alert-danger error-container" id="error-container-album-modal"></div>
+
+                        <label class="form-label" for="name">Name*</label>
+                        <input class="form-control form-input" name="name" type="text" autofocus="" required="" placeholder="Enter the name of the album">
+                        <br>
+                        <label class="form-label" for="start_date">Start date*</label>
+                        <input class="form-control form-input" name="start_date" type="date" min="1900-01-01" max="9000-12-31" required="">
+                        <br>
+                        <label class="form-label" for="end_date">End date*</label>
+                        <input class="form-control form-input" name="end_date" type="date" min="1900-01-01" max="9000-12-31" required="">
+                        <br>
+                        <label class="form-label" for="cover_picture">Cover picture</label>
+                        <input class="form-control form-input" name="cover_picture" type="file">
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-wrapper">
+                        <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
+                        <button type="submit" form="add-album-form" class="btn btn-primary button-positive">Add</button>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
