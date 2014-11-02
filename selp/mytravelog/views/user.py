@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from mytravelog.models.album import Album
 from mytravelog.models.user_profile import UserProfile
 
 __author__ = 'Manas'
@@ -95,6 +96,20 @@ def sign_out(request):
     else:
         return HttpResponseRedirect('/mytravelog/sign_in')
 
+
+def show_user_albums(request, username):
+    data_dict = get_permissions(username, request.user)
+
+    # get user albums and attach duration to each album
+    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
+    for album in requested_user_albums:
+        duration = (album.end_date - album.start_date).days
+        album.duration = duration
+    data_dict['requested_user_albums'] = requested_user_albums
+
+    return render(request, 'mytravelog/user_albums.html', data_dict)
+
+
 # ----------------------Helper functions------------------------
 
 def validate_sign_up_form(first_name, last_name, email, username, password):
@@ -120,3 +135,27 @@ def validate_sign_up_form(first_name, last_name, email, username, password):
         return "That username is not available"
     return None
 
+
+def get_permissions(username, current_user):
+    # get requested user and user profile
+    requested_user = get_object_or_404(User, username=username)
+    requested_user_profile = UserProfile.objects.get(user=requested_user)
+
+    # get permissions
+    authenticated_to_edit_profile = False
+    if current_user.is_authenticated():
+        if current_user.username == requested_user.username:
+            authenticated_to_edit_profile = True
+
+    # get current user profile only if authenticated
+    current_user_profile = None
+    if authenticated_to_edit_profile:
+        current_user_profile = get_object_or_404(UserProfile, user=current_user)
+
+    # load all the required data and permissions into a dict
+    data_dict = {'requested_user': requested_user,
+                 'requested_user_profile': requested_user_profile,
+                 'authenticated_to_edit_profile': authenticated_to_edit_profile,
+                 'current_user_profile': current_user_profile}
+
+    return data_dict
