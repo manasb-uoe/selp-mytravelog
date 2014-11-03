@@ -97,7 +97,7 @@ body {
     padding: 0;
 }
 
-/*----------------popup----------------*/
+/*----------------popups----------------*/
 .form-container {
     width: 90%;
     margin-left: auto;
@@ -116,11 +116,11 @@ body {
 }
 
 .modal-footer-wrapper .button-negative {
-    width: 15%;
+    width: 20%;
 }
 
 .modal-footer-wrapper .button-positive {
-    width: 15%;
+    width: 20%;
 }
 /*----------------user_albums----------------*/
 
@@ -156,6 +156,54 @@ body {
     height: 100%;
     transition: 150ms;
 }
+
+.albums-container .album .cover-picture .mask .overflow-button {
+    background-image: url('/static/mytravelog/imgs/default/overflow_light.png');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+}
+
+.albums-container .album .cover-picture .mask .overflow-button:hover + .album-dropdown-container {
+    display: inherit;
+}
+
+.albums-container .album .cover-picture .mask .album-dropdown-container {
+    display: none;
+    width: 150px;
+    position: absolute;
+    top: 32px;
+    right: 0;
+}
+
+.albums-container .album .cover-picture .mask .album-dropdown-container:hover {
+    display: inherit;
+}
+
+.albums-container .album .cover-picture .mask .album-dropdown-menu {
+    background-color: #ffffff;
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    margin-top: 5px;
+}
+
+.albums-container .album .cover-picture .mask .album-dropdown-item {
+    color: #000000;
+    margin: 0;
+    padding: 5px 15px;
+}
+
+.albums-container .album .cover-picture .mask .album-dropdown-item:hover {
+    color: #ffffff;
+    margin: 0;
+    background-color: #428bca;
+    padding: 5px 15px;
+}
+
 
 .albums-container .album .cover-picture .mask:hover {
     background-color: rgba(0, 0, 0, 0.2);

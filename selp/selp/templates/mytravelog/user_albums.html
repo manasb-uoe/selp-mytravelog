@@ -12,9 +12,18 @@
         <div class="row">
             {% for album in requested_user_albums %}
                 <div class="col-lg-4 custom-column">
-                    <a class="album">
+                    <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}">
                         <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
-                            <div class="mask"></div>
+                            <div class="mask">
+                                <div class="overflow-button"></div>
+                                <div class="album-dropdown-container">
+                                    <div class="album-dropdown-menu">
+                                        <p class="album-dropdown-item album-dropdown-item-view">View</p>
+                                        <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
+                                        <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <p class="name">{{ album.name }}</p>
                         <p class="duration">{{ album.duration }} days</p>
@@ -30,26 +39,26 @@
 {% endblock %}
 
 {% block popup_block %}
-    <div class="modal fade" id="add-album-modal">
+    <div class="modal fade" id="add-or-edit-album-modal">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title">Add new album</h4>
+                    <h4 class="modal-title" id="add-or-edit-album-modal-title">Add new album</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-container form-group" id="add-album-form" enctype="multipart/form-data">
+                    <form class="form-container form-group" id="add-or-edit-album-modal-form" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <div class="alert alert-danger error-container" id="error-container-album-modal"></div>
+                        <div class="alert alert-danger error-container" id="add-or-edit-album-modal-error-container"></div>
 
                         <label class="form-label" for="name">Name*</label>
-                        <input class="form-control form-input" name="name" type="text" autofocus="" required="" placeholder="Enter the name of the album">
+                        <input class="form-control form-input" id="add-or-edit-album-modal-name-input" name="name" type="text" autofocus="" required="" placeholder="Enter the name of the album">
                         <br>
                         <label class="form-label" for="start_date">Start date*</label>
-                        <input class="form-control form-input" name="start_date" type="date" min="1900-01-01" max="9000-12-31" required="">
+                        <input class="form-control form-input" id="add-or-edit-album-modal-start-date-input" name="start_date" type="date" min="1900-01-01" max="9000-12-31" required="">
                         <br>
                         <label class="form-label" for="end_date">End date*</label>
-                        <input class="form-control form-input" name="end_date" type="date" min="1900-01-01" max="9000-12-31" required="">
+                        <input class="form-control form-input" id="add-or-edit-album-modal-end-date-input" name="end_date" type="date" min="1900-01-01" max="9000-12-31" required="">
                         <br>
                         <label class="form-label" for="cover_picture">Cover picture</label>
                         <input class="form-control form-input" name="cover_picture" type="file">
@@ -59,7 +68,7 @@
                 <div class="modal-footer">
                     <div class="modal-footer-wrapper">
                         <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
-                        <button type="submit" form="add-album-form" class="btn btn-primary button-positive">Add</button>
+                        <button type="submit" form="add-or-edit-album-modal-form" class="btn btn-primary button-positive" id="add-or-edit-album-modal-submit-button">Add</button>
                     </div>
                 </div>
             </div><!-- /.modal-content -->
