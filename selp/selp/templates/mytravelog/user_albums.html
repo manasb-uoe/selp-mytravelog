@@ -15,14 +15,15 @@
                     <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}">
                         <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
                             <div class="mask">
-                                <div class="overflow-button"></div>
-                                <div class="album-dropdown-container">
-                                    <div class="album-dropdown-menu">
-                                        <p class="album-dropdown-item album-dropdown-item-view">View</p>
-                                        <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
-                                        <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+                                {% if authenticated_to_edit_profile %}
+                                    <div class="overflow-button"></div>
+                                    <div class="album-dropdown-container">
+                                        <div class="album-dropdown-menu">
+                                            <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
+                                            <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+                                        </div>
                                     </div>
-                                </div>
+                                {% endif %}
                             </div>
                         </div>
                         <p class="name">{{ album.name }}</p>
@@ -70,6 +71,26 @@
                         <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
                         <button type="submit" form="add-or-edit-album-modal-form" class="btn btn-primary button-positive" id="add-or-edit-album-modal-submit-button">Add</button>
                     </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" id="delete-album-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Delete album</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger error-container" id="delete-album-modal-error-container"></div>
+                    <p>Are you sure you want to delete the following album:</p>
+                    <p id="delete-album-modal-album-name"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger button-positive" id="delete-album-modal-submit-button">Delete</button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->

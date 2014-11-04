@@ -104,7 +104,7 @@ body {
     margin-right: auto;
 }
 
-.form-container .error-container {
+.error-container {
     display: none;
     padding: 10px;
 }
@@ -122,6 +122,11 @@ body {
 .modal-footer-wrapper .button-positive {
     width: 20%;
 }
+
+#delete-album-modal-album-name {
+    font-weight: bold;
+}
+
 /*----------------user_albums----------------*/
 
 .button-add-album {
