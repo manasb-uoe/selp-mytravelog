@@ -15,7 +15,7 @@ function handleTabNavigation() {
 //--------------------Albums------------------------
 
 function handleAlbums() {
-    var selectors = {
+    var AddOrEditAlbumSelectors = {
         form: $('#add-or-edit-album-modal-form'),
         errorContainer: $('#add-or-edit-album-modal-error-container'),
         modalTitle: $('#add-or-edit-album-modal-title'),
@@ -27,7 +27,7 @@ function handleAlbums() {
     };
 
     $('.button-add-album').click(function () {
-        showAddOrEditAlbumModal(selectors, 'Add new album', '', '', '', 'Add', '/mytravelog/album/create/');
+        showAddOrEditAlbumModal(AddOrEditAlbumSelectors, 'Add new album', '', '', '', 'Add', '/mytravelog/album/create/');
     });
 
     $('.album-dropdown-item-edit').click(function () {
@@ -38,12 +38,22 @@ function handleAlbums() {
         var startDate = album.attr('data-start-date');
         var endDate = album.attr('data-end-date');
 
-        showAddOrEditAlbumModal(selectors, 'Edit album', name, startDate, endDate, 'Save', '/mytravelog/album/update/' + id + '/');
+        showAddOrEditAlbumModal(AddOrEditAlbumSelectors, 'Edit album', name, startDate, endDate, 'Save', '/mytravelog/album/update/' + id + '/');
     });
 
-    selectors.form.submit(function (event) {
-        event.preventDefault();
-        submitAddOrEditAlbumForm($(this), selectors.form.attr('action'), selectors.errorContainer);
+    var deleteAlbumSelectors = {
+        albumName:  $('#delete-album-modal-album-name'),
+        submitButton: $('#delete-album-modal-submit-button'),
+        errorContainer: $('#delete-album-modal-error-container'),
+        modal: $('#delete-album-modal')
+    };
+
+    $('.album-dropdown-item-delete').click(function () {
+        //get all data about the selected album
+        var album = $(this).parents('.album');
+        var id = album.attr('data-id');
+        var name = album.children('.name').text();
+        showDeleteAlbumModal(deleteAlbumSelectors, id, name);
     });
 }
 
@@ -57,11 +67,17 @@ function showAddOrEditAlbumModal(selectors, modalTitle, name, startDate, endDate
     selectors.submitButton.text(submitButtonText);
     selectors.form.attr('action', action);
     selectors.modal.modal();
+
+    selectors.form.submit(function (event) {
+        event.preventDefault();
+        submitAddOrEditAlbumForm($(this), selectors.form.attr('action'), selectors.errorContainer);
+    });
 }
 
 function submitAddOrEditAlbumForm (form, url, errorContainer) {
-    //clear existing errors
+    //clear and hide existing errors
     errorContainer.empty();
+    errorContainer.hide();
 
     //get form data
     var formData = new FormData(form[0]);                  //get reference of the form DOM element
@@ -90,6 +106,41 @@ function submitAddOrEditAlbumForm (form, url, errorContainer) {
     });
 }
 
+function showDeleteAlbumModal(selectors, id, name) {
+    selectors.albumName.text(name);
+    selectors.modal.modal();
+
+    selectors.submitButton.click(function () {
+        submitDeleteAlbumRequest(selectors.errorContainer, id);
+    });
+}
+
+function submitDeleteAlbumRequest(errorContainer, id) {
+    //clear and hide existing errors
+    errorContainer.empty();
+    errorContainer.hide();
+
+    $.ajax({
+        url: '/mytravelog/album/delete/' + id + '/',
+        type: "POST",
+        dataType: "json",
+        data: {
+            album_id: id,
+            csrfmiddlewaretoken: csrf_token
+        },
+        success: function (response) {
+            var redirect_to = response['redirect_to'];
+            var error_message = response['error'];
+            if (redirect_to != null) {
+                window.location.href = redirect_to;
+            }
+            else {
+                errorContainer.append('<strong>Error! </strong>' + error_message);
+                errorContainer.show();
+            }
+        }
+    });
+}
 
 //--------------------Function calls go here------------------------
 
