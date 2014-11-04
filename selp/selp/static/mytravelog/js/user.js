@@ -68,7 +68,7 @@ function showAddOrEditAlbumModal(selectors, modalTitle, name, startDate, endDate
     selectors.form.attr('action', action);
     selectors.modal.modal();
 
-    selectors.form.submit(function (event) {
+    selectors.form.unbind().submit(function (event) {
         event.preventDefault();
         submitAddOrEditAlbumForm($(this), selectors.form.attr('action'), selectors.errorContainer);
     });
@@ -110,7 +110,7 @@ function showDeleteAlbumModal(selectors, id, name) {
     selectors.albumName.text(name);
     selectors.modal.modal();
 
-    selectors.submitButton.click(function () {
+    selectors.submitButton.unbind().click(function () {
         submitDeleteAlbumRequest(selectors.errorContainer, id);
     });
 }
