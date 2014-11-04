@@ -28,6 +28,28 @@ def update_album(request, album_id):
         raise Http404
 
 
+def delete_album(request, album_id):
+    user = request.user
+    return_data = {}
+    if request.is_ajax():
+        if user.is_authenticated():
+            album_to_delete = Album.objects.get(id=album_id)
+            # check if album belongs to current user
+            if album_to_delete.user_profile.user.username == user.username:
+                # delete album
+                album_to_delete.delete()
+                return_data['redirect_to'] = '/mytravelog/user/' + user.username + '/albums/'
+            else:
+                return_data['error'] = "This album does not belong to you"
+        else:
+            return_data['redirect_to'] = "/mytravelog/sign_in/"
+
+        return_data = json.dumps(return_data)
+        mimetype = "application/json"
+        return HttpResponse(return_data, mimetype)
+    else:
+        raise Http404
+
 # -------------------HELPER FUNCTIONS--------------------
 
 def create_or_update_album(request, operation, album_id):
