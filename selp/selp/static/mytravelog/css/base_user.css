@@ -127,7 +127,17 @@ body {
     font-weight: bold;
 }
 
-/*----------------user_albums----------------*/
+/*----------------logs content----------------*/
+
+.logs-content {
+    display: none;
+}
+
+/*----------------albums content----------------*/
+
+.albums-content {
+    display: none;
+}
 
 .button-add-album {
     margin-top: 15px;
@@ -224,3 +234,16 @@ body {
     margin: 0;
     color: gray;
 }
+
+/*----------------followers content----------------*/
+
+.followers-content {
+    display: none;
+}
+
+/*----------------following content----------------*/
+
+.following-content {
+    display: none;
+}
+

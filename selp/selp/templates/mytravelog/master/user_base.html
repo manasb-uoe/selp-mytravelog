@@ -18,23 +18,19 @@
             <div class="col-lg-9">
                 <div class="row">
                     <div class="tabs-container">
-                        <a class="tab" href="/mytravelog/user/{{ requested_user.username }}/logs/">
+                        <a class="tab" href="#logs">
                             <p class="tab-name">Logs</p>
                             <p class="count">0</p>
                         </a>
-                        <a class="tab" href="/mytravelog/user/{{ requested_user.username }}/albums/">
+                        <a class="tab" href="#albums">
                             <p class="tab-name">Albums</p>
-                            <p class="count">0</p>
+                            <p class="count">{{ requested_user_albums|length }}</p>
                         </a>
-                        <a class="tab" href="/mytravelog/user/{{ requested_user.username }}/likes/">
-                            <p class="tab-name">Likes</p>
-                            <p class="count">4</p>
-                        </a>
-                        <a class="tab" href="/mytravelog/user/{{ requested_user.username }}/followers/">
+                        <a class="tab" href="#followers">
                             <p class="tab-name">Followers</p>
                             <p class="count">4</p>
                         </a>
-                        <a class="tab" href="/mytravelog/user/{{ requested_user.username }}/following/">
+                        <a class="tab" href="#following">
                             <p class="tab-name">Following</p>
                             <p class="count">4</p>
                         </a>

@@ -12,7 +12,7 @@ urlpatterns = patterns('',
                        url(r'^city/autocomplete/$', city.get_autocomplete_suggestions),
                        url(r'^city/(?P<city_url_name>\w+)/$', city.show_city),
                        url(r'^search/$', search.search_for_cities_and_users),
-                       url(r'^user/(?P<username>\w+)/albums/$', user.show_user_albums),
+                       url(r'^user/(?P<username>\w+)/$', user.show_user),
                        url(r'^album/create/$', album.create_album),
                        url(r'^album/update/(?P<album_id>\w+)/$', album.update_album),
                        url(r'^album/delete/(?P<album_id>\w+)/$', album.delete_album)

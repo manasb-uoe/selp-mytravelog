@@ -97,7 +97,7 @@ def sign_out(request):
         return HttpResponseRedirect('/mytravelog/sign_in')
 
 
-def show_user_albums(request, username):
+def show_user(request, username):
     data_dict = get_permissions(username, request.user)
 
     # get user albums and attach duration to each album
@@ -107,7 +107,7 @@ def show_user_albums(request, username):
         album.duration = duration
     data_dict['requested_user_albums'] = requested_user_albums
 
-    return render(request, 'mytravelog/user_albums.html', data_dict)
+    return render(request, 'mytravelog/user.html', data_dict)
 
 
 # ----------------------Helper functions------------------------

@@ -1,44 +1,69 @@
 {% extends 'mytravelog/master/user_base.html' %}
 {% load static %}
 
+<!-- left column -->
 {% block left_column_block %}
-    {% if authenticated_to_edit_profile %}
-        <button class="btn btn-primary button-add-album">Add new album</button>
-    {% endif %}
+    <div class="logs-content"></div>
+
+    <div class="albums-content">
+        {% if authenticated_to_edit_profile %}
+            <button class="btn btn-primary button-add-album">Add new album</button>
+        {% endif %}
+    </div>
+
+    <div class="followers-content"></div>
+
+    <div class="following-content"></div>
 {% endblock %}
 
+<!-- right column -->
 {% block right_column_block %}
-    <div class="albums-container">
-        <div class="row">
-            {% for album in requested_user_albums %}
-                <div class="col-lg-4 custom-column">
-                    <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}">
-                        <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
-                            <div class="mask">
-                                {% if authenticated_to_edit_profile %}
-                                    <div class="overflow-button"></div>
-                                    <div class="album-dropdown-container">
-                                        <div class="album-dropdown-menu">
-                                            <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
-                                            <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+    <div class="logs-content">
+        <p>LOGS</p>
+    </div>
+
+    <div class="albums-content">
+        <div class="albums-container">
+            <div class="row">
+                {% for album in requested_user_albums %}
+                    <div class="col-lg-4 custom-column">
+                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}">
+                            <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
+                                <div class="mask">
+                                    {% if authenticated_to_edit_profile %}
+                                        <div class="overflow-button"></div>
+                                        <div class="album-dropdown-container">
+                                            <div class="album-dropdown-menu">
+                                                <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
+                                                <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                {% endif %}
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                        <p class="name">{{ album.name }}</p>
-                        <p class="duration">{{ album.duration }} days</p>
-                    </a>
-                </div>
-                {% if forloop.counter|divisibleby:3%}
+                            <p class="name">{{ album.name }}</p>
+                            <p class="duration">{{ album.duration }} days</p>
+                        </a>
                     </div>
-                    <div class="row">
-                {% endif %}
-            {% endfor %}
-            </div>
+                    {% if forloop.counter|divisibleby:3%}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                {% endfor %}
+                </div>
+        </div>
+    </div>
+
+    <div class="followers-content">
+        <p>FOLLOWERS</p>
+    </div>
+
+    <div class="following-content">
+        <p>FOLLOWING</p>
     </div>
 {% endblock %}
 
+<!-- all modals -->
 {% block popup_block %}
     <div class="modal fade" id="add-or-edit-album-modal">
         <div class="modal-dialog">
