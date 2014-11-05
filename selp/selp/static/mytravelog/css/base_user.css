@@ -132,6 +132,24 @@ body {
     width: 200px;
 }
 
+#add-log-modal-more-images-button-wrapper {
+    text-align: right;
+}
+
+#add-log-modal-more-images-button-wrapper #add-log-modal-more-images-button {
+    color: #428bca;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#add-log-modal-more-images-button-wrapper #add-log-modal-more-images-button:hover {
+    color: #2e618d;
+}
+
+.form-image-input {
+    margin-bottom: 5px;
+}
+
 /*----------------logs content----------------*/
 
 .logs-content {
