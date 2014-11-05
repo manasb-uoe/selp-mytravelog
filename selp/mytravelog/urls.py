@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from mytravelog.views import search, album
+from mytravelog.views import search, album, log
 from views import home, user, city
 
 __author__ = 'Manas'
@@ -15,5 +15,6 @@ urlpatterns = patterns('',
                        url(r'^user/(?P<username>\w+)/$', user.show_user),
                        url(r'^album/create/$', album.create_album),
                        url(r'^album/update/(?P<album_id>\w+)/$', album.update_album),
-                       url(r'^album/delete/(?P<album_id>\w+)/$', album.delete_album)
+                       url(r'^album/delete/(?P<album_id>\w+)/$', album.delete_album),
+                       url(r'^log/create/$', log.create_log)
 )
