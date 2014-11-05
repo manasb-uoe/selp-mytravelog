@@ -34,7 +34,7 @@ function navigateToActiveTab() {
 //--------------------Albums------------------------
 
 function handleAlbums() {
-    var AddOrEditAlbumSelectors = {
+    var addOrEditAlbumSelectors = {
         form: $('#add-or-edit-album-modal-form'),
         errorContainer: $('#add-or-edit-album-modal-error-container'),
         modalTitle: $('#add-or-edit-album-modal-title'),
@@ -46,7 +46,7 @@ function handleAlbums() {
     };
 
     $('#add-new-album-button').click(function () {
-        showAddOrEditAlbumModal(AddOrEditAlbumSelectors, 'Add new album', '', '', '', 'Add', '/mytravelog/album/create/');
+        showAddOrEditAlbumModal(addOrEditAlbumSelectors, 'Add new album', '', '', '', 'Add', '/mytravelog/album/create/');
     });
 
     $('.album-dropdown-item-edit').click(function () {
@@ -57,7 +57,7 @@ function handleAlbums() {
         var startDate = album.attr('data-start-date');
         var endDate = album.attr('data-end-date');
 
-        showAddOrEditAlbumModal(AddOrEditAlbumSelectors, 'Edit album', name, startDate, endDate, 'Save', '/mytravelog/album/update/' + id + '/');
+        showAddOrEditAlbumModal(addOrEditAlbumSelectors, 'Edit album', name, startDate, endDate, 'Save', '/mytravelog/album/update/' + id + '/');
     });
 
     var deleteAlbumSelectors = {
@@ -76,7 +76,7 @@ function handleAlbums() {
     });
 }
 
-function showAddOrEditAlbumModal(selectors, modalTitle, name, startDate, endDate, submitButtonText, action) {
+function showAddOrEditAlbumModal(selectors, modalTitle, name, startDate, endDate, submitButtonText, url) {
     selectors.errorContainer.hide();
     selectors.errorContainer.empty();
     selectors.modalTitle.text(modalTitle);
@@ -84,47 +84,11 @@ function showAddOrEditAlbumModal(selectors, modalTitle, name, startDate, endDate
     selectors.inputStartDate.val(startDate);
     selectors.inputEndDate.val(endDate);
     selectors.submitButton.text(submitButtonText);
-    selectors.form.attr('action', action);
     selectors.modal.modal();
 
     selectors.form.unbind().submit(function (event) {
         event.preventDefault();
-        submitAddOrEditAlbumForm($(this), selectors.form.attr('action'), selectors.errorContainer);
-    });
-}
-
-function submitAddOrEditAlbumForm (form, url, errorContainer) {
-    //clear and hide existing errors
-    errorContainer.empty();
-    errorContainer.hide();
-
-    //get form data
-    var formData = new FormData(form[0]);                  //get reference of the form DOM element
-    formData.append('csrfmiddlewaretoken', csrf_token);    //token declared in user base template
-
-    $.ajax({
-        url: url,
-        type: "POST",
-        dataType: "json",
-        data: formData,
-        success: function (response) {
-            var redirect_to = response['redirect_to'];
-            var error_message = response['error'];
-            if (redirect_to != null) {
-                window.location.href = redirect_to;
-            }
-            else if (error_message != null) {
-                errorContainer.append('<strong>Error! </strong>' + error_message);
-                errorContainer.show();
-            }
-            else {
-                window.location.reload();
-            }
-        },
-        //Options to tell JQuery not to process data or worry about content-type
-        cache: false,
-        contentType: false,
-        processData: false
+        submitForm($(this), selectors.errorContainer, url);
     });
 }
 
@@ -147,7 +111,6 @@ function submitDeleteAlbumRequest(errorContainer, id) {
         type: "POST",
         dataType: "json",
         data: {
-            album_id: id,
             csrfmiddlewaretoken: csrf_token
         },
         success: function (response) {
@@ -206,11 +169,13 @@ function showAddLogModal(selectors) {
 
     selectors.form.unbind().submit(function (event) {
         event.preventDefault();
-        submitAddLogForm(selectors.form, selectors.errorContainer, '/mytravelog/log/create/');
+        submitForm($(this), selectors.errorContainer, '/mytravelog/log/create/');
     });
 }
 
-function submitAddLogForm(form, errorContainer, url) {
+//--------------------Helper functions------------------------
+
+function submitForm(form, errorContainer, url) {
     //clear and hide existing errors
     errorContainer.empty();
     errorContainer.hide();
