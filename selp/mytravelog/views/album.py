@@ -1,9 +1,12 @@
 import json
 import re
 import datetime
-from django.http.response import Http404, HttpResponse, HttpResponseRedirect
+
+from django.http.response import Http404, HttpResponse
+
 from mytravelog.models.album import Album
 from mytravelog.models.user_profile import UserProfile
+
 
 __author__ = 'Manas'
 
@@ -38,7 +41,6 @@ def delete_album(request, album_id):
             if album_to_delete.user_profile.user.username == user.username:
                 # delete album
                 album_to_delete.delete()
-                return_data['redirect_to'] = '/mytravelog/user/' + user.username + '/albums/'
             else:
                 return_data['error'] = "This album does not belong to you"
         else:
@@ -103,8 +105,6 @@ def create_or_update_album(request, operation, album_id):
                         album_to_update.cover_picture = cover_picture
                     album_to_update.save()
 
-                # send redirection url if album is updated successfully
-                return_data['redirect_to'] = "/mytravelog/user/" + user.username + "/albums/"
     else:
         return_data['redirect_to'] = "/mytravelog/sign_in/"
 

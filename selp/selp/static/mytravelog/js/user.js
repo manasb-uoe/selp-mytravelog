@@ -113,9 +113,12 @@ function submitAddOrEditAlbumForm (form, url, errorContainer) {
             if (redirect_to != null) {
                 window.location.href = redirect_to;
             }
-            else {
+            else if (error_message != null) {
                 errorContainer.append('<strong>Error! </strong>' + error_message);
                 errorContainer.show();
+            }
+            else {
+                window.location.reload();
             }
         },
         //Options to tell JQuery not to process data or worry about content-type
@@ -153,9 +156,12 @@ function submitDeleteAlbumRequest(errorContainer, id) {
             if (redirect_to != null) {
                 window.location.href = redirect_to;
             }
-            else {
+            else if (error_message != null) {
                 errorContainer.append('<strong>Error! </strong>' + error_message);
                 errorContainer.show();
+            }
+            else {
+                window.location.reload();
             }
         }
     });
