@@ -127,6 +127,11 @@ body {
     font-weight: bold;
 }
 
+.button-add-new {
+    margin-top: 15px;
+    width: 200px;
+}
+
 /*----------------logs content----------------*/
 
 .logs-content {
@@ -137,11 +142,6 @@ body {
 
 .albums-content {
     display: none;
-}
-
-.button-add-album {
-    margin-top: 15px;
-    width: 200px;
 }
 
 .albums-container .custom-column {

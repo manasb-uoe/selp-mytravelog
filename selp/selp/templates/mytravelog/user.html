@@ -3,11 +3,15 @@
 
 <!-- left column -->
 {% block left_column_block %}
-    <div class="logs-content"></div>
+    <div class="logs-content">
+        {% if authenticated_to_edit_profile %}
+            <button class="btn btn-primary button-add-new" id="add-new-log-button">Add new log</button>
+        {% endif %}
+    </div>
 
     <div class="albums-content">
         {% if authenticated_to_edit_profile %}
-            <button class="btn btn-primary button-add-album">Add new album</button>
+            <button class="btn btn-primary button-add-new" id="add-new-album-button">Add new album</button>
         {% endif %}
     </div>
 
@@ -65,6 +69,7 @@
 
 <!-- all modals -->
 {% block popup_block %}
+    <!-- Add or Edit album modal -->
     <div class="modal fade" id="add-or-edit-album-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -101,6 +106,7 @@
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <!-- Delete album modal -->
     <div class="modal fade" id="delete-album-modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -120,4 +126,43 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <!-- Add log modal -->
+    <div class="modal fade" id="add-log-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="add-log-modal-title">Add new log</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-container form-group" id="add-log-modal-form" enctype="multipart/form-data" action="/mytravelog/log/create/">
+                        {% csrf_token %}
+                        <div class="alert alert-danger error-container" id="add-log-modal-error-container"></div>
+
+                        <label class="form-label" for="location">Location/Current city*</label>
+                        <input class="form-control form-input" id="add-log-modal-location-input" name="location" type="text" placeholder="Enter the name of your current city" required="">
+                        <br>
+                        <label class="form-label" for="album_name">Choose an album this log belongs to*</label>
+                        <select class="form-control form-input" name="album_name" id="add-log-modal-album-input" required="">
+                            <option value="None">None</option>
+                            {% for album in requested_user_albums %}
+                                <option value="{{ album.name }}">{{ album.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        <label class="form-label" for="description">Description*</label>
+                        <textarea class="form-control form-input" id="add-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
+                        <br>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-wrapper">
+                        <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
+                        <button type="submit" form="add-log-modal-form" class="btn btn-primary button-positive" id="add-log-modal-submit-button">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
