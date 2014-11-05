@@ -136,7 +136,7 @@
                     <h4 class="modal-title" id="add-log-modal-title">Add new log</h4>
                 </div>
                 <div class="modal-body">
-                    <form class="form-container form-group" id="add-log-modal-form" enctype="multipart/form-data" action="/mytravelog/log/create/">
+                    <form class="form-container form-group" id="add-log-modal-form" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="alert alert-danger error-container" id="add-log-modal-error-container"></div>
 
@@ -154,6 +154,13 @@
                         <label class="form-label" for="description">Description*</label>
                         <textarea class="form-control form-input" id="add-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
                         <br>
+                        <label class="form-label">Choose images to upload</label>
+                        <div class="form-image-group" id="add-log-modal-images-container">
+                            <input class="form-control form-input form-image-input" name="log_picture" type="file">
+                        </div>
+                        <div id="add-log-modal-more-images-button-wrapper">
+                            <p class="add-more-images-button" id="add-log-modal-more-images-button">+ Add another image</p>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">

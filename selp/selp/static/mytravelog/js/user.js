@@ -177,8 +177,9 @@ function handleLogs() {
         inputLocation: $('#add-log-modal-location-input'),
         inputAlbum: $('#add-log-modal-album-input'),
         inputDescription: $('#add-log-modal-description-input'),
+        imagesContainer: $('#add-log-modal-images-container'),
         submitButton: $('#add-log-modal-submit-button'),
-        imageDropzone: $('#add-log-modal-image-dropzone'),
+        moreImagesButton: $('#add-log-modal-more-images-button'),
         modal: $('#add-log-modal')
     };
 
@@ -192,7 +193,16 @@ function showAddLogModal(selectors) {
     selectors.errorContainer.empty();
     selectors.inputAlbum.find('option[value="None"]').attr('selected', true);
     selectors.inputDescription.val('');
+    selectors.imagesContainer.empty().append('<input class="form-control form-input form-image-input" name="log_picture_1" type="file">');
     selectors.modal.modal();
+
+    // if multiple files are submitted with the same name, only the last file is received on the server side
+    // to solve this, input name is changed based on a counter
+    var imageCounter = 1;
+    selectors.moreImagesButton.unbind().click(function () {
+        imageCounter++;
+        selectors.imagesContainer.append('<input class="form-control form-input form-image-input" name="log_picture_' + imageCounter + '" type="file">');
+    });
 
     selectors.form.unbind().submit(function (event) {
         event.preventDefault();
