@@ -1,8 +1,9 @@
 from django.contrib import admin
-from mytravelog.models import city, user_profile, album
+from mytravelog.models import city, user_profile, album, log
 
 
 # Register your models here.
 admin.site.register(city.City)
 admin.site.register(user_profile.UserProfile)
 admin.site.register(album.Album)
+admin.site.register(log.Log)
