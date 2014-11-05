@@ -3,6 +3,7 @@ from django.http.response import Http404, HttpResponse
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.log import Log
+from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 
 __author__ = 'Manas'
@@ -14,6 +15,7 @@ def create_log(request):
         return_data = {}
         if user.is_authenticated():
             post_data = request.POST
+            file_data = request.FILES
             location = post_data.get('location', '')
             album_name = post_data.get('album_name', '')
             description = post_data.get('description', '')
@@ -37,6 +39,14 @@ def create_log(request):
                 new_log.album = album
                 new_log.description = description
                 new_log.save()
+
+                # create new log picture for every image submitted by user
+                for key, image_file in file_data.iteritems():
+                    new_log_picture = LogPicture()
+                    new_log_picture.log = new_log
+                    new_log_picture.picture = image_file
+                    new_log_picture.save()
+
             else:
                 return_data['error'] = error
 
