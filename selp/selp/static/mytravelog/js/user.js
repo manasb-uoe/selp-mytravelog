@@ -5,12 +5,31 @@
 //--------------------Base------------------------
 
 function handleTabNavigation() {
-    var urlSegments = $(location).attr('href').split('/');
-    var currentPage = urlSegments[urlSegments.length - 2];
-    var activeTab = $('a[href$="' + currentPage +'/"]');
-    activeTab.addClass('tab-active');
+    // navigate to logs if no hash found
+    if (window.location.hash == '') {
+        window.location.href = window.location.href + '#logs'
+    }
+    navigateToActiveTab();
+
+    // navigate to active tab every time the hash changes
+    $(window).on('hashchange', function () {
+        navigateToActiveTab();
+    });
 }
 
+function navigateToActiveTab() {
+    var hash = window.location.hash;
+
+    // only mark selected tab as active
+    var activeTab = $('a[href="' + hash +'"]');
+    activeTab.siblings().removeClass('tab-active');
+    activeTab.addClass('tab-active');
+
+    // only show active tab content
+    var activeContent = $('.' + hash.substr(1) + '-content');
+    activeContent.show();
+    activeContent.siblings().hide();
+}
 
 //--------------------Albums------------------------
 
