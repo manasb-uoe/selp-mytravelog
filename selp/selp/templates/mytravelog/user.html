@@ -140,8 +140,10 @@
                         {% csrf_token %}
                         <div class="alert alert-danger error-container" id="add-log-modal-error-container"></div>
 
-                        <label class="form-label" for="location">Location/Current city*</label>
-                        <input class="form-control form-input" id="add-log-modal-location-input" name="location" type="text" placeholder="Enter the name of your current city" required="">
+                        <div id="add-log-modal-map-container"></div>
+
+                        <label class="form-label" for="location">Current location*</label>
+                        <input class="form-control form-input" id="add-log-modal-location-input" name="location" type="text" readonly placeholder="Enter the name of your current city" required="">
                         <br>
                         <label class="form-label" for="album_name">Choose an album this log belongs to*</label>
                         <select class="form-control form-input" name="album_name" id="add-log-modal-album-input" required="">
@@ -154,9 +156,8 @@
                         <label class="form-label" for="description">Description*</label>
                         <textarea class="form-control form-input" id="add-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
                         <br>
-                        <label class="form-label">Choose images to upload</label>
+                        <label class="form-label">Choose pictures to upload</label>
                         <div class="form-image-group" id="add-log-modal-images-container">
-                            <input class="form-control form-input form-image-input" name="log_picture" type="file">
                         </div>
                         <div id="add-log-modal-more-images-button-wrapper">
                             <p class="add-more-images-button" id="add-log-modal-more-images-button">+ Add another image</p>

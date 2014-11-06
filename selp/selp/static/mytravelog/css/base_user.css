@@ -97,7 +97,7 @@ body {
     padding: 0;
 }
 
-/*----------------popups----------------*/
+/*----------------modals----------------*/
 .form-container {
     width: 90%;
     margin-left: auto;
@@ -146,7 +146,14 @@ body {
     color: #2e618d;
 }
 
-.form-image-input {
+#add-log-modal-map-container {
+    background-color: #f2f2f2;
+    height: 250px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#add-log-modal-image-input {
     margin-bottom: 5px;
 }
 
