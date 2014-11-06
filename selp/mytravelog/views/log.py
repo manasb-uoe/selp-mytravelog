@@ -17,6 +17,8 @@ def create_log(request):
             post_data = request.POST
             file_data = request.FILES
             location = post_data.get('location', '')
+            if ',' in location:
+                location = location[0:location.index(',')]
             album_name = post_data.get('album_name', '')
             description = post_data.get('description', '')
 
