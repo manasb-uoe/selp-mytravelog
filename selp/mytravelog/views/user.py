@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from mytravelog.models.album import Album
+from mytravelog.models.log import Log
+from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 
 __author__ = 'Manas'
@@ -106,6 +108,13 @@ def show_user(request, username):
         duration = (album.end_date - album.start_date).days
         album.duration = duration
     data_dict['requested_user_albums'] = requested_user_albums
+
+    # get user logs and attach at most 3 pictures to each log
+    requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
+    for log in requested_user_logs: 
+        log_pictures = LogPicture.objects.filter(log=log)[:3]
+        log.pictures = log_pictures
+    data_dict['requested_user_logs'] = requested_user_logs
 
     return render(request, 'mytravelog/user.html', data_dict)
 
