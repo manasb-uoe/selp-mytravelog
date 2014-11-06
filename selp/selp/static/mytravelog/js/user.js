@@ -137,6 +137,7 @@ function handleLogs() {
     var addLogSelectors= {
         form: $('#add-log-modal-form'),
         errorContainer: $('#add-log-modal-error-container'),
+        mapContainer: $('#add-log-modal-map-container'),
         inputLocation: $('#add-log-modal-location-input'),
         inputAlbum: $('#add-log-modal-album-input'),
         inputDescription: $('#add-log-modal-description-input'),
@@ -156,7 +157,7 @@ function showAddLogModal(selectors) {
     selectors.errorContainer.empty();
     selectors.inputAlbum.find('option[value="None"]').attr('selected', true);
     selectors.inputDescription.val('');
-    selectors.imagesContainer.empty().append('<input class="form-control form-input form-image-input" name="log_picture_1" type="file">');
+    selectors.imagesContainer.empty().append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_1" type="file">');
     selectors.modal.modal();
 
     // if multiple files are submitted with the same name, only the last file is received on the server side
@@ -164,14 +165,175 @@ function showAddLogModal(selectors) {
     var imageCounter = 1;
     selectors.moreImagesButton.unbind().click(function () {
         imageCounter++;
-        selectors.imagesContainer.append('<input class="form-control form-input form-image-input" name="log_picture_' + imageCounter + '" type="file">');
+        selectors.imagesContainer.append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_' + imageCounter + '" type="file">');
     });
+
+    //show current location on map and location input field
+    var locationDisplayer = new LocationDisplayer(selectors.mapContainer[0], selectors.inputLocation);
+    setTimeout(locationDisplayer.showCurrentLocation, 1000);
 
     selectors.form.unbind().submit(function (event) {
         event.preventDefault();
         submitForm($(this), selectors.errorContainer, '/mytravelog/log/create/');
     });
 }
+
+// This class is used to show current location in the provided map container and input field
+function LocationDisplayer(mapContainer, locationInput) {
+
+    this.showCurrentLocation = function () {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(success, failure);
+        }
+        else {
+            console.log("Geolocation is not supported by this browser");
+        }
+    };
+
+    var success = function (position) {
+        var lat = position.coords.latitude;
+        var lng = position.coords.longitude;
+        var latlng = new google.maps.LatLng(lat, lng);
+
+        //show current location on map
+        if (mapContainer != null) {
+            var options = {
+                zoom: 15,
+                center: latlng,
+                mapTypeControl: false,
+                navigationControlOptions: {
+                    style: google.maps.NavigationControlStyle.SMALL
+                },
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            var map = new google.maps.Map(mapContainer, options);
+            var marker = new google.maps.Marker({
+                position: latlng,
+                map: map,
+                title:"You are here!"
+            });
+            marker.setMap(map);
+        }
+
+        //reverse geocode latlng and then show current city and country in the input element provided
+        if (locationInput != null) {
+            reverseGeocode(latlng, locationInput);
+        }
+    };
+
+    var failure = function (error) {
+        var error_message = null;
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                error_message = "User denied the request for Geolocation.";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                error_message = "Location information is unavailable.";
+                break;
+            case error.TIMEOUT:
+                error_message = "The request to get user location timed out.";
+                break;
+        }
+        console.log(error_message);
+    };
+
+    var reverseGeocode = function (latlng, locationInput) {
+        var currentLocation = null;
+        var geocoder = new google.maps.Geocoder();
+        geocoder.geocode({'latLng': latlng}, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                if (results[0]) {
+                    var city = null;
+                    var country = null;
+                    for (var i=0; i<results[0].address_components.length; i++) {
+                        for (var b=0;b<results[0].address_components[i].types.length;b++) {
+                            if (results[0].address_components[i].types[b] == "locality") {
+                                city = results[0].address_components[i];
+                            }
+                            if (results[0].address_components[i].types[b] == "country") {
+                                country = results[0].address_components[i];
+                            }
+                        }
+                    }
+                    if (city && country) {
+                        locationInput.val(city.long_name + ", " + country.long_name);
+                    }
+                    else {
+                        locationInput.val("Location not found");
+                    }
+                }
+                else {
+                    console.log("location not found");
+                }
+            }
+            else {
+                console.log("Geocoder failed due to: " + status);
+            }
+        });
+    };
+
+    //sample api output for reference
+//{
+//   "results" : [
+//      {
+//         "address_components" : [
+//            {
+//               "long_name" : "Miami",
+//               "short_name" : "Miami",
+//               "types" : [ "locality", "political" ]
+//            },
+//            {
+//               "long_name" : "Miami-Dade County",
+//               "short_name" : "Miami-Dade County",
+//               "types" : [ "administrative_area_level_2", "political" ]
+//            },
+//            {
+//               "long_name" : "Florida",
+//               "short_name" : "FL",
+//               "types" : [ "administrative_area_level_1", "political" ]
+//            },
+//            {
+//               "long_name" : "United States",
+//               "short_name" : "US",
+//               "types" : [ "country", "political" ]
+//            }
+//         ],
+//         "formatted_address" : "Miami, FL, USA",
+//         "geometry" : {
+//            "bounds" : {
+//               "northeast" : {
+//                  "lat" : 25.8556059,
+//                  "lng" : -80.14240029999999
+//               },
+//               "southwest" : {
+//                  "lat" : 25.709042,
+//                  "lng" : -80.31975989999999
+//               }
+//            },
+//            "location" : {
+//               "lat" : 25.7890972,
+//               "lng" : -80.2040435
+//            },
+//            "location_type" : "APPROXIMATE",
+//            "viewport" : {
+//               "northeast" : {
+//                  "lat" : 25.8556059,
+//                  "lng" : -80.14240029999999
+//               },
+//               "southwest" : {
+//                  "lat" : 25.709042,
+//                  "lng" : -80.31975989999999
+//               }
+//            }
+//         },
+//         "types" : [ "locality", "political" ]
+//      }
+//   ],
+//   "status" : "OK"
+//}
+}
+
 
 //--------------------Helper functions------------------------
 
