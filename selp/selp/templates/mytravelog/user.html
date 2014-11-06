@@ -22,8 +22,86 @@
 
 <!-- right column -->
 {% block right_column_block %}
+
     <div class="logs-content">
-        <p>LOGS</p>
+        <div class="logs-container">
+            {% for log in requested_user_logs %}
+                <div class="log">
+                    <div class="header">
+                        <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
+                        <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
+
+                        <div class="overflow-button"></div>
+                        <div class="log-dropdown-container">
+                            <div class="log-dropdown-menu">
+                                <p class="log-dropdown-item log-dropdown-item-view">View</p>
+                                <p class="log-dropdown-item log-dropdown-item-share">Share</p>
+                                <p class="log-dropdown-item log-dropdown-item-edit">Edit</p>
+                                <p class="log-dropdown-item log-dropdown-item-delete">Delete</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if log.pictures|length > 0 %}
+                        <div class="pictures-container">
+                            {% if log.pictures|length == 1 %}
+                                <div class="picture picture-full" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                    <div class="mask"></div>
+                                </div>
+                            {% elif log.pictures|length == 2 %}
+                                <div class="picture picture-left" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                    <div class="mask"></div>
+                                </div><!--
+                                --><div class="picture picture-right" style="background-image: url('{{ log.pictures.1.picture.url }}')">
+                                <div class="mask"></div>
+                            </div>
+                            {% else %}
+                                <div class="picture picture-left" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                    <div class="mask"></div>
+                                </div><!--
+                                --><div class="picture-right">
+                                <div class="picture picture-right-top" style="background-image: url('{{ log.pictures.1.picture.url }}')">
+                                    <div class="mask"></div>
+                                </div>
+                                <div class="picture picture-right-bottom" style="background-image: url('{{ log.pictures.2.picture.url }}')">
+                                    <div class="mask"></div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    <p class="description">{{ log.description }}</p>
+
+                    <div class="user-info-container">
+                        <img class="profile-picture" src="{{ log.user_profile.profile_picture.url }}">
+                        <div class="name-and-timestamp-container">
+                            <p class="name">{{ log.user_profile.user.get_full_name }}</p>
+                            <p class="timestamp">{{ log.created_at }}</p>
+                        </div>
+                    </div>
+
+                    <div class="like-and-comment-count-container">
+                        <div class="count-container">
+                            <p class="title">Likes</p>
+                            <p class="count">0</p>
+                        </div>
+                        <div class="count-container right">
+                            <p class="title">Comments</p>
+                            <p class="count">0</p>
+                        </div>
+                        <div class="liker-or-commenter-user-profile-pictures">
+
+                        </div>
+                    </div>
+
+                    <div class="like-and-comment-container">
+                        <button class="like-log-button"></button>
+                        <input class="form-control comment-log-input" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
     </div>
 
     <div class="albums-content">
@@ -65,6 +143,7 @@
     <div class="following-content">
         <p>FOLLOWING</p>
     </div>
+
 {% endblock %}
 
 <!-- all modals -->
