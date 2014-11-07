@@ -150,6 +150,8 @@ function handleLogs() {
     $('#add-new-log-button').click(function () {
         showAddLogModal(addLogSelectors);
     });
+
+    LogPicturesViewer.init();
 }
 
 function showAddLogModal(selectors) {
@@ -333,6 +335,91 @@ function LocationDisplayer(mapContainer, locationInput) {
 //   "status" : "OK"
 //}
 }
+
+var LogPicturesViewer = (function () {
+
+    var _config = {
+        logPicture: $('.log-picture'),
+        modal: $('#log-picture-modal'),
+        modalPictureContainer: $('#log-picture-modal-picture'),
+        modalPreviousButton: $('#log-picture-modal-previous-button'),
+        modalNextButton: $('#log-picture-modal-next-button'),
+        modalIndex: $('#log-picture-modal-index'),
+        currentIndex: 0,
+        totalPictures: 0,
+        urls: []
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.logPicture.click(function () {
+            _config.logPicture = $(this);
+            getCurrentIndexAndUrls();
+            _config.modal.modal();
+        });
+        _config.modal.on('shown.bs.modal', function(){
+            showCurrentPicture();
+        });
+        _config.modal.on('hidden.bs.modal', function(){
+            _config.modalPictureContainer.html('');
+        });
+        _config.modalNextButton.click(function () {
+            _config.currentIndex++;
+            showCurrentPicture();
+        });
+        _config.modalPreviousButton.click(function () {
+            _config.currentIndex--;
+            showCurrentPicture();
+        });
+    }
+
+    function showCurrentPicture() {
+        var img = '<div id="log-picture-modal-picture" style="background-image: url(\'' + _config.urls[_config.currentIndex] +'\')"/>';
+        _config.modalPictureContainer.html(img);
+
+        //set modal index
+        _config.modalIndex.text(_config.currentIndex+1 + ' of ' + _config.totalPictures);
+
+        // hide/show previous and next buttons depending on the index
+        if (_config.currentIndex == _config.totalPictures-1) {
+            _config.modalNextButton.css('visibility', 'hidden');
+        }
+        else {
+            _config.modalNextButton.css('visibility', 'visible');
+        }
+        if (_config.currentIndex == 0) {
+            _config.modalPreviousButton.css('visibility', 'hidden');
+        }
+        else {
+            _config.modalPreviousButton.css('visibility', 'visible');
+        }
+    }
+
+    function getCurrentIndexAndUrls() {
+        _config.urls = [];
+        var logPicturesContainer = _config.logPicture.closest('.log-pictures-container');
+        var logPictures = logPicturesContainer.find('.log-picture');
+        logPictures.each(function () {
+            _config.urls.push($(this).attr('data-url'));
+        });
+        _config.totalPictures = logPictures.length;
+
+        //get index of selected picture
+        var currentUrl = _config.logPicture.attr('data-url');
+        for (var i=0; i<_config.totalPictures; i++) {
+            if (_config.urls[i] == currentUrl) {
+                _config.currentIndex = i;
+            }
+        }
+    }
+
+    return {
+        init: init
+    };
+})();
 
 
 //--------------------Helper functions------------------------
