@@ -43,30 +43,38 @@
                     </div>
 
                     {% if log.pictures|length > 0 %}
-                        <div class="pictures-container">
+                        <div class="log-pictures-container">
                             {% if log.pictures|length == 1 %}
-                                <div class="picture picture-full" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                <div class="log-picture log-picture-full" data-url="{{ log.pictures.0.picture.url }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
                                     <div class="mask"></div>
                                 </div>
                             {% elif log.pictures|length == 2 %}
-                                <div class="picture picture-left" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                <div class="log-picture log-picture-left" data-url="{{ log.pictures.0.picture.url }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
                                     <div class="mask"></div>
                                 </div><!--
-                                --><div class="picture picture-right" style="background-image: url('{{ log.pictures.1.picture.url }}')">
+                                --><div class="log-picture log-picture-right" data-url="{{ log.pictures.1.picture.url }}" style="background-image: url('{{ log.pictures.1.picture.url }}')">
                                 <div class="mask"></div>
                             </div>
                             {% else %}
-                                <div class="picture picture-left" style="background-image: url('{{ log.pictures.0.picture.url }}')">
-                                    <div class="mask"></div>
-                                </div><!--
-                                --><div class="picture-right">
-                                <div class="picture picture-right-top" style="background-image: url('{{ log.pictures.1.picture.url }}')">
-                                    <div class="mask"></div>
-                                </div>
-                                <div class="picture picture-right-bottom" style="background-image: url('{{ log.pictures.2.picture.url }}')">
-                                    <div class="mask"></div>
-                                </div>
-                            </div>
+                                {% for log_picture in log.pictures %}
+                                    {% if forloop.counter == 1 %}
+                                        <div class="log-picture log-picture-left" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                            <div class="mask"></div>
+                                        </div><!--
+                                    {% elif forloop.counter == 2 %}
+                                        --><div class="log-picture-right">
+                                        <div class="log-picture log-picture-right-top" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                            <div class="mask"></div>
+                                        </div>
+                                        {% elif forloop.counter == 3 %}
+                                        <div class="log-picture log-picture-right-bottom" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                            <div class="mask"></div>
+                                        </div>
+                                    </div>
+                                    {% else %}
+                                        <div class="log-picture" data-url="{{ log_picture.picture.url }}" style="display: none"></div>
+                                    {% endif %}
+                                {% endfor %}
                             {% endif %}
                         </div>
                     {% endif %}
@@ -247,6 +255,22 @@
                     <div class="modal-footer-wrapper">
                         <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
                         <button type="submit" form="add-log-modal-form" class="btn btn-primary button-positive" id="add-log-modal-submit-button">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- show log picture modal -->
+    <div class="modal fade" id="log-picture-modal">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-body" id="log-picture-modal-body">
+                    <div id="log-picture-modal-picture"></div>
+                    <div id="log-picture-modal-footer">
+                        <p id="log-picture-modal-previous-button">< Prev</p>
+                        <p id="log-picture-modal-index">1 of 5</p>
+                        <p id="log-picture-modal-next-button">Next ></p>
                     </div>
                 </div>
             </div>

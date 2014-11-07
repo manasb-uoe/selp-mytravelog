@@ -156,6 +156,69 @@ body {
     margin-bottom: 5px;
 }
 
+#log-picture-modal #log-picture-modal-picture {
+    width: 100%;
+    height: 500px;
+    background-size: cover;
+    background-position: center center;
+}
+
+#log-picture-modal #log-picture-modal-body {
+    padding: 0;
+    background-color: #000000;
+}
+
+#log-picture-modal #log-picture-modal-footer {
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    bottom: 0;
+    padding: 10px 15px;
+    width: 100%;
+}
+
+#log-picture-modal #log-picture-modal-index {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    width: 59%;
+}
+
+#log-picture-modal #log-picture-modal-previous-button {
+    margin: 0;
+    display: inline-block;
+    cursor: pointer;
+    /*font-weight: bold;*/
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: left;
+    width: 20%;
+    color: rgba(255, 255, 255, 0.7)
+}
+
+#log-picture-modal #log-picture-modal-next-button {
+    margin: 0;
+    display: inline-block;
+    cursor: pointer;
+    /*font-weight: bold;*/
+    text-align: right;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 20%;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#log-picture-modal #log-picture-modal-previous-button:hover,
+#log-picture-modal #log-picture-modal-next-button:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
 /*----------------logs content----------------*/
 
 .logs-content {
@@ -236,51 +299,51 @@ body {
     padding: 5px 15px;
 }
 
-.logs-container .log .pictures-container {
+.logs-container .log .log-pictures-container {
     padding: 0;
     margin-bottom: 10px;
 }
 
-.logs-container .log .pictures-container .mask {
+.logs-container .log .log-pictures-container .mask {
     width: 100%;
     height: 100%;
     transition: 150ms;
     cursor: pointer;
 }
 
-.logs-container .log .pictures-container .mask:hover {
+.logs-container .log .log-pictures-container .mask:hover {
     background-color: rgba(0, 0, 0, 0.2);
 }
 
-.logs-container .log .pictures-container .picture {
+.logs-container .log .log-pictures-container .log-picture {
     background-position: center center;
     background-size: cover;
 }
 
-.logs-container .log .pictures-container .picture-full {
+.logs-container .log .log-pictures-container .log-picture-full {
     width: 100%;
     height: 300px;
 }
 
-.logs-container .log .pictures-container .picture-left {
+.logs-container .log .log-pictures-container .log-picture-left {
     width: 50%;
     height: 300px;
     display: inline-block;
 }
 
-.logs-container .log .pictures-container .picture-right {
+.logs-container .log .log-pictures-container .log-picture-right {
     width: 50%;
     height: 300px;
     display: inline-block;
 }
 
-.logs-container .log .pictures-container .picture-right-top {
+.logs-container .log .log-pictures-container .log-picture-right-top {
     width: 100%;
     height: 150px;
     display: block;
 }
 
-.logs-container .log .pictures-container .picture-right-bottom {
+.logs-container .log .log-pictures-container .log-picture-right-bottom {
     width: 100%;
     height: 150px;
     display: block;
