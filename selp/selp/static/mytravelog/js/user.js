@@ -357,26 +357,26 @@ var LogPicturesViewer = (function () {
     function _bindUIActions() {
         _config.logPicture.click(function () {
             _config.logPicture = $(this);
-            getCurrentIndexAndUrls();
+            _getCurrentIndexAndUrls();
             _config.modal.modal();
         });
         _config.modal.on('shown.bs.modal', function(){
-            showCurrentPicture();
+            _showCurrentPicture();
         });
         _config.modal.on('hidden.bs.modal', function(){
             _config.modalPictureContainer.html('');
         });
         _config.modalNextButton.click(function () {
             _config.currentIndex++;
-            showCurrentPicture();
+            _showCurrentPicture();
         });
         _config.modalPreviousButton.click(function () {
             _config.currentIndex--;
-            showCurrentPicture();
+            _showCurrentPicture();
         });
     }
 
-    function showCurrentPicture() {
+    function _showCurrentPicture() {
         var img = '<div id="log-picture-modal-picture" style="background-image: url(\'' + _config.urls[_config.currentIndex] +'\')"/>';
         _config.modalPictureContainer.html(img);
 
@@ -398,7 +398,7 @@ var LogPicturesViewer = (function () {
         }
     }
 
-    function getCurrentIndexAndUrls() {
+    function _getCurrentIndexAndUrls() {
         _config.urls = [];
         var logPicturesContainer = _config.logPicture.closest('.log-pictures-container');
         var logPictures = logPicturesContainer.find('.log-picture');
