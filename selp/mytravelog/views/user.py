@@ -109,10 +109,10 @@ def show_user(request, username):
         album.duration = duration
     data_dict['requested_user_albums'] = requested_user_albums
 
-    # get user logs and attach at most 3 pictures to each log
+    # get user logs and attach at all pictures to each log
     requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
     for log in requested_user_logs: 
-        log_pictures = LogPicture.objects.filter(log=log)[:3]
+        log_pictures = LogPicture.objects.filter(log=log)
         log.pictures = log_pictures
     data_dict['requested_user_logs'] = requested_user_logs
 
