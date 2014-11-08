@@ -19,11 +19,13 @@ def create_log(request):
             location = post_data.get('location', '')
             if ',' in location:
                 location = location[0:location.index(',')]
+            latitude = post_data.get('latitude', '')
+            longitude = post_data.get('longitude', '')
             album_name = post_data.get('album_name', '')
             description = post_data.get('description', '')
 
             # validate log data
-            validation_output = validate_log_form(location, description)
+            validation_output = validate_log_form(location, latitude, longitude, description)
             error = validation_output.get('error', None)
             if error is None:
                 # get user_profile, album and city associated with this log
@@ -38,6 +40,8 @@ def create_log(request):
                 new_log = Log()
                 new_log.user_profile = user_profile
                 new_log.city = city
+                new_log.latitude = latitude
+                new_log.longitude = longitude
                 new_log.album = album
                 new_log.description = description
                 new_log.save()
@@ -85,10 +89,10 @@ def delete_log(request, log_id):
 
 # ---------------Helper functions----------------
 
-def validate_log_form(location, description):
+def validate_log_form(location, latitude, longitude ,description):
     output = {}
-    if len(location) == 0:
-        output['error'] = "Location/Current city is required"
+    if len(location) == 0 or len(latitude) == 0 or len(longitude) == 0:
+        output['error'] = "Your location could not be verified"
     elif len(description) == 0:
         output['error'] = "Description is required"
     else:
