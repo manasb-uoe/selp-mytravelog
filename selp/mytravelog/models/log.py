@@ -11,6 +11,8 @@ class Log(models.Model):
     user_profile = ForeignKey(UserProfile)
     album = ForeignKey(Album, null=True, blank=True)
     city = ForeignKey(City)
+    latitude = models.DecimalField(max_digits=7, decimal_places=4, null=False)
+    longitude = models.DecimalField(max_digits=7, decimal_places=4, null=False)
     description = models.CharField(max_length=1000, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
