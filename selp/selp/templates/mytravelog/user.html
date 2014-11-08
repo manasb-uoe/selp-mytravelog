@@ -26,7 +26,7 @@
     <div class="logs-content">
         <div class="logs-container">
             {% for log in requested_user_logs %}
-                <div class="log">
+                <div class="log" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-created-at="{{ log.created_at }}">
                     <div class="header">
                         <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
                         <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
@@ -243,7 +243,7 @@
                         <label class="form-label" for="description">Description*</label>
                         <textarea class="form-control form-input" id="add-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
                         <br>
-                        <label class="form-label">Choose pictures to upload</label>
+                        <label class="form-label">Choose images to upload</label>
                         <div class="form-image-group" id="add-log-modal-images-container">
                         </div>
                         <div id="add-log-modal-more-images-button-wrapper">
@@ -276,4 +276,26 @@
             </div>
         </div>
     </div>
+
+    <!-- delete log modal -->
+    <div class="modal fade" id="delete-log-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Delete log</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger error-container" id="delete-log-modal-error-container"></div>
+                    <p>Are you sure you want to delete the following log:</p>
+                    <p id="delete-log-modal-paragraph">Location: <span id="delete-log-modal-location"></span></p>
+                    <p id="delete-log-modal-paragraph">Created at: <span id="delete-log-modal-created-at"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger button-positive" id="delete-log-modal-submit-button">Delete</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 {% endblock %}
