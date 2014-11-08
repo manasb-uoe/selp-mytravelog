@@ -141,6 +141,7 @@ var DeleteAlbumModal = (function () {
 
 function handleLogs() {
     AddLogModal.init();
+    DeleteLogModal.init();
     LogPicturesViewer.init();
 }
 
@@ -287,7 +288,6 @@ var AddLogModal = (function () {
     };
 }());
 
-
 var LogPicturesViewer = (function () {
 
     var _config = {
@@ -373,6 +373,47 @@ var LogPicturesViewer = (function () {
     };
 })();
 
+var DeleteLogModal = (function () {
+    var _config = {
+        logLocation: $('#delete-log-modal-location'),
+        logCreatedAt: $('#delete-log-modal-created-at'),
+        submitButton: $('#delete-log-modal-submit-button'),
+        errorContainer: $('#delete-log-modal-error-container'),
+        dropdownItemDelete: $('.log-dropdown-item-delete'),
+        modal: $('#delete-log-modal'),
+        submitUrl: ''
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.dropdownItemDelete.click(function () {
+            //get required data about the selected log
+            var log = $(this).closest('.log');
+            var id = log.attr('data-id');
+            var location = log.attr('data-location');
+            var createdAt = log.attr('data-created-at');
+
+            _showModal(location, createdAt);
+            _config.submitUrl = '/mytravelog/log/delete/' + id + '/';
+        });
+        _config.submitButton.click(function () {
+            submitSimpleRequest(_config.errorContainer, _config.submitUrl);
+        });
+    }
+
+    function _showModal(location, createdAt) {
+        _config.logLocation.text(location);
+        _config.logCreatedAt.text(createdAt);
+        _config.modal.modal();
+    }
+
+    return {
+        init:init
+    };
+}());
 
 //--------------------Helper functions------------------------
 
