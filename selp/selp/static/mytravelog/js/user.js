@@ -140,7 +140,13 @@ var DeleteAlbumModal = (function () {
 //--------------------Logs------------------------
 
 function handleLogs() {
-    var addLogSelectors= {
+    AddLogModal.init();
+    LogPicturesViewer.init();
+}
+
+var AddLogModal = (function () {
+
+    var _config = {
         form: $('#add-log-modal-form'),
         errorContainer: $('#add-log-modal-error-container'),
         mapContainer: $('#add-log-modal-map-container'),
@@ -150,87 +156,83 @@ function handleLogs() {
         imagesContainer: $('#add-log-modal-images-container'),
         submitButton: $('#add-log-modal-submit-button'),
         moreImagesButton: $('#add-log-modal-more-images-button'),
-        modal: $('#add-log-modal')
+        modal: $('#add-log-modal'),
+        addNewLogButton: $('#add-new-log-button'),
+        additionalImageCounter: 0
     };
 
-    $('#add-new-log-button').click(function () {
-        showAddLogModal(addLogSelectors);
-    });
+    function init() {
+        _bindUIActions();
+    }
 
-    LogPicturesViewer.init();
-}
+    function _bindUIActions() {
+        _config.addNewLogButton.click(function () {
+            _showModal();
+        });
+        // if multiple files are submitted with the same name, only the last file is received on the server side
+        // to solve this, input name is changed based on a counter
+        _config.moreImagesButton.click(function () {
+            _config.additionalImageCounter++;
+            _config.imagesContainer.append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_' + _config.additionalImageCounter + '" type="file">');
+        });
+        _config.form.submit(function (event) {
+            event.preventDefault();
+            submitForm($(this), _config.errorContainer, '/mytravelog/log/create/');
+        });
+    }
 
-function showAddLogModal(selectors) {
-    selectors.errorContainer.hide();
-    selectors.errorContainer.empty();
-    selectors.inputAlbum.find('option[value="None"]').attr('selected', true);
-    selectors.inputDescription.val('');
-    selectors.imagesContainer.empty().append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_1" type="file">');
-    selectors.modal.modal();
+    function _showModal() {
+        _config.errorContainer.hide();
+        _config.errorContainer.empty();
+        _config.inputAlbum.find('option[value="None"]').attr('selected', true);
+        _config.inputDescription.val('');
+        _config.imagesContainer.empty().append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_1" type="file">');
+        _config.additionalImageCounter = 1;
+        _config.modal.modal();
 
-    // if multiple files are submitted with the same name, only the last file is received on the server side
-    // to solve this, input name is changed based on a counter
-    var imageCounter = 1;
-    selectors.moreImagesButton.unbind().click(function () {
-        imageCounter++;
-        selectors.imagesContainer.append('<input class="form-control form-input" id="add-log-modal-image-input" name="log_picture_' + imageCounter + '" type="file">');
-    });
+        //show current location on map and location input field
+        setTimeout(_showCurrentPosition, 1000);
+    }
 
-    //show current location on map and location input field
-    var locationDisplayer = new LocationDisplayer(selectors.mapContainer[0], selectors.inputLocation);
-    setTimeout(locationDisplayer.showCurrentLocation, 1000);
-
-    selectors.form.unbind().submit(function (event) {
-        event.preventDefault();
-        submitForm($(this), selectors.errorContainer, '/mytravelog/log/create/');
-    });
-}
-
-// This class is used to show current location in the provided map container and input field
-function LocationDisplayer(mapContainer, locationInput) {
-
-    this.showCurrentLocation = function () {
+    function _showCurrentPosition() {
+        console.log('called');
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(success, failure);
+            navigator.geolocation.getCurrentPosition(_showCurrentPositionSuccessCallback, _showCurrentPositionFailureCallback);
         }
         else {
             console.log("Geolocation is not supported by this browser");
         }
-    };
+    }
 
-    var success = function (position) {
+    function _showCurrentPositionSuccessCallback(position) {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
         var latlng = new google.maps.LatLng(lat, lng);
 
         //show current location on map
-        if (mapContainer != null) {
-            var options = {
-                zoom: 15,
-                center: latlng,
-                mapTypeControl: false,
-                navigationControlOptions: {
-                    style: google.maps.NavigationControlStyle.SMALL
-                },
-                mapTypeId: google.maps.MapTypeId.ROADMAP
-            };
+        var options = {
+            zoom: 15,
+            center: latlng,
+            mapTypeControl: false,
+            navigationControlOptions: {
+                style: google.maps.NavigationControlStyle.SMALL
+            },
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
 
-            var map = new google.maps.Map(mapContainer, options);
-            var marker = new google.maps.Marker({
-                position: latlng,
-                map: map,
-                title:"You are here!"
-            });
-            marker.setMap(map);
-        }
+        var map = new google.maps.Map(_config.mapContainer[0], options);
+        var marker = new google.maps.Marker({
+            position: latlng,
+            map: map,
+            title:"You are here!"
+        });
+        marker.setMap(map);
 
         //reverse geocode latlng and then show current city and country in the input element provided
-        if (locationInput != null) {
-            reverseGeocode(latlng, locationInput);
-        }
-    };
+        _reverseGeocode(latlng);
+    }
 
-    var failure = function (error) {
+    function _showCurrentPositionFailureCallback(error) {
         var error_message = null;
         switch(error.code) {
             case error.PERMISSION_DENIED:
@@ -244,10 +246,9 @@ function LocationDisplayer(mapContainer, locationInput) {
                 break;
         }
         console.log(error_message);
-    };
+    }
 
-    var reverseGeocode = function (latlng, locationInput) {
-        var currentLocation = null;
+    function _reverseGeocode(latlng) {
         var geocoder = new google.maps.Geocoder();
         geocoder.geocode({'latLng': latlng}, function (results, status) {
             if (status == google.maps.GeocoderStatus.OK) {
@@ -265,10 +266,10 @@ function LocationDisplayer(mapContainer, locationInput) {
                         }
                     }
                     if (city && country) {
-                        locationInput.val(city.long_name + ", " + country.long_name);
+                        _config.inputLocation.val(city.long_name + ", " + country.long_name);
                     }
                     else {
-                        locationInput.val("Location not found");
+                        _config.inputLocation.val("Location not found");
                     }
                 }
                 else {
@@ -279,68 +280,13 @@ function LocationDisplayer(mapContainer, locationInput) {
                 console.log("Geocoder failed due to: " + status);
             }
         });
-    };
+    }
 
-    //sample api output for reference
-//{
-//   "results" : [
-//      {
-//         "address_components" : [
-//            {
-//               "long_name" : "Miami",
-//               "short_name" : "Miami",
-//               "types" : [ "locality", "political" ]
-//            },
-//            {
-//               "long_name" : "Miami-Dade County",
-//               "short_name" : "Miami-Dade County",
-//               "types" : [ "administrative_area_level_2", "political" ]
-//            },
-//            {
-//               "long_name" : "Florida",
-//               "short_name" : "FL",
-//               "types" : [ "administrative_area_level_1", "political" ]
-//            },
-//            {
-//               "long_name" : "United States",
-//               "short_name" : "US",
-//               "types" : [ "country", "political" ]
-//            }
-//         ],
-//         "formatted_address" : "Miami, FL, USA",
-//         "geometry" : {
-//            "bounds" : {
-//               "northeast" : {
-//                  "lat" : 25.8556059,
-//                  "lng" : -80.14240029999999
-//               },
-//               "southwest" : {
-//                  "lat" : 25.709042,
-//                  "lng" : -80.31975989999999
-//               }
-//            },
-//            "location" : {
-//               "lat" : 25.7890972,
-//               "lng" : -80.2040435
-//            },
-//            "location_type" : "APPROXIMATE",
-//            "viewport" : {
-//               "northeast" : {
-//                  "lat" : 25.8556059,
-//                  "lng" : -80.14240029999999
-//               },
-//               "southwest" : {
-//                  "lat" : 25.709042,
-//                  "lng" : -80.31975989999999
-//               }
-//            }
-//         },
-//         "types" : [ "locality", "political" ]
-//      }
-//   ],
-//   "status" : "OK"
-//}
-}
+    return {
+        init:init
+    };
+}());
+
 
 var LogPicturesViewer = (function () {
 
