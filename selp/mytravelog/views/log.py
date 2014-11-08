@@ -25,7 +25,7 @@ def create_log(request):
             description = post_data.get('description', '')
 
             # validate log data
-            validation_output = validate_log_form(location, latitude, longitude, description)
+            validation_output = validate_log_form(location, latitude, longitude, description, len(file_data))
             error = validation_output.get('error', None)
             if error is None:
                 # get user_profile, album and city associated with this log
@@ -89,12 +89,14 @@ def delete_log(request, log_id):
 
 # ---------------Helper functions----------------
 
-def validate_log_form(location, latitude, longitude ,description):
+def validate_log_form(location, latitude, longitude, description, number_of_pictures):
     output = {}
     if len(location) == 0 or len(latitude) == 0 or len(longitude) == 0:
         output['error'] = "Your location could not be verified"
     elif len(description) == 0:
         output['error'] = "Description is required"
+    elif number_of_pictures == 0:
+        output['error'] = "At least one image is required"
     else:
         city = City.objects.filter(name=location)
         if len(city) == 1:
