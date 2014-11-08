@@ -61,6 +61,30 @@ def create_log(request):
         raise Http404
 
 
+def delete_log(request, log_id):
+    user = request.user
+    return_data = {}
+    if request.is_ajax():
+        if user.is_authenticated():
+            log_to_delete = Log.objects.get(id=log_id)
+            # check if log belongs to current user
+            if log_to_delete.user_profile.user == user:
+                # delete log
+                log_to_delete.delete()
+            else:
+                return_data['error'] = "This log does not belong to you"
+        else:
+            return_data['redirect_to'] = "/mytravelog/sign_in/"
+
+        return_data = json.dumps(return_data)
+        mimetype = "application/json"
+        return HttpResponse(return_data, mimetype)
+    else:
+        raise Http404
+
+
+# ---------------Helper functions----------------
+
 def validate_log_form(location, description):
     output = {}
     if len(location) == 0:
