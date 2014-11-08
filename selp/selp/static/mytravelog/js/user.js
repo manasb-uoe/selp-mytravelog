@@ -152,6 +152,8 @@ var AddLogModal = (function () {
         errorContainer: $('#add-log-modal-error-container'),
         mapContainer: $('#add-log-modal-map-container'),
         inputLocation: $('#add-log-modal-location-input'),
+        inputLatitude: $('#add-log-modal-latitude-input'),
+        inputLongitude: $('#add-log-modal-longitude-input'),
         inputAlbum: $('#add-log-modal-album-input'),
         inputDescription: $('#add-log-modal-description-input'),
         imagesContainer: $('#add-log-modal-images-container'),
@@ -196,7 +198,6 @@ var AddLogModal = (function () {
     }
 
     function _showCurrentPosition() {
-        console.log('called');
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(_showCurrentPositionSuccessCallback, _showCurrentPositionFailureCallback);
         }
@@ -209,6 +210,10 @@ var AddLogModal = (function () {
         var lat = position.coords.latitude;
         var lng = position.coords.longitude;
         var latlng = new google.maps.LatLng(lat, lng);
+
+        //fill latitude and longitude form input fields
+        _config.inputLatitude.val(lat);
+        _config.inputLongitude.val(lng);
 
         //show current location on map
         var options = {
