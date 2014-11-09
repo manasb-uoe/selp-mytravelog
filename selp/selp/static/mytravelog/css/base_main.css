@@ -1,6 +1,6 @@
 
 .navbar-shadow {
-    box-shadow: 0 10px 10px -8px #a3a3a3;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .navbar-brand-custom {
