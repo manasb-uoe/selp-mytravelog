@@ -51,13 +51,13 @@ var AddOrEditAlbumModal = (function() {
         modal: $('#add-or-edit-album-modal'),
         dropdownItemEdit: $('.album-dropdown-item-edit'),
         addNewAlbumButton: $('#add-new-album-button'),
-        formSubmitUrl: ''
+        submitUrl: ''
     };
 
     function _bindUIActions() {
         _config.addNewAlbumButton.click(function () {
             _showModal('Add new album', '', '', '', 'Add');
-            _config.formSubmitUrl = '/mytravelog/album/create/';
+            _config.submitUrl = '/mytravelog/album/create/';
         });
         _config.dropdownItemEdit.click(function () {
             //get all data about the selected album
@@ -68,11 +68,11 @@ var AddOrEditAlbumModal = (function() {
             var endDate = album.attr('data-end-date');
 
             _showModal('Edit album', name, startDate, endDate, 'Save');
-            _config.formSubmitUrl = '/mytravelog/album/update/' + id + '/'
+            _config.submitUrl = '/mytravelog/album/update/' + id + '/'
         });
         _config.form.submit(function (event) {
             event.preventDefault();
-            submitForm($(this), _config.errorContainer, _config.formSubmitUrl);
+            submitForm($(this), _config.errorContainer, _config.submitUrl);
         });
     }
 
@@ -143,6 +143,7 @@ function handleLogs() {
     AddLogModal.init();
     DeleteLogModal.init();
     LogPicturesViewer.init();
+    EditLogModal.init();
 }
 
 var AddLogModal = (function () {
@@ -418,6 +419,139 @@ var DeleteLogModal = (function () {
     return {
         init:init
     };
+}());
+
+var EditLogModal = (function () {
+
+    var _config = {
+        form: $('#edit-log-modal-form'),
+        errorContainer: $('#edit-log-modal-error-container'),
+        mapContainer: $('#edit-log-modal-map-container'),
+        inputLocation: $('#edit-log-modal-location-input'),
+        inputAlbum: $('#edit-log-modal-album-input'),
+        inputDescription: $('#edit-log-modal-description-input'),
+        imagesContainer: $('#edit-log-modal-images-container'),
+        submitButton: $('#edit-log-modal-submit-button'),
+        moreImagesButton: $('#edit-log-modal-more-images-button'),
+        modal: $('#edit-log-modal'),
+        dropdownItemEdit: $('.log-dropdown-item-edit'),
+        additionalImageCounter: 0,
+        previousImagesContainer: $('#edit-log-modal-previous-images-container'),
+        inputPreviousImagesToDelete: $('#edit-log-modal-images-to-delete'),
+        submitUrl: ''
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.dropdownItemEdit.click(function () {
+            //get required data about the selected log
+            var log = $(this).closest('.log');
+            var id = log.attr('data-id');
+            var location = log.attr('data-location');
+            var latitude = log.attr('data-latitude');
+            var longitude = log.attr('data-longitude');
+            var albumName = log.attr('data-album-name');
+            var description = log.attr('data-description');
+
+            var previousImagesInfo = {};
+            var logPicturesContainer = log.children('.log-pictures-container');
+            var logPictures = logPicturesContainer.find('.log-picture');
+            logPictures.each(function () {
+                previousImagesInfo[$(this).attr('data-id')] = $(this).attr('data-url');
+            });
+
+            _showModal(location, latitude, longitude, albumName, description, previousImagesInfo);
+
+            _config.submitUrl = '/mytravelog/log/edit/' + id + '/';
+        });
+        // if multiple files are submitted with the same name, only the last file is received on the server side
+        // to solve this, input name is changed based on a counter
+        _config.moreImagesButton.click(function () {
+            _config.additionalImageCounter++;
+            _config.imagesContainer.append('<input class="form-control form-input" id="edit-log-modal-image-input" name="log_picture_' + _config.additionalImageCounter + '" type="file">');
+        });
+        _config.form.submit(function (event) {
+            event.preventDefault();
+            submitForm($(this), _config.errorContainer, _config.submitUrl);
+        });
+        _config.previousImagesContainer.on('click', '.edit-log-modal-previous-image', function () {
+            // append picture id for every image clicked by user
+            // this id would be used by the server to delete the corresponding pictures
+            _config.inputPreviousImagesToDelete.val(_config.inputPreviousImagesToDelete.val() + $(this).attr('data-id') + ", ");
+            $(this).css('display', 'none');
+
+            var remainingImagesCounter = 0;
+            _config.previousImagesContainer.children().each(function () {
+                if ($(this).css('display') != 'none') {
+                    remainingImagesCounter++;
+                }
+            });
+            if (remainingImagesCounter == 0) {
+                _config.previousImagesContainer.append('<p class="edit-log-modal-no-previous-images-text">No more images remaining</p>');
+            }
+            console.log(remainingImagesCounter);
+        });
+    }
+
+    function _showModal(location, latitude, longitude, albumName, description, previousImageInfo) {
+        _config.errorContainer.hide();
+        _config.errorContainer.empty();
+        _config.inputLocation.val(location);
+        _config.inputAlbum.find('option[value="' + albumName + '"]').attr('selected', true);
+        _config.inputDescription.val(description);
+        _config.imagesContainer.empty().append('<input class="form-control form-input" id="edit-log-modal-image-input" name="log_picture_1" type="file">');
+        _config.additionalImageCounter = 1;
+        _config.previousImagesContainer.empty();
+        for (var key in previousImageInfo) {
+            if (previousImageInfo.hasOwnProperty(key)) {
+                var imageHtml = [
+                        '<div class="edit-log-modal-previous-image" data-id="' + key + '" style="background-image: url(\'' + previousImageInfo[key] + '\')">',
+                    '<div class="edit-log-modal-previous-image-mask">',
+                    '<div class="edit-log-modal-previous-image-delete-button"></div>',
+                    '</div>',
+                    '</div>'].join('\n');
+                _config.previousImagesContainer.append(imageHtml);
+            }
+        }
+        _config.inputPreviousImagesToDelete.val('');
+        _config.modal.modal();
+
+        //show location on map and location input field
+        setTimeout(function () {
+            _showPositionOnMap(latitude, longitude)
+        }, 1000);
+    }
+
+    function _showPositionOnMap(latitude, longitude) {
+        var latlng = new google.maps.LatLng(latitude, longitude);
+
+        //show current location on map
+        var options = {
+            zoom: 15,
+            center: latlng,
+            mapTypeControl: false,
+            navigationControlOptions: {
+                style: google.maps.NavigationControlStyle.SMALL
+            },
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        var map = new google.maps.Map(_config.mapContainer[0], options);
+        var marker = new google.maps.Marker({
+            position: latlng,
+            map: map,
+            title:"You were here!"
+        });
+        marker.setMap(map);
+    }
+
+    return {
+        init:init
+    };
+
 }());
 
 //--------------------Helper functions------------------------
