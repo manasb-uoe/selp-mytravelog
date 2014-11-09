@@ -17,5 +17,6 @@ urlpatterns = patterns('',
                        url(r'^album/update/(?P<album_id>\w+)/$', album.update_album),
                        url(r'^album/delete/(?P<album_id>\w+)/$', album.delete_album),
                        url(r'^log/create/$', log.create_log),
-                       url(r'^log/delete/(?P<log_id>\w+)/$', log.delete_log)
+                       url(r'^log/delete/(?P<log_id>\w+)/$', log.delete_log),
+                       url(r'^log/edit/(?P<log_id>\w+)/$', log.edit_log)
 )

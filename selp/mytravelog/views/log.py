@@ -87,6 +87,58 @@ def delete_log(request, log_id):
         raise Http404
 
 
+def edit_log(request, log_id):
+    if request.is_ajax():
+        user = request.user
+        return_data = {}
+        if user.is_authenticated():
+            post_data = request.POST
+            file_data = request.FILES
+            album_name = post_data.get('album_name', '')
+            description = post_data.get('description', '')
+            # get list of picture ids to remove and remove empty string at the end
+            delete_picture_ids = post_data.get('images_to_delete', '').split(',')
+            delete_picture_ids.pop()
+
+            # get log that has to be edited along with all the pictures associated with it
+            log_to_edit = Log.objects.get(id=log_id)
+            log_pictures = LogPicture.objects.filter(log=log_to_edit)
+
+            # validate log data
+            error = validate_edit_log_form(description, len(delete_picture_ids), len(file_data), len(log_pictures))
+            if error is None:
+                # update existing log
+                user_profile = UserProfile.objects.get(user=user)
+                if album_name != "None":
+                    log_to_edit.album = Album.objects.get(name=album_name, user_profile=user_profile)
+                else:
+                    log_to_edit.album = None
+                log_to_edit.description = description
+                log_to_edit.save()
+
+                # remove log pictures requested by user
+                for picture_id in delete_picture_ids:
+                    LogPicture.objects.get(id=picture_id).delete()
+
+                # create new log picture for every image submitted by user
+                for key, image_file in file_data.iteritems():
+                    new_log_picture = LogPicture()
+                    new_log_picture.log = log_to_edit
+                    new_log_picture.picture = image_file
+                    new_log_picture.save()
+
+            else:
+                return_data['error'] = error
+
+            return_data = json.dumps(return_data)
+            mimetype = "application/json"
+            return HttpResponse(return_data, mimetype)
+        else:
+            return_data['redirect_to'] = '/mytravelog/sign_in/'
+    else:
+        raise Http404
+
+
 # ---------------Helper functions----------------
 
 def validate_log_form(location, latitude, longitude, description, number_of_pictures):
@@ -104,3 +156,12 @@ def validate_log_form(location, latitude, longitude, description, number_of_pict
         else:
             output['error'] = "No city named '" + location + "' in the database"
     return output
+
+
+def validate_edit_log_form(description, number_of_pictures_to_delete, number_of_pictures_to_add, total_number_of_pictures):
+    if len(description) == 0:
+        return "Description is required"
+    elif (total_number_of_pictures - number_of_pictures_to_delete + number_of_pictures_to_add) == 0:
+        return "At least one image is required"
+    else:
+        return None
