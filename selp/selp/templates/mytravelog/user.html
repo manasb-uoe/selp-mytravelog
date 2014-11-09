@@ -116,7 +116,7 @@
             <div class="row">
                 {% for album in requested_user_albums %}
                     <div class="col-lg-4 custom-column">
-                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}">
+                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
                             <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
                                 <div class="mask">
                                     {% if authenticated_to_edit_profile %}
@@ -203,7 +203,8 @@
                 <div class="modal-body">
                     <div class="alert alert-danger error-container" id="delete-album-modal-error-container"></div>
                     <p>Are you sure you want to delete the following album:</p>
-                    <p id="delete-album-modal-album-name"></p>
+                    <p class="delete-album-modal-paragraph">Name: <span id="delete-album-modal-album-name"></span></p>
+                    <p class="delete-album-modal-paragraph">Created at: <span id="delete-album-modal-created-at"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
@@ -289,8 +290,8 @@
                 <div class="modal-body">
                     <div class="alert alert-danger error-container" id="delete-log-modal-error-container"></div>
                     <p>Are you sure you want to delete the following log:</p>
-                    <p id="delete-log-modal-paragraph">Location: <span id="delete-log-modal-location"></span></p>
-                    <p id="delete-log-modal-paragraph">Created at: <span id="delete-log-modal-created-at"></span></p>
+                    <p class="delete-log-modal-paragraph">Location: <span id="delete-log-modal-location"></span></p>
+                    <p class="delete-log-modal-paragraph">Created at: <span id="delete-log-modal-created-at"></span></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>

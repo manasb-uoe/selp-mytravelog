@@ -122,7 +122,15 @@ body {
     width: 20%;
 }
 
+#delete-album-modal .delete-album-modal-paragraph {
+    margin: 0;
+}
+
 #delete-album-modal-album-name {
+    font-weight: bold;
+}
+
+#delete-album-modal-created-at {
     font-weight: bold;
 }
 
@@ -227,7 +235,7 @@ body {
     font-weight: bold;
 }
 
-#delete-log-modal #delete-log-modal-paragraph {
+#delete-log-modal .delete-log-modal-paragraph {
     margin: 0;
 }
 

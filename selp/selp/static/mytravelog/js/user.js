@@ -100,6 +100,7 @@ var DeleteAlbumModal = (function () {
 
     var _config = {
         albumName:  $('#delete-album-modal-album-name'),
+        albumCreatedAt: $('#delete-album-modal-created-at'),
         submitButton: $('#delete-album-modal-submit-button'),
         errorContainer: $('#delete-album-modal-error-container'),
         modal: $('#delete-album-modal'),
@@ -113,8 +114,9 @@ var DeleteAlbumModal = (function () {
             var album = $(this).parents('.album');
             var id = album.attr('data-id');
             var name = album.children('.name').text();
+            var createdAt = album.attr('data-created-at');
 
-            _showModal(name);
+            _showModal(name, createdAt);
             _config.submitUrl = '/mytravelog/album/delete/' + id + '/';
         });
         _config.submitButton.click(function () {
@@ -122,8 +124,9 @@ var DeleteAlbumModal = (function () {
         });
     }
 
-    function _showModal(name) {
+    function _showModal(name, createdAt) {
         _config.albumName.text(name);
+        _config.albumCreatedAt.text(createdAt);
         _config.modal.modal();
     }
 
