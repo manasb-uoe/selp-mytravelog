@@ -26,7 +26,7 @@
     <div class="logs-content">
         <div class="logs-container">
             {% for log in requested_user_logs %}
-                <div class="log" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-created-at="{{ log.created_at }}">
+                <div class="log" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-latitude="{{ log.latitude }}" data-longitude="{{ log.longitude }}" data-album-name="{{ log.album.name }}" data-description="{{ log.description }}" data-created-at="{{ log.created_at }}">
                     <div class="header">
                         <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
                         <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
@@ -34,7 +34,6 @@
                         <div class="overflow-button"></div>
                         <div class="log-dropdown-container">
                             <div class="log-dropdown-menu">
-                                <p class="log-dropdown-item log-dropdown-item-view">View</p>
                                 <p class="log-dropdown-item log-dropdown-item-share">Share</p>
                                 <p class="log-dropdown-item log-dropdown-item-edit">Edit</p>
                                 <p class="log-dropdown-item log-dropdown-item-delete">Delete</p>
@@ -45,34 +44,34 @@
                     {% if log.pictures|length > 0 %}
                         <div class="log-pictures-container">
                             {% if log.pictures|length == 1 %}
-                                <div class="log-picture log-picture-full" data-url="{{ log.pictures.0.picture.url }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                <div class="log-picture log-picture-full" data-url="{{ log.pictures.0.picture.url }}" data-id="{{ log.pictures.0.id }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
                                     <div class="mask"></div>
                                 </div>
                             {% elif log.pictures|length == 2 %}
-                                <div class="log-picture log-picture-left" data-url="{{ log.pictures.0.picture.url }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
+                                <div class="log-picture log-picture-left" data-url="{{ log.pictures.0.picture.url }}" data-id="{{ log.pictures.0.id }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
                                     <div class="mask"></div>
                                 </div><!--
-                                --><div class="log-picture log-picture-right" data-url="{{ log.pictures.1.picture.url }}" style="background-image: url('{{ log.pictures.1.picture.url }}')">
+                                --><div class="log-picture log-picture-right" data-url="{{ log.pictures.1.picture.url }}" data-id="{{ log.pictures.1.id }}" style="background-image: url('{{ log.pictures.1.picture.url }}')">
                                 <div class="mask"></div>
                             </div>
                             {% else %}
                                 {% for log_picture in log.pictures %}
                                     {% if forloop.counter == 1 %}
-                                        <div class="log-picture log-picture-left" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                        <div class="log-picture log-picture-left" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
                                             <div class="mask"></div>
                                         </div><!--
                                     {% elif forloop.counter == 2 %}
                                         --><div class="log-picture-right">
-                                        <div class="log-picture log-picture-right-top" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                        <div class="log-picture log-picture-right-top" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
                                             <div class="mask"></div>
                                         </div>
                                         {% elif forloop.counter == 3 %}
-                                        <div class="log-picture log-picture-right-bottom" data-url="{{ log_picture.picture.url }}" style="background-image: url('{{ log_picture.picture.url }}')">
+                                        <div class="log-picture log-picture-right-bottom" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
                                             <div class="mask"></div>
                                         </div>
                                     </div>
                                     {% else %}
-                                        <div class="log-picture" data-url="{{ log_picture.picture.url }}" style="display: none"></div>
+                                        <div class="log-picture" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="display: none"></div>
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
@@ -245,11 +244,11 @@
                         <label class="form-label" for="description">Description*</label>
                         <textarea class="form-control form-input" id="add-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
                         <br>
-                        <label class="form-label">Choose images to upload</label>
+                        <label class="form-label">Choose images to upload*</label>
                         <div class="form-image-group" id="add-log-modal-images-container">
                         </div>
                         <div id="add-log-modal-more-images-button-wrapper">
-                            <p class="add-more-images-button" id="add-log-modal-more-images-button">+ Add another image</p>
+                            <p id="add-log-modal-more-images-button">+ Add another image</p>
                         </div>
                     </form>
                 </div>
@@ -300,4 +299,58 @@
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+
+    <!-- Edit log modal -->
+    <div class="modal fade" id="edit-log-modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="edit-log-modal-title">Edit log</h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-container form-group" id="edit-log-modal-form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="alert alert-danger error-container" id="edit-log-modal-error-container"></div>
+
+                        <div id="edit-log-modal-map-container"></div>
+
+                        <label class="form-label" for="location">Location*</label>
+                        <input class="form-control form-input" id="edit-log-modal-location-input" name="location" type="text" readonly required="">
+                        <br>
+                        <label class="form-label" for="album_name">Album*</label>
+                        <select class="form-control form-input" name="album_name" id="edit-log-modal-album-input" required="">
+                            <option value="None">None</option>
+                            {% for album in requested_user_albums %}
+                                <option value="{{ album.name }}">{{ album.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <br>
+                        <label class="form-label" for="description">Description*</label>
+                        <textarea class="form-control form-input" id="edit-log-modal-description-input" placeholder="Enter a short description" name="description" required="" rows="3"></textarea>
+                        <br>
+                        <label class="form-label">Previously uploaded images (Click on image to delete)</label>
+                        <div id="edit-log-modal-previous-images-container">
+                            <div class="edit-log-modal-previous-image-mask">
+                                <div class="edit-log-modal-previous-image-delete-button"></div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="images_to_delete" id="edit-log-modal-images-to-delete">
+                        <br>
+                        <label class="form-label">Choose new images to upload</label>
+                        <div class="form-image-group" id="edit-log-modal-images-container"></div>
+                        <div id="edit-log-modal-more-images-button-wrapper">
+                            <p id="edit-log-modal-more-images-button">+ Add another image</p>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="modal-footer-wrapper">
+                        <button type="button" class="btn btn-default button-negative" data-dismiss="modal">Close</button>
+                        <button type="submit" form="edit-log-modal-form" class="btn btn-primary button-positive" id="edit-log-modal-submit-button">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}

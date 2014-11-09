@@ -231,6 +231,76 @@ body {
     margin: 0;
 }
 
+#edit-log-modal #edit-log-modal-map-container {
+    background-color: #f2f2f2;
+    height: 250px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#edit-log-modal #edit-log-modal-image-input {
+    margin-bottom: 5px;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper {
+    text-align: right;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper #edit-log-modal-more-images-button {
+    color: #428bca;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper #edit-log-modal-more-images-button:hover {
+    color: #2e618d;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container {;
+    width: 100%;
+    padding: 5px 0 0 0;
+    border: 1px dashed gray;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image {
+    height: 60px;
+    width: 60px;
+    background-size: cover;
+    background-position: center center;
+    display: inline-block;
+    margin-left: 5px;
+    border-radius: 3px;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    display: table;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask .edit-log-modal-previous-image-delete-button {
+    background-position: center center;
+    background-size: contain;
+    height: 50%;
+    width: 50%;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask .edit-log-modal-previous-image-delete-button:hover {
+    background-image: url('/static/mytravelog/imgs/default/icon_delete.png');
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-no-previous-images-text {
+    text-align: center;
+    padding: 10px;
+}
+
 /*----------------logs content----------------*/
 
 .logs-content {
