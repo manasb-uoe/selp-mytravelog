@@ -12,7 +12,7 @@ class Like(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return str(self.log.id) + " " + self.user_profile.full_name
+        return str(self.log.id) + " " + self.liker_user_profile.user.get_full_name()
 
     class Meta():
         ordering = ['-created_at']
