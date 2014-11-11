@@ -102,33 +102,36 @@ def edit_log(request, log_id):
 
             # get log that has to be edited along with all the pictures associated with it
             log_to_edit = Log.objects.get(id=log_id)
-            log_pictures = LogPicture.objects.filter(log=log_to_edit)
+            if log_to_edit.user_profile.user == user:
+                log_pictures = LogPicture.objects.filter(log=log_to_edit)
 
-            # validate log data
-            error = validate_edit_log_form(description, len(delete_picture_ids), len(file_data), len(log_pictures))
-            if error is None:
-                # update existing log
-                user_profile = UserProfile.objects.get(user=user)
-                if album_name != "None":
-                    log_to_edit.album = Album.objects.get(name=album_name, user_profile=user_profile)
+                # validate log data
+                error = validate_edit_log_form(description, len(delete_picture_ids), len(file_data), len(log_pictures))
+                if error is None:
+                    # update existing log
+                    user_profile = UserProfile.objects.get(user=user)
+                    if album_name != "None":
+                        log_to_edit.album = Album.objects.get(name=album_name, user_profile=user_profile)
+                    else:
+                        log_to_edit.album = None
+                    log_to_edit.description = description
+                    log_to_edit.save()
+
+                    # remove log pictures requested by user
+                    for picture_id in delete_picture_ids:
+                        LogPicture.objects.get(id=picture_id).delete()
+
+                    # create new log picture for every image submitted by user
+                    for key, image_file in file_data.iteritems():
+                        new_log_picture = LogPicture()
+                        new_log_picture.log = log_to_edit
+                        new_log_picture.picture = image_file
+                        new_log_picture.save()
+
                 else:
-                    log_to_edit.album = None
-                log_to_edit.description = description
-                log_to_edit.save()
-
-                # remove log pictures requested by user
-                for picture_id in delete_picture_ids:
-                    LogPicture.objects.get(id=picture_id).delete()
-
-                # create new log picture for every image submitted by user
-                for key, image_file in file_data.iteritems():
-                    new_log_picture = LogPicture()
-                    new_log_picture.log = log_to_edit
-                    new_log_picture.picture = image_file
-                    new_log_picture.save()
-
+                    return_data['error'] = error
             else:
-                return_data['error'] = error
+                return_data['error'] = "This log does not belong to you"
 
             return_data = json.dumps(return_data)
             mimetype = "application/json"
