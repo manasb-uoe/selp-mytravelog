@@ -475,17 +475,20 @@ body {
     border-top: 1px solid #e1e8ed;
 }
 
-.logs-container .log .like-and-comment-count-container .count-container {
+.logs-container .log .like-and-comment-count-container .like-count-container {
     display: inline-block;
     padding: 5px 20px 5px 10px;
 }
 
-.logs-container .log .like-and-comment-count-container .right {
+.logs-container .log .like-and-comment-count-container .comment-count-container {
+    display: inline-block;
+    padding: 5px 20px 5px 10px;
     border-right: 1px solid #e1e8ed;
 }
 
 
-.logs-container .log .like-and-comment-count-container .count-container .title {
+.logs-container .log .like-and-comment-count-container .like-count-container .title,
+.logs-container .log .like-and-comment-count-container .comment-count-container .title {
     text-transform: uppercase;
     margin: 0;
     padding: 0;
@@ -493,12 +496,28 @@ body {
     font-size: 80%;
 }
 
-.logs-container .log .like-and-comment-count-container .count-container .count {
+.logs-container .log .like-and-comment-count-container .like-count-container .count,
+.logs-container .log .like-and-comment-count-container .comment-count-container .count {
     text-transform: uppercase;
     margin: 0;
     padding: 0;
     font-size: 125%;
     color: #0084B4;
+}
+
+.logs-container .log .like-and-comment-count-container .liker-profile-pictures {
+    padding: 5px 5px 5px 0;
+    display: inline-block;
+}
+
+.logs-container .log .like-and-comment-count-container .liker-profile-pictures .liker-profile-picture {
+    margin: 0 0 0 8px;
+    background-position: center center;
+    background-size: cover;
+    width: 20px;
+    float: left;
+    height: 20px;
+    border-radius: 3px;
 }
 
 .logs-container .log .like-and-comment-container {
