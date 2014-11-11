@@ -147,6 +147,7 @@ function handleLogs() {
     DeleteLogModal.init();
     LogPicturesViewer.init();
     EditLogModal.init();
+    LikeHandler.init();
 }
 
 var AddLogModal = (function () {
@@ -549,6 +550,101 @@ var EditLogModal = (function () {
             title:"You were here!"
         });
         marker.setMap(map);
+    }
+
+    return {
+        init:init
+    };
+
+}());
+
+var LikeHandler = (function () {
+
+    var _config = {
+        likeButton: $('.like-log-button'),
+        inactiveClass: 'like-log-button',
+        activeClass: 'like-log-button-active',
+        maxLikerProfilePicturesAllowed: 14
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.likeButton.click(function () {
+            var logId = $(this).attr('data-log-id');
+            var className = $(this).attr('class');
+            if (className == _config.inactiveClass) {
+                _sendPostRequest(logId, 'like' , $(this));
+            }
+            else {
+                _sendPostRequest(logId, 'dislike', $(this));
+            }
+        });
+    }
+
+    function _sendPostRequest(logId, operation, likeButton) {
+        var url = null;
+        if (operation == 'like') {
+            url = '/mytravelog/like/' + logId + '/';
+        }
+        else {
+            url = '/mytravelog/dislike/' + logId + '/';
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: csrf_token
+            },
+            success: function (response) {
+                var redirectTo = response['redirect_to'];
+                if (redirectTo != null) {
+                    window.location.href = redirectTo;
+                }
+                else {
+                    var username = response['username'];
+                    var profilePictureUrl = response['profile_picture_url'];
+                    _postSuccessCallback(username, profilePictureUrl, operation, likeButton);
+                }
+            }
+        });
+    }
+
+    function _postSuccessCallback(username, profilePictureUrl, operation, likeButton) {
+        var likeAndCommentContainer = likeButton.parent('.like-and-comment-container');
+        var likeAndCommentCountContainer = likeAndCommentContainer.siblings('.like-and-comment-count-container');
+        var likerProfilePicturesContainer = likeAndCommentCountContainer.children('.liker-profile-pictures');
+        var likeCount = likeAndCommentCountContainer.children('.like-count-container').children('.count');
+        var likeCountVal = parseInt(likeCount.text());
+
+        if (operation == 'like') {
+            likeButton.addClass(_config.activeClass);
+            // increment like count, preprend profile picture of liker and delete last picture if total pictures == max pictures allowed
+            likeCount.text(likeCountVal + 1);
+            var imageHtml = [
+                '<a href="' + "/mytravelog/user/" + username + '/" data-toggle="tooltip" title="' + username + '">',
+                    '<div class="liker-profile-picture" style="background-image: url(\'' + profilePictureUrl + '\')"></div>',
+                '</a>'
+            ].join('\n');
+            likerProfilePicturesContainer.prepend(imageHtml);
+            if (likerProfilePicturesContainer.children().length > _config.maxLikerProfilePicturesAllowed) {
+                likerProfilePicturesContainer.children().last().remove();
+            }
+        }
+        else {
+            likeButton.removeClass(_config.activeClass);
+            //decrement like count and remove profile picture of disliker
+            likeCount.text(likeCountVal - 1);
+            var linkToRemove = "/mytravelog/user/" + username + '/';
+            likerProfilePicturesContainer.children().each(function () {
+                if ($(this).attr('href') == linkToRemove) {
+                    $(this).remove();
+                }
+            });
+        }
     }
 
     return {
