@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from mytravelog.models.album import Album
+from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
@@ -109,11 +110,22 @@ def show_user(request, username):
         album.duration = duration
     data_dict['requested_user_albums'] = requested_user_albums
 
-    # get user logs and attach at all pictures to each log
+    # get user logs and attach pictures and likes to each log
     requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
-    for log in requested_user_logs: 
+    current_user_profile = data_dict.get('current_user_profile', None)
+    for log in requested_user_logs:
+        # attach pictures
         log_pictures = LogPicture.objects.filter(log=log)
         log.pictures = log_pictures
+        # attach likes and check if current user liked a log or not
+        likes = Like.objects.filter(log=log)
+        log.likes = likes
+        log.liked = False
+        for like in likes:
+            if current_user_profile is not None:
+                if like.liker_user_profile == current_user_profile:
+                    log.liked = True
+
     data_dict['requested_user_logs'] = requested_user_logs
 
     return render(request, 'mytravelog/user.html', data_dict)
@@ -152,19 +164,22 @@ def get_permissions(username, current_user):
 
     # get permissions
     authenticated_to_edit_profile = False
+    authenticated_to_like_and_comment = False
     if current_user.is_authenticated():
+        authenticated_to_like_and_comment = True
         if current_user.username == requested_user.username:
             authenticated_to_edit_profile = True
 
     # get current user profile only if authenticated
     current_user_profile = None
-    if authenticated_to_edit_profile:
+    if authenticated_to_like_and_comment:
         current_user_profile = get_object_or_404(UserProfile, user=current_user)
 
     # load all the required data and permissions into a dict
     data_dict = {'requested_user': requested_user,
                  'requested_user_profile': requested_user_profile,
                  'authenticated_to_edit_profile': authenticated_to_edit_profile,
+                 'authenticated_to_like_and_comment': authenticated_to_like_and_comment,
                  'current_user_profile': current_user_profile}
 
     return data_dict
