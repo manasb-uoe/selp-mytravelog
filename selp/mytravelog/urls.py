@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from mytravelog.views import search, album, log, like
+from mytravelog.views import search, album, log, like, comment
 from views import home, user, city
 
 __author__ = 'Manas'
@@ -20,5 +20,7 @@ urlpatterns = patterns('',
                        url(r'^log/delete/(?P<log_id>\w+)/$', log.delete_log),
                        url(r'^log/edit/(?P<log_id>\w+)/$', log.edit_log),
                        url(r'^like/(?P<log_id>\w+)/$', like.like_log),
-                       url(r'^dislike/(?P<log_id>\w+)/$', like.dislike_log)
+                       url(r'^dislike/(?P<log_id>\w+)/$', like.dislike_log),
+                       url(r'^comment/create/(?P<log_id>\w+)/$', comment.create_log_comment),
+                       url(r'^comment/delete/(?P<comment_id>\w+)/$', comment.delete_log_comment)
 )
