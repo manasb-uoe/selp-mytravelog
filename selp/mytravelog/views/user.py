@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from mytravelog.models.album import Album
+from mytravelog.models.comment import Comment
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
@@ -110,7 +111,7 @@ def show_user(request, username):
         album.duration = duration
     data_dict['requested_user_albums'] = requested_user_albums
 
-    # get user logs and attach pictures and likes to each log
+    # get user logs and attach pictures, likes and comments to each log
     requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
     current_user_profile = data_dict.get('current_user_profile', None)
     for log in requested_user_logs:
@@ -125,6 +126,14 @@ def show_user(request, username):
             if current_user_profile is not None:
                 if like.liker_user_profile == current_user_profile:
                     log.liked = True
+        # attach comments and check if current user can delete it or not
+        comments = Comment.objects.filter(log=log)
+        log.comments = comments
+        for comment in comments:
+            comment.can_delete = False
+            if current_user_profile is not None:
+                if comment.commenter_user_profile == current_user_profile:
+                    comment.can_delete = True
 
     data_dict['requested_user_logs'] = requested_user_logs
 
