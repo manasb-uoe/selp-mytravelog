@@ -588,10 +588,10 @@ var LikeHandler = (function () {
     function _sendPostRequest(logId, operation, likeButton) {
         var url = null;
         if (operation == 'like') {
-            url = '/mytravelog/like/' + logId + '/';
+            url = '/mytravelog/like/create/' + logId + '/';
         }
         else {
-            url = '/mytravelog/dislike/' + logId + '/';
+            url = '/mytravelog/like/delete/' + logId + '/';
         }
 
         $.ajax({
