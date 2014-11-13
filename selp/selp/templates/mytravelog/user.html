@@ -98,7 +98,7 @@
                         </div>
                         <div class="comment-count-container">
                             <p class="title">Comments</p>
-                            <p class="count">0</p>
+                            <p class="count">{{ log.comments.count }}</p>
                         </div>
                         <div class="liker-profile-pictures">
                             {% for like in log.likes %}
@@ -110,17 +110,37 @@
                     </div>
 
                     <div class="like-and-comment-container">
+                        <div class="comment-container">
+                            {% for comment in log.comments %}
+                                <div class="comment">
+                                    <a href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">
+                                        <div class="comment-profile-picture" style="background-image: url('{{ comment.commenter_user_profile.profile_picture.url }}/')"></div>
+                                    </a>
+                                    <div class="comment-content">
+                                        <div class="comment-header">
+                                            <a class="comment-full-name" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">{{ comment.commenter_user_profile.user.get_full_name }}</a>
+                                            <a class="comment-username" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">@{{ comment.commenter_user_profile.user.username }}</a>
+                                            <p class="comment-timestamp">• {{ comment.created_at }}</p>
+                                        </div>
+                                        <p class="comment-body">{{ comment.body }}</p>
+                                        {% if comment.can_delete %}
+                                            <p class="comment-delete-button" data-comment-id="{{ comment.id }}">Delete</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
                         {% if authenticated_to_like_and_comment %}
                             {% if log.liked %}
                                 <button class="like-log-button like-log-button-active" data-log-id="{{ log.id }}"></button>
-                                <input class="form-control comment-log-input" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
+                                <input class="form-control comment-log-input" data-log-id="{{ log.id }}" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
                             {% else %}
                                 <button class="like-log-button" data-log-id="{{ log.id }}"></button>
-                                <input class="form-control comment-log-input" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
+                                <input class="form-control comment-log-input" data-log-id="{{ log.id }}" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
                             {% endif %}
                         {% else %}
                             <button class="like-log-button" data-log-id="{{ log.id }}" disabled></button>
-                            <input class="form-control comment-log-input" type="text" placeholder="You need to sign in to comment" autocomplete="off" required="true" disabled>
+                            <input class="form-control comment-log-input" type="text" data-log-id="{{ log.id }}" placeholder="You need to sign in to comment" autocomplete="off" required="true" disabled>
                         {% endif %}
                     </div>
                 </div>

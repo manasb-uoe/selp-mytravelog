@@ -470,7 +470,7 @@ body {
 }
 
 .logs-container .log .like-and-comment-count-container {
-    margin: 5px 15px 10px 15px;
+    margin: 5px 15px 0 15px;
     border-bottom: 1px solid #e1e8ed;
     border-top: 1px solid #e1e8ed;
 }
@@ -521,7 +521,8 @@ body {
 }
 
 .logs-container .log .like-and-comment-container {
-    padding: 15px;
+    padding: 5px 15px 15px 15px;
+    margin-bottom: 5px;
 }
 
 .logs-container .log .like-and-comment-container .like-log-button {
@@ -562,6 +563,67 @@ body {
 
 .logs-container .log .like-and-comment-container .comment-log-input:focus {
     background-color: #ffffff;
+}
+
+.logs-container .log .like-and-comment-container .comment-container {
+    padding-top: 10px;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-profile-picture {
+    background-position: center center;
+    background-size: cover;
+    width: 25px;
+    height: 25px;
+    display: inline-block;
+    border-radius: 3px;
+    float: left;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content {
+    display: inline-block;
+    margin-left: 10px;
+    width: 90%;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-header {
+    margin-top: -3px;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-header .comment-full-name {
+    font-weight: bold;
+    margin: 0;
+    color: #000000;
+    display: inline-block;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-header .comment-username {
+    color: #8899a6;
+    margin: 0;
+    display: inline-block;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-header .comment-timestamp {
+    color: #8899a6;
+    margin: 0;
+    display: inline-block;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-body {
+    margin: 0;
+}
+
+.logs-container .log .like-and-comment-container .comment-container .comment .comment-content .comment-delete-button {
+    color: red;
+    /*font-weight: bold;*/
+    font-size: 80%;
+    cursor: pointer;
+    margin: 0;
+    display: inline-block;
 }
 
 /*----------------albums content----------------*/
