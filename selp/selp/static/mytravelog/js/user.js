@@ -148,6 +148,7 @@ function handleLogs() {
     LogPicturesViewer.init();
     EditLogModal.init();
     LikeHandler.init();
+    CommentHandler.init();
 }
 
 var AddLogModal = (function () {
@@ -625,7 +626,7 @@ var LikeHandler = (function () {
             // increment like count, preprend profile picture of liker and delete last picture if total pictures == max pictures allowed
             likeCount.text(likeCountVal + 1);
             var imageHtml = [
-                '<a href="' + "/mytravelog/user/" + username + '/" data-toggle="tooltip" title="' + username + '">',
+                    '<a href="' + "/mytravelog/user/" + username + '/" data-toggle="tooltip" title="' + username + '">',
                     '<div class="liker-profile-picture" style="background-image: url(\'' + profilePictureUrl + '\')"></div>',
                 '</a>'
             ].join('\n');
@@ -644,6 +645,130 @@ var LikeHandler = (function () {
                     $(this).remove();
                 }
             });
+        }
+    }
+
+    return {
+        init:init
+    };
+
+}());
+
+var CommentHandler = (function () {
+
+    var _config = {
+        inputComment: $('.comment-log-input'),
+        createCommentBaseUrl: '/mytravelog/comment/create/',
+        deleteCommentBaseUrl: '/mytravelog/comment/delete/',
+        dataLogIdAttr: 'data-log-id',
+        dataCommentIdAttr: 'data-comment-id',
+        createCommentOperation: 'create_comment',
+        deleteCommentOperation: 'delete_comment',
+        commentContainerClass: '.comment-container',
+        commentDeleteButtonClass: '.comment-delete-button',
+        likeAndCommentContainerClass: '.like-and-comment-container',
+        likeAndCommentCountContainerClass: '.like-and-comment-count-container',
+        commentCountContainerClass: '.comment-count-container',
+        countClass: '.count',
+        commentClass: '.comment'
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.inputComment.keypress(function (event) {
+            //detect enter keypress
+            if (event.which == 13) {
+                var logId = $(this).attr(_config.dataLogIdAttr);
+                var body = $(this).val();
+                _sendPostRequest(logId, body, _config.createCommentOperation, $(this));
+            }
+        });
+        $(_config.commentContainerClass).on('click', _config.commentDeleteButtonClass, function () {
+            var commentId = $(this).attr(_config.dataCommentIdAttr);
+            _sendPostRequest(commentId, null, _config.deleteCommentOperation, $(this));
+        });
+    }
+
+    function _sendPostRequest(id, body, operation, inputComment) {
+        var url = null;
+        if (operation == _config.createCommentOperation) {
+            url = _config.createCommentBaseUrl + id + '/';
+        }
+        else {
+            url = _config.deleteCommentBaseUrl + id + '/';
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: csrf_token,
+                body: body
+            },
+            success: function (response) {
+                var redirectTo = response['redirect_to'];
+                var error_message = response['error'];
+                if (redirectTo != null) {
+                    window.location.href = redirectTo;
+                }
+                else if (error_message != null) {
+                    window.alert(error_message);
+                }
+                else {
+                    _postSuccessCallback(response, operation, inputComment);
+                }
+            }
+        });
+    }
+
+    // if operation == create_comment, then selector is inputComment, else the selector is deleteButton
+    function _postSuccessCallback(response, operation, selector) {
+        selector.val("");
+        var likeAndCommentContainer = null;
+        var likeAndCommentCountContainer = null;
+        var commentCount = null;
+        var commentCountVal = 0;
+
+        if (operation == _config.createCommentOperation) {
+            likeAndCommentContainer = selector.parent(_config.likeAndCommentContainerClass);
+            likeAndCommentCountContainer = likeAndCommentContainer.siblings(_config.likeAndCommentCountContainerClass);
+            commentCount = likeAndCommentCountContainer.children(_config.commentCountContainerClass).children(_config.countClass);
+            commentCountVal = parseInt(commentCount.text());
+            var commentContainer = likeAndCommentContainer.children(_config.commentContainerClass);
+
+            // increment comment count and add comment
+            commentCount.text(commentCountVal + 1);
+            var commentHtml = [
+                '<div class="comment">',
+                '<a href="/mytravelog/user/' + response['username'] + '/">',
+                    '<div class="comment-profile-picture" style="background-image: url(' + response['profile_picture_url'] + ')"></div>',
+                '</a>',
+                '<div class="comment-content">',
+                '<div class="comment-header">',
+                    '<a class="comment-full-name" href="/mytravelog/user/' + response['username'] + '/">' + response['full_name'] + '</a>',
+                    '<a class="comment-username" href="/mytravelog/user/' + response['username'] + '/">' + response['username'] + '</a>',
+                    '<p class="comment-timestamp">• ' + response['created_at'] + '</p>',
+                '</div>',
+                    '<p class="comment-body">' + response['body'] + '</p>',
+                '<p class="comment-delete-button" data-comment-id="' + response['comment_id'] + '">Delete</p>',
+                '</div>',
+                '</div>'
+            ].join('\n');
+            commentContainer.append(commentHtml);
+        }
+        else {
+            likeAndCommentContainer = selector.parents(_config.likeAndCommentContainerClass);
+            likeAndCommentCountContainer = likeAndCommentContainer.siblings(_config.likeAndCommentCountContainerClass);
+            commentCount = likeAndCommentCountContainer.children(_config.commentCountContainerClass).children(_config.countClass);
+            commentCountVal = parseInt(commentCount.text());
+
+            //decrement comment count and delete comment
+            commentCount.text(commentCountVal - 1);
+            var commentToDelete = selector.closest(_config.commentClass);
+            commentToDelete.remove();
         }
     }
 
