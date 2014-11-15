@@ -27,10 +27,10 @@ function getCityAutocompleteSuggestions() {
                     for (var key in data) {
                         if (data.hasOwnProperty(key)) {
                             if (counter % 2 == 0) {
-                                suggestions_container.append('<div class="suggestion-light">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
+                                suggestions_container.append('<div class="suggestion suggestion-light">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
                             }
                             else {
-                                suggestions_container.append('<div class="suggestion-dark">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
+                                suggestions_container.append('<div class="suggestion suggestion-dark">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
                             }
                             counter++;
                         }
