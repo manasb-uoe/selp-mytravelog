@@ -563,8 +563,18 @@ var LikeHandler = (function () {
 
     var _config = {
         likeButton: $('.like-log-button'),
-        inactiveClass: 'like-log-button',
-        activeClass: 'like-log-button-active',
+        likeButtonInActiveClass: 'like-log-button',
+        likeButtonActiveClass: 'like-log-button-active',
+        dataLogIdAttr: 'data-log-id',
+        createLikeOperation: 'create_like',
+        deleteLikeOperation: 'delete_like',
+        createLikeBaseUrl: '/mytravelog/like/create/',
+        deleteLikeBaseUrl: '/mytravelog/like/delete/',
+        likeAndCommentContainerClass: '.like-and-comment-container',
+        likeAndCommentCountContainerClass: '.like-and-comment-count-container',
+        likerProfilePicturesClass: '.liker-profile-pictures',
+        likeCountContainerClass: '.like-count-container',
+        countClass: '.count',
         maxLikerProfilePicturesAllowed: 14
     };
 
@@ -574,24 +584,24 @@ var LikeHandler = (function () {
 
     function _bindUIActions() {
         _config.likeButton.click(function () {
-            var logId = $(this).attr('data-log-id');
+            var logId = $(this).attr(_config.dataLogIdAttr);
             var className = $(this).attr('class');
-            if (className == _config.inactiveClass) {
-                _sendPostRequest(logId, 'like' , $(this));
+            if (className == _config.likeButtonInActiveClass) {
+                _sendPostRequest(logId, _config.createLikeOperation , $(this));
             }
             else {
-                _sendPostRequest(logId, 'dislike', $(this));
+                _sendPostRequest(logId, _config.deleteLikeOperation, $(this));
             }
         });
     }
 
     function _sendPostRequest(logId, operation, likeButton) {
         var url = null;
-        if (operation == 'like') {
-            url = '/mytravelog/like/create/' + logId + '/';
+        if (operation == _config.createLikeOperation) {
+            url = _config.createLikeBaseUrl + logId + '/';
         }
         else {
-            url = '/mytravelog/like/delete/' + logId + '/';
+            url = _config.deleteLikeBaseUrl + logId + '/';
         }
 
         $.ajax({
@@ -615,14 +625,14 @@ var LikeHandler = (function () {
     }
 
     function _postSuccessCallback(username, profilePictureUrl, operation, likeButton) {
-        var likeAndCommentContainer = likeButton.parent('.like-and-comment-container');
-        var likeAndCommentCountContainer = likeAndCommentContainer.siblings('.like-and-comment-count-container');
-        var likerProfilePicturesContainer = likeAndCommentCountContainer.children('.liker-profile-pictures');
-        var likeCount = likeAndCommentCountContainer.children('.like-count-container').children('.count');
+        var likeAndCommentContainer = likeButton.parent(_config.likeAndCommentContainerClass);
+        var likeAndCommentCountContainer = likeAndCommentContainer.siblings(_config.likeAndCommentCountContainerClass);
+        var likerProfilePicturesContainer = likeAndCommentCountContainer.children(_config.likerProfilePicturesClass);
+        var likeCount = likeAndCommentCountContainer.children(_config.likeCountContainerClass).children(_config.countClass);
         var likeCountVal = parseInt(likeCount.text());
 
-        if (operation == 'like') {
-            likeButton.addClass(_config.activeClass);
+        if (operation == _config.createLikeOperation) {
+            likeButton.addClass(_config.likeButtonActiveClass);
             // increment like count, preprend profile picture of liker and delete last picture if total pictures == max pictures allowed
             likeCount.text(likeCountVal + 1);
             var imageHtml = [
@@ -636,7 +646,7 @@ var LikeHandler = (function () {
             }
         }
         else {
-            likeButton.removeClass(_config.activeClass);
+            likeButton.removeClass(_config.likeButtonActiveClass);
             //decrement like count and remove profile picture of disliker
             likeCount.text(likeCountVal - 1);
             var linkToRemove = "/mytravelog/user/" + username + '/';
