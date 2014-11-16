@@ -34,7 +34,15 @@
                             <p class="tab-name">Following</p>
                             <p class="count">4</p>
                         </a>
-                        <button class="btn btn-default edit-profile-button">Edit profile</button>
+
+                        {% if authenticated_to_edit_profile %}
+                            <button class="btn btn-primary button-add-new logs-content" id="add-new-log-button">Add new log</button>
+                        {% endif %}
+
+                        {% if authenticated_to_edit_profile %}
+                            <button class="btn btn-primary button-add-new albums-content" id="add-new-album-button">Add new album</button>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>
@@ -49,8 +57,21 @@
             <p class="full-name">{{ requested_user_profile.user.get_full_name }}</p>
             <p class="username">@{{ requested_user_profile.user.username }}</p>
             <div class="left-column">
-                {% block left_column_block %}
-                {% endblock %}
+                <div class="travel-stats-container">
+                    <div class="stat-container">
+                        <p class="count">{{ requested_user_profile.country_count }}</p>
+                        <p class="title">Countries</p>
+                    </div>
+                    <div class="stat-container">
+                        <p class="count">{{ requested_user_profile.city_count }}</p>
+                        <p class="title">Cities</p>
+                    </div>
+                    <div class="stat-container">
+                        <p class="count">1</p>
+                        <p class="title">Rank</p>
+                    </div>
+                    <button class="btn btn-primary world-map-button" id="show-on-map-button">Show on Map</button>
+                </div>
             </div>
         </div>
         <div class="col-lg-9">

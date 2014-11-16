@@ -2,6 +2,7 @@
 /*----------------base_user----------------*/
 body {
     background-color: #f5f8fa;
+    overflow-y: scroll;
 }
 
 .cover-picture {
@@ -57,12 +58,6 @@ body {
     font-size: 125%;
 }
 
-.tabs-bar .tabs-container .edit-profile-button {
-    display: inline-block;
-    float: right;
-    margin-top: 12px;
-}
-
 .main-user-container {
     margin-top: 20px;
     margin-bottom: 30px;
@@ -87,6 +82,8 @@ body {
     font-size: 150%;
     font-weight: bold;
     margin: 5px 0 0 0;
+    text-align: center;
+    width: 200px;
 }
 
 .main-user-container .username {
@@ -94,6 +91,47 @@ body {
     margin-top: -5px;
     color: gray;
     padding: 0;
+    width: 200px;
+    text-align: center;
+}
+
+.travel-stats-container {
+    text-align: center;
+    width: 200px;
+    margin-top: 15px;
+}
+
+.travel-stats-container .title {
+    font-size: 130%;
+    text-align: center;
+    color: gray;
+}
+
+.travel-stats-container .stat-container {
+    display: inline-block;
+    width: 31%;
+}
+
+.travel-stats-container .stat-container .title {
+    text-align: center;
+    font-weight: 500;
+    color: gray;
+    font-size: 80%;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.travel-stats-container .stat-container .count {
+    text-align: center;
+    margin: 0;
+    color: #0084B4;
+    font-size: 130%;
+    padding: 0;
+}
+
+.travel-stats-container .world-map-button {
+    margin-top: 15px;
+    width: 100%;
 }
 
 /*----------------modals----------------*/
@@ -135,8 +173,10 @@ body {
 }
 
 .button-add-new {
-    margin-top: 15px;
-    width: 200px;
+    display: inline-block;
+    float: right;
+    margin-top: 12px;
+    width: 140px;
 }
 
 #add-log-modal-more-images-button-wrapper {

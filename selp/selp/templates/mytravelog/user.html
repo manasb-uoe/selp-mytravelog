@@ -1,25 +1,6 @@
 {% extends 'mytravelog/master/user_base.html' %}
 {% load static %}
 
-<!-- left column -->
-{% block left_column_block %}
-    <div class="logs-content">
-        {% if authenticated_to_edit_profile %}
-            <button class="btn btn-primary button-add-new" id="add-new-log-button">Add new log</button>
-        {% endif %}
-    </div>
-
-    <div class="albums-content">
-        {% if authenticated_to_edit_profile %}
-            <button class="btn btn-primary button-add-new" id="add-new-album-button">Add new album</button>
-        {% endif %}
-    </div>
-
-    <div class="followers-content"></div>
-
-    <div class="following-content"></div>
-{% endblock %}
-
 <!-- right column -->
 {% block right_column_block %}
 
