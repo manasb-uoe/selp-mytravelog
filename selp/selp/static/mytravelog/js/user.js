@@ -4,32 +4,58 @@
 
 //--------------------Base------------------------
 
-function handleTabNavigation() {
-    // navigate to logs if no hash found
-    if (window.location.hash == '') {
-        window.location.href = window.location.href + '#logs'
+var TabNavigationHandler = (function () {
+
+    var _config = {
+        addNewLogButton: $('#add-new-log-button'),
+        addNewAlbumButton: $('#add-new-album-button')
+    };
+
+    function _navigateToActiveTab() {
+        var hash = window.location.hash;
+
+        // only mark selected tab as active
+        var activeTab = $('a[href="' + hash +'"]');
+        activeTab.siblings().removeClass('tab-active');
+        activeTab.addClass('tab-active');
+
+        // only show active tab content
+        var activeContent = $('.' + hash.substr(1) + '-content');
+        activeContent.show();
+        activeContent.siblings('div[class$=content]').hide();
+        if (hash == '#logs') {
+            _config.addNewAlbumButton.hide();
+            _config.addNewLogButton.show();
+        }
+        else if (hash == '#albums') {
+            _config.addNewAlbumButton.show();
+            _config.addNewLogButton.hide();
+        }
+        else {
+            _config.addNewAlbumButton.hide();
+            _config.addNewLogButton.hide();
+        }
     }
-    navigateToActiveTab();
 
-    // navigate to active tab every time the hash changes
-    $(window).on('hashchange', function () {
-        navigateToActiveTab();
-    });
-}
+    function init() {
+        // navigate to logs if no hash found
+        if (window.location.hash == '') {
+            window.location.href = window.location.href + '#logs'
+        }
+        _navigateToActiveTab();
 
-function navigateToActiveTab() {
-    var hash = window.location.hash;
+        // navigate to active tab every time the hash changes
+        $(window).on('hashchange', function () {
+            _navigateToActiveTab();
+        });
+    }
 
-    // only mark selected tab as active
-    var activeTab = $('a[href="' + hash +'"]');
-    activeTab.siblings().removeClass('tab-active');
-    activeTab.addClass('tab-active');
+    return {
+        init:init
+    };
 
-    // only show active tab content
-    var activeContent = $('.' + hash.substr(1) + '-content');
-    activeContent.show();
-    activeContent.siblings().hide();
-}
+}());
+
 
 //--------------------Albums------------------------
 
@@ -753,7 +779,7 @@ var CommentHandler = (function () {
             commentCount.text(commentCountVal + 1);
             var commentHtml = [
                 '<div class="comment">',
-                '<a href="/mytravelog/user/' + response['username'] + '/">',
+                    '<a href="/mytravelog/user/' + response['username'] + '/">',
                     '<div class="comment-profile-picture" style="background-image: url(' + response['profile_picture_url'] + ')"></div>',
                 '</a>',
                 '<div class="comment-content">',
@@ -763,7 +789,7 @@ var CommentHandler = (function () {
                     '<p class="comment-timestamp">• ' + response['created_at'] + '</p>',
                 '</div>',
                     '<p class="comment-body">' + response['body'] + '</p>',
-                '<p class="comment-delete-button" data-comment-id="' + response['comment_id'] + '">Delete</p>',
+                    '<p class="comment-delete-button" data-comment-id="' + response['comment_id'] + '">Delete</p>',
                 '</div>',
                 '</div>'
             ].join('\n');
@@ -858,7 +884,7 @@ function submitSimpleRequest(errorContainer, url) {
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
-    handleTabNavigation();
+    TabNavigationHandler.init();
     handleAlbums();
     handleLogs();
 });
