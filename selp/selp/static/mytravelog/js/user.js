@@ -814,6 +814,86 @@ var CommentHandler = (function () {
 
 }());
 
+//--------------------Followers------------------------
+
+var FollowerHandler = (function () {
+
+    var _config = {
+        followButton: $('.follow-button'),
+        followButtonActiveClass: 'follow-button-active',
+        followButtonInactiveClass: 'follow-button',
+        followingUserProfileIdAttr: 'data-following-user-profile-id',
+        createFollowerBaseUrl: '/mytravelog/follower/create/',
+        deleteFollowerBaseUrl: '/mytravelog/follower/delete/',
+        createFollowerOperation: 'create_follower',
+        deleteFollowerOperation: 'delete_follower'
+    };
+
+    function _bindUIActions() {
+        _config.followButton.click(function () {
+            var followingUserProfileId = $(this).attr(_config.followingUserProfileIdAttr);
+            if ($(this).attr('class').indexOf(_config.followButtonActiveClass) == -1) {
+                _sendPostRequest(followingUserProfileId, _config.createFollowerOperation, $(this), _postSuccessCallback);
+            }
+            else {
+                _sendPostRequest(followingUserProfileId, _config.deleteFollowerOperation, $(this), _postSuccessCallback);
+            }
+        });
+    }
+
+    function _sendPostRequest(followerUserProfileId, operation, followButton, successCallback) {
+        var url = null;
+        if (operation == _config.createFollowerOperation) {
+            url = _config.createFollowerBaseUrl + followerUserProfileId + "/";
+        }
+        else {
+            url = _config.deleteFollowerBaseUrl + followerUserProfileId + "/";
+        }
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: csrf_token,
+                follower_user_profile_id: followerUserProfileId
+            },
+            success: function (response) {
+                var redirectTo = response['redirect_to'];
+                var error_message = response['error'];
+                if (redirectTo != null) {
+                    window.location.href = redirectTo;
+                }
+                else if (error_message != null) {
+                    alert(error_message);
+                }
+                else {
+                    successCallback(operation, followButton);
+                }
+            }
+        });
+    }
+
+    function _postSuccessCallback(operation, followButton) {
+        if (operation == _config.createFollowerOperation) {
+            followButton.addClass(_config.followButtonActiveClass);
+            followButton.text('Following');
+        }
+        else {
+            followButton.removeClass(_config.followButtonActiveClass);
+            followButton.text('Follow');
+        }
+    }
+
+    function init() {
+        _bindUIActions();
+    }
+
+    return {
+        init:init
+    };
+
+}());
+
 //--------------------Helper functions------------------------
 
 function submitForm(form, errorContainer, url) {
@@ -884,7 +964,12 @@ function submitSimpleRequest(errorContainer, url) {
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
-    TabNavigationHandler.init();
+    // only initialize tab handler if the user is currently on the user page
+    if (window.location.href.indexOf('/user/') > -1) {
+        TabNavigationHandler.init();
+        console.log('init');
+    }
     handleAlbums();
     handleLogs();
+    FollowerHandler.init();
 });
