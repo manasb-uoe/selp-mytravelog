@@ -116,6 +116,7 @@ body {
     border: 1px solid #e1e8ed;
     border-radius: 5px;
     text-align: left;
+    margin-bottom: 25px;
 }
 
 .search-container .results-container .user-results .user .cover-picture {
@@ -154,6 +155,23 @@ body {
 .search-container .results-container .user-results .user .info-container .follow-button {
     float: right;
     outline: none;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid lightgrey;
+    width: 100px;
+}
+
+.search-container .results-container .user-results .user .info-container .follow-button:hover {
+    background-color: #f2f2f2;
+}
+
+.search-container .results-container .user-results .user .info-container .follow-button-active {
+    background-color: #428bca;
+    color: #ffffff;
+}
+
+.search-container .results-container .user-results .user .info-container .follow-button-active:hover {
+    background-color: #2e618d;
 }
 
 .search-container .results-container .user-results .user .info-container .full-name {
