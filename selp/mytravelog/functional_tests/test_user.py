@@ -13,14 +13,16 @@ class UserTest(unittest.TestCase):
     url_home = 'http://127.0.0.1:8000/mytravelog/'
     url_sign_up = 'http://127.0.0.1:8000/mytravelog/sign_up/'
     url_sign_in = 'http://127.0.0.1:8000/mytravelog/sign_in/'
+    url_user = 'http://127.0.0.1:8000/mytravelog/user/test_user/'
 
     def setUp(self):
-        self.browser = webdriver.Chrome()
+        self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
         self.browser.quit()
 
+    @skip('test_user already exists in the database')
     def test_sign_up(self):
         # User navigates to the sign up page
         self.browser.get(self.url_sign_up)
@@ -103,6 +105,69 @@ class UserTest(unittest.TestCase):
         # Ensure that user dropdown toggle is not visible anymore
         if len(self.browser.find_elements_by_id('user-dropdown-toggle')) != 0:
             self.fail('User dropdown should not be visible to a guest user')
+
+    def test_user_page_tab_navigation(self):
+        # User navigates to the user page
+        self.browser.get(self.url_user)
+
+        # User notices that a fragment identified for logs is immediately added to the url
+        self.assertEqual(self.url_user + "#logs", self.browser.current_url)
+
+        # User clicks on the logs tab
+        # gets navigated to #logs
+        link_logs = self.browser.find_element_by_css_selector('a[href=\'#logs\']')
+        link_logs.click()
+        self.assertEqual(self.url_user + "#logs", self.browser.current_url)
+
+        content_divs = {
+            'logs-content': self.browser.find_element_by_class_name('logs-content'),
+            'albums-content': self.browser.find_element_by_class_name('albums-content'),
+            'followers-content': self.browser.find_element_by_class_name('followers-content'),
+            'following-content': self.browser.find_element_by_class_name('following-content')
+        }
+        # Check if ONLY logs content div is visible
+        self.assertTrue(self.is_content_div_visible(content_divs, 'logs-content'))
+
+        # User clicks on the albums tab
+        # gets navigated to #albums and only albums content is visible
+        link_albums = self.browser.find_element_by_css_selector('a[href=\'#albums\']')
+        link_albums.click()
+        self.assertEqual(self.url_user + "#albums", self.browser.current_url)
+
+        # Check if ONLY albums content div is visible
+        self.assertTrue(self.is_content_div_visible(content_divs, 'albums-content'))
+
+        # User clicks on the followers tab
+        # gets navigated to #followers and only followers content is visible
+        link_followers = self.browser.find_element_by_css_selector('a[href=\'#followers\']')
+        link_followers.click()
+        self.assertEqual(self.url_user + "#followers", self.browser.current_url)
+
+        # Check if ONLY followers content div is visible
+        self.assertTrue(self.is_content_div_visible(content_divs, 'followers-content'))
+
+        # User clicks on the following tab
+        # gets navigated to #following and only following content is visible
+        link_following = self.browser.find_element_by_css_selector('a[href=\'#following\']')
+        link_following.click()
+        self.assertEqual(self.url_user + "#following", self.browser.current_url)
+
+        # Check if ONLY following content div is visible
+        self.assertTrue(self.is_content_div_visible(content_divs, 'following-content'))
+
+    # A helper function which checks whether a div is currently visible (while other divs are invisible)
+    def is_content_div_visible(self, content_divs, content_div_classname):
+        boolean_list = []
+        for classname, div in content_divs.iteritems():
+            if classname == content_div_classname:
+                boolean_list.append('display: block' in div.get_attribute('style'))
+            else:
+                boolean_list.append('display: none' in div.get_attribute('style'))
+        return all(boolean_list)
+
+    def
+
+
 
 
 
