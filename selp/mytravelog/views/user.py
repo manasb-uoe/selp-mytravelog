@@ -4,6 +4,7 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from mytravelog.models.album import Album
 from mytravelog.models.comment import Comment
+from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
@@ -134,8 +135,31 @@ def show_user(request, username):
             if current_user_profile is not None:
                 if comment.commenter_user_profile == current_user_profile:
                     comment.can_delete = True
-
     data_dict['requested_user_logs'] = requested_user_logs
+
+    # get user followers
+    requested_user_followers = Follower.objects.filter(following_user_profile=data_dict['requested_user_profile'])
+    for follower in requested_user_followers:
+        follower.followed = False
+        if current_user_profile is not None:
+            if len(Follower.objects.filter(follower_user_profile=current_user_profile,
+                                           following_user_profile=follower.follower_user_profile)) > 0:
+                follower.followed = True
+    data_dict['requested_user_followers'] = requested_user_followers
+
+    # get users followed by current user
+    requested_user_following = Follower.objects.filter(follower_user_profile=data_dict['requested_user_profile'])
+    if current_user_profile is not None:
+        for following in requested_user_following:
+            following.followed = True
+    data_dict['requested_user_following'] = requested_user_following
+
+    # check if requested user is being followed by current user
+    is_following = False
+    if current_user_profile is not None:
+        if len(Follower.objects.filter(follower_user_profile=current_user_profile, following_user_profile=data_dict['requested_user_profile'])) > 0:
+            is_following = True
+    data_dict['is_followed'] = is_following
 
     return render(request, 'mytravelog/user.html', data_dict)
 
