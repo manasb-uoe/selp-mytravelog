@@ -134,6 +134,16 @@ body {
     width: 100%;
 }
 
+.travel-stats-container .world-map-button:focus {
+    outline: none;
+}
+
+#main-follow-button {
+    width: 200px;
+    margin-top: 5px;
+    float: left;
+}
+
 /*----------------modals----------------*/
 .form-container {
     width: 90%;
@@ -767,6 +777,87 @@ body {
 
 .followers-content {
     display: none;
+}
+
+.followers-container .follower {
+    background-color: #fff;
+    border: 1px solid #e1e8ed;
+    border-radius: 5px;
+    text-align: left;
+    margin-bottom: 25px;
+}
+
+.followers-container .follower .cover-picture {
+    width: 100%;
+    height: 110px;
+    border-bottom: 1px solid #e1e8ed;
+    background-color: #0084b4;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+}
+
+.followers-container .follower .info-container {
+    margin: 0 10px 10px 10px;
+}
+
+.followers-container .follower .info-container .profile-picture-container {
+    width: 76px;
+    height: 76px;
+    margin-top: -50px;
+    margin-bottom: 5px;
+    background-size: cover;
+    border: 4px solid #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 1px rgba(136,153,166,0.15);
+}
+
+.followers-container .follower .info-container .profile-picture-container .profile-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 6px;
+}
+
+.follow-button {
+    float: right;
+    outline: none;
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid lightgrey;
+    width: 100px;
+}
+
+.follow-button:focus {
+    outline: none;
+}
+
+.follow-button:hover {
+    background-color: #f2f2f2;
+}
+
+.follow-button-active {
+    background-color: #68bf60;
+    color: #ffffff !important;
+}
+
+.follow-button-active:hover {
+    background-color: #5DAB56;
+    color: #ffffff;
+}
+
+.followers-container .follower .info-container .full-name {
+    font-weight: bold;
+    font-size: 110%;
+    padding-left: 3px;
+    color: #000000;
+}
+
+.followers-container .follower .info-container .username {
+    padding-left: 3px;
+    color: gray;
+    font-size: 90%;
 }
 
 /*----------------following content----------------*/

@@ -28,19 +28,19 @@
                         </a>
                         <a class="tab" href="#followers">
                             <p class="tab-name">Followers</p>
-                            <p class="count">4</p>
+                            <p class="count">{{ requested_user_followers|length }}</p>
                         </a>
                         <a class="tab" href="#following">
                             <p class="tab-name">Following</p>
-                            <p class="count">4</p>
+                            <p class="count">{{ requested_user_following|length }}</p>
                         </a>
 
                         {% if authenticated_to_edit_profile %}
-                            <button class="btn btn-primary button-add-new logs-content" id="add-new-log-button">Add new log</button>
+                            <button class="btn btn-primary button-add-new logs-content" id="add-new-log-button">+ Add Log</button>
                         {% endif %}
 
                         {% if authenticated_to_edit_profile %}
-                            <button class="btn btn-primary button-add-new albums-content" id="add-new-album-button">Add new album</button>
+                            <button class="btn btn-primary button-add-new albums-content" id="add-new-album-button">+ Add Album</button>
                         {% endif %}
 
                     </div>
@@ -70,8 +70,18 @@
                         <p class="count">1</p>
                         <p class="title">Rank</p>
                     </div>
+
+                    <!-- world map button -->
                     <button class="btn btn-primary world-map-button" id="show-on-map-button">Show on Map</button>
                 </div>
+                <!-- main follow button -->
+                {% if authenticated_to_like_and_comment and requested_user != user %}
+                    {% if is_followed %}
+                        <button class="btn follow-button follow-button-active" id="main-follow-button" data-following-user-profile-id="{{ requested_user_profile.id }}">Following</button>
+                    {% else %}
+                        <button class="btn follow-button" id="main-follow-button" data-following-user-profile-id="{{ requested_user_profile.id }}">Follow</button>
+                    {% endif %}
+                {% endif %}
             </div>
         </div>
         <div class="col-lg-9">

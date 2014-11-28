@@ -162,11 +162,70 @@
     </div>
 
     <div class="followers-content">
-        <p>FOLLOWERS</p>
+        <div class="followers-container">
+            <div class="row">
+                {% for follower in requested_user_followers %}
+                    <div class="col-lg-4">
+                        <div class="follower">
+                            <div class="cover-picture" style="background-image: url({{ follower.follower_user_profile.cover_picture.url }})"></div>
+                            <div class="info-container">
+                                <div class="profile-picture-container">
+                                    <img class="profile-picture" src="{{ follower.follower_user_profile.profile_picture.url }}">
+                                </div>
+                                <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="full-name">{{ follower.follower_user_profile.user.get_full_name }}</a>
+                                {% if authenticated_to_like_and_comment and follower.follower_user_profile.user != user %}
+                                    {% if follower.followed %}
+                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Following</button>
+                                    {% else %}
+                                        <button class="btn follow-button" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Follow</button>
+                                    {% endif %}
+                                {% endif %}
+                                <br>
+                                <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="username">@{{ follower.follower_user_profile.user.username }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:3 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                {% endfor %}
+                </div>
+        </div>
     </div>
 
     <div class="following-content">
-        <p>FOLLOWING</p>
+        <div class="followers-container">
+            <div class="row">
+                {% for following in requested_user_following %}
+                    <div class="col-lg-4">
+                        <div class="follower">
+                            <div class="cover-picture" style="background-image: url({{ following.following_user_profile.cover_picture.url }})"></div>
+                            <div class="info-container">
+                                <div class="profile-picture-container">
+                                    <img class="profile-picture" src="{{ following.following_user_profile.profile_picture.url }}">
+                                </div>
+                                <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="full-name">{{ following.following_user_profile.user.get_full_name }}</a>
+                                {% if authenticated_to_like_and_comment and following.following_user_profile.user != user %}
+                                    {% if following.followed %}
+                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
+                                    {% else %}
+                                        <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
+                                    {% endif %}
+                                {% endif %}
+                                <br>
+                                <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="username">@{{ following.following_user_profile.user.username }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:3 %}
+                        </div>
+                        <div class="row">
+                    {% endif %}
+                {% endfor %}
+                </div>
+        </div>
+
     </div>
 
 {% endblock %}
