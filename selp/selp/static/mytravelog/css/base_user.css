@@ -359,6 +359,17 @@ body {
     padding: 10px;
 }
 
+#world-map-modal #world-map-modal-dialog {
+    width: 60%;
+    min-width: 800px;
+}
+
+#world-map-modal #world-map-modal-dialog #world-map-modal-map-container {
+    background-color: #000000;
+    height: 600px;
+    border-radius: 5px;
+}
+
 /*----------------logs content----------------*/
 
 .logs-content {
