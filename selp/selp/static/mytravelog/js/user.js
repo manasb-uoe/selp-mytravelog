@@ -63,7 +63,8 @@ var WorldMapHandler = (function () {
         modal: $('#world-map-modal'),
         mapContainer: $('#world-map-modal-map-container'),
         getPositionsBaseURL: 'mytravelog/log/get_positions/',
-        dataUsername: 'data-requested-user-username'
+        usernameAttr: 'data-requested-user-username',
+        firstNameAttr: 'data-requested-user-first-name'
     };
 
     function _bindUIActions() {
@@ -77,7 +78,7 @@ var WorldMapHandler = (function () {
         _getPositionsFromServer();
     }
 
-    function _showPositionsOnMap(allPositions) {
+    function _showPositionsOnMap(allPositions, firstName) {
         var centerLatLng = new google.maps.LatLng(51.4800, 0.0000);
 
         var options = {
@@ -98,7 +99,7 @@ var WorldMapHandler = (function () {
 
                 var infoWindow = new google.maps.InfoWindow({
                     content: [
-                        "You were in <strong>" + allPositions[key]['city'] + "</strong> <br>",
+                        firstName + " was in <strong>" + allPositions[key]['city'] + "</strong> <br>",
                         " on " + new Date(allPositions[key]['date_and_time']).toDateString() + "<br>",
                         " at " + new Date(allPositions[key]['date_and_time']).toLocaleTimeString()
                     ].join('\n')
@@ -128,12 +129,12 @@ var WorldMapHandler = (function () {
 
     function _getPositionsFromServer() {
         $.ajax({
-            url: _config.getPositionsBaseURL + _config.showOnMapButton.attr(_config.dataUsername) + "/",
+            url: _config.getPositionsBaseURL + _config.showOnMapButton.attr(_config.usernameAttr) + "/",
             type: 'GET',
             dataType: "json",
             success: function (response) {
                 setTimeout(function () {
-                    _showPositionsOnMap(response['all_positions']);
+                    _showPositionsOnMap(response['all_positions'], _config.showOnMapButton.attr(_config.firstNameAttr));
                 }, 1000);
             }
         })
