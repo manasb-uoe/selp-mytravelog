@@ -1,5 +1,7 @@
 import json
+from django.contrib.auth.models import User
 from django.http.response import Http404, HttpResponse
+from django.shortcuts import get_object_or_404
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.log import Log
@@ -138,6 +140,25 @@ def edit_log(request, log_id):
             return HttpResponse(return_data, mimetype)
         else:
             return_data['redirect_to'] = '/mytravelog/sign_in/'
+    else:
+        raise Http404
+
+
+def get_log_positions(request, username):
+    return_data = {}
+    if request.is_ajax():
+        all_user_logs = Log.objects.filter(user_profile__user=get_object_or_404(User, username=username))
+        log_positions = {}
+        for log in all_user_logs:
+            log_positions[log.id] = {'city': log.city.name,
+                                     'date_and_time': str(log.created_at),
+                                     'latitude': str(log.latitude),
+                                     'longitude': str(log.longitude)}
+        return_data['all_positions'] = log_positions
+
+        return_data = json.dumps(return_data)
+        mimetype = "application/json"
+        return HttpResponse(return_data, mimetype)
     else:
         raise Http404
 
