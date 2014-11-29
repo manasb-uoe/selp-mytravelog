@@ -351,12 +351,24 @@ var AddLogModal = (function () {
         };
 
         var map = new google.maps.Map(_config.mapContainer[0], options);
+
+        var infoWindow = new google.maps.InfoWindow({
+            content: "<div class='map-info-window'>You are here!</div>"
+        });
+
         var marker = new google.maps.Marker({
             position: latlng,
-            map: map,
-            title:"You are here!"
+            map: map
         });
         marker.setMap(map);
+
+        //show info window when marker is clicked
+        google.maps.event.addListener(marker, 'click', function() {
+            infoWindow.open(map, marker);
+        });
+
+        // initially show info window
+        infoWindow.open(map, marker);
 
         //reverse geocode latlng and then show current city and country in the input element provided
         _reverseGeocode(latlng);
@@ -662,12 +674,24 @@ var EditLogModal = (function () {
         };
 
         var map = new google.maps.Map(_config.mapContainer[0], options);
+
+        var infoWindow = new google.maps.InfoWindow({
+           content: "<div class='map-info-window'>You were here!</div>"
+        });
+
         var marker = new google.maps.Marker({
             position: latlng,
-            map: map,
-            title:"You were here!"
+            map: map
         });
         marker.setMap(map);
+
+        //show info window when marker is clicked
+        google.maps.event.addListener(marker, 'click', function() {
+            infoWindow.open(map, marker);
+        });
+
+        // initially show info window
+        infoWindow.open(map, marker);
     }
 
     return {

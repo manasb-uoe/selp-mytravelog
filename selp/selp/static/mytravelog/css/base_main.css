@@ -45,3 +45,9 @@
 .footer-container .footer-text {
     display: inline-block;
 }
+
+/* Map classes */
+.map-info-window {
+    overflow: hidden;
+    white-space: nowrap;
+}
