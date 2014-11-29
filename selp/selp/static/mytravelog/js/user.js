@@ -56,6 +56,98 @@ var TabNavigationHandler = (function () {
 
 }());
 
+var WorldMapHandler = (function () {
+
+    var _config = {
+        showOnMapButton: $('#show-on-map-button'),
+        modal: $('#world-map-modal'),
+        mapContainer: $('#world-map-modal-map-container'),
+        getPositionsBaseURL: 'mytravelog/log/get_positions/',
+        dataUsername: 'data-requested-user-username'
+    };
+
+    function _bindUIActions() {
+        _config.showOnMapButton.click(function () {
+            _showModal();
+        });
+    }
+
+    function _showModal() {
+        _config.modal.modal();
+        _getPositionsFromServer();
+    }
+
+    function _showPositionsOnMap(allPositions) {
+        var centerLatLng = new google.maps.LatLng(51.4800, 0.0000);
+
+        var options = {
+            zoom: 2,
+            center: centerLatLng,
+            mapTypeControl: false,
+            navigationControlOptions: {
+                style: google.maps.NavigationControlStyle.SMALL
+            },
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        var map = new google.maps.Map(_config.mapContainer[0], options);
+
+        for (var key in allPositions) {
+            if (allPositions.hasOwnProperty(key)) {
+                var latlng = new google.maps.LatLng(allPositions[key]['latitude'], allPositions[key]['longitude']);
+
+                var infoWindow = new google.maps.InfoWindow({
+                    content: [
+                        "You were in <strong>" + allPositions[key]['city'] + "</strong> <br>",
+                        " on " + new Date(allPositions[key]['date_and_time']).toDateString() + "<br>",
+                        " at " + new Date(allPositions[key]['date_and_time']).toLocaleTimeString()
+                    ].join('\n')
+                });
+
+
+                var markerIcon = new google.maps.MarkerImage(
+                    "http://www.google.com/mapfiles/marker" + allPositions[key]['city'].substring(0, 1) + ".png"
+                );
+
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    icon: markerIcon
+                });
+                marker.setMap(map);
+
+                // open infoWindow when marker is clicked
+                (function(infoWindow, marker) {
+                    google.maps.event.addListener(marker, 'click', function() {
+                        infoWindow.open(map, marker);
+                    });
+                }(infoWindow, marker))
+            }
+        }
+    }
+
+    function _getPositionsFromServer() {
+        $.ajax({
+            url: _config.getPositionsBaseURL + _config.showOnMapButton.attr(_config.dataUsername) + "/",
+            type: 'GET',
+            dataType: "json",
+            success: function (response) {
+                setTimeout(function () {
+                    _showPositionsOnMap(response['all_positions']);
+                }, 1000);
+            }
+        })
+    }
+
+    function init() {
+        _bindUIActions();
+    }
+
+    return {
+        init:init
+    };
+
+}());
 
 //--------------------Albums------------------------
 
@@ -539,7 +631,7 @@ var EditLogModal = (function () {
         for (var key in previousImageInfo) {
             if (previousImageInfo.hasOwnProperty(key)) {
                 var imageHtml = [
-                        '<div class="edit-log-modal-previous-image" data-id="' + key + '" style="background-image: url(\'' + previousImageInfo[key] + '\')">',
+                    '<div class="edit-log-modal-previous-image" data-id="' + key + '" style="background-image: url(\'' + previousImageInfo[key] + '\')">',
                     '<div class="edit-log-modal-previous-image-mask">',
                     '<div class="edit-log-modal-previous-image-delete-button"></div>',
                     '</div>',
@@ -559,7 +651,6 @@ var EditLogModal = (function () {
     function _showPositionOnMap(latitude, longitude) {
         var latlng = new google.maps.LatLng(latitude, longitude);
 
-        //show current location on map
         var options = {
             zoom: 15,
             center: latlng,
@@ -662,8 +753,8 @@ var LikeHandler = (function () {
             // increment like count, preprend profile picture of liker and delete last picture if total pictures == max pictures allowed
             likeCount.text(likeCountVal + 1);
             var imageHtml = [
-                    '<a href="' + "/mytravelog/user/" + username + '/" data-toggle="tooltip" title="' + username + '">',
-                    '<div class="liker-profile-picture" style="background-image: url(\'' + profilePictureUrl + '\')"></div>',
+                '<a href="' + "/mytravelog/user/" + username + '/" data-toggle="tooltip" title="' + username + '">',
+                '<div class="liker-profile-picture" style="background-image: url(\'' + profilePictureUrl + '\')"></div>',
                 '</a>'
             ].join('\n');
             likerProfilePicturesContainer.prepend(imageHtml);
@@ -779,17 +870,17 @@ var CommentHandler = (function () {
             commentCount.text(commentCountVal + 1);
             var commentHtml = [
                 '<div class="comment">',
-                    '<a href="/mytravelog/user/' + response['username'] + '/">',
-                    '<div class="comment-profile-picture" style="background-image: url(' + response['profile_picture_url'] + ')"></div>',
+                '<a href="/mytravelog/user/' + response['username'] + '/">',
+                '<div class="comment-profile-picture" style="background-image: url(' + response['profile_picture_url'] + ')"></div>',
                 '</a>',
                 '<div class="comment-content">',
                 '<div class="comment-header">',
-                    '<a class="comment-full-name" href="/mytravelog/user/' + response['username'] + '/">' + response['full_name'] + '</a>',
-                    '<a class="comment-username" href="/mytravelog/user/' + response['username'] + '/">' + response['username'] + '</a>',
-                    '<p class="comment-timestamp">• ' + response['created_at'] + '</p>',
+                '<a class="comment-full-name" href="/mytravelog/user/' + response['username'] + '/">' + response['full_name'] + '</a>',
+                '<a class="comment-username" href="/mytravelog/user/' + response['username'] + '/">' + response['username'] + '</a>',
+                '<p class="comment-timestamp">• ' + response['created_at'] + '</p>',
                 '</div>',
-                    '<p class="comment-body">' + response['body'] + '</p>',
-                    '<p class="comment-delete-button" data-comment-id="' + response['comment_id'] + '">Delete</p>',
+                '<p class="comment-body">' + response['body'] + '</p>',
+                '<p class="comment-delete-button" data-comment-id="' + response['comment_id'] + '">Delete</p>',
                 '</div>',
                 '</div>'
             ].join('\n');
@@ -964,12 +1055,12 @@ function submitSimpleRequest(errorContainer, url) {
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
-    // only initialize tab handler if the user is currently on the user page
+    // only initialize user related handlers if the user is currently on the user page
     if (window.location.href.indexOf('/user/') > -1) {
         TabNavigationHandler.init();
-        console.log('init');
+        WorldMapHandler.init();
+        handleAlbums();
     }
-    handleAlbums();
     handleLogs();
     FollowerHandler.init();
 });
