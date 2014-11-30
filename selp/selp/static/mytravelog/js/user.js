@@ -169,8 +169,13 @@ var AddOrEditAlbumModal = (function() {
         submitButton: $('#add-or-edit-album-modal-submit-button'),
         modal: $('#add-or-edit-album-modal'),
         dropdownItemEdit: $('.album-dropdown-item-edit'),
+        editAlbumButton: $('#edit-album-button'),
         addNewAlbumButton: $('#add-new-album-button'),
-        submitUrl: ''
+        submitUrl: '',
+        idAttr: 'data-id',
+        nameAttr: 'data-name',
+        startDateAttr: 'data-start-date',
+        endDateAttr: 'data-end-date'
     };
 
     function _bindUIActions() {
@@ -181,13 +186,23 @@ var AddOrEditAlbumModal = (function() {
         _config.dropdownItemEdit.click(function () {
             //get all data about the selected album
             var album = $(this).parents('.album');
-            var id = album.attr('data-id');
+            var id = album.attr(_config.idAttr);
             var name = album.children('.name').text();
-            var startDate = album.attr('data-start-date');
-            var endDate = album.attr('data-end-date');
+            var startDate = album.attr(_config.startDateAttr);
+            var endDate = album.attr(_config.endDateAttr);
 
             _showModal('Edit album', name, startDate, endDate, 'Save');
-            _config.submitUrl = '/mytravelog/album/update/' + id + '/'
+            _config.submitUrl = '/mytravelog/album/update/' + id + '/';
+        });
+        _config.editAlbumButton.click(function () {
+            //get all data about the selected album
+            var id = (this).attr(_config.idAttr);
+            var name = this.attr(_config.nameAttr);
+            var startDate = this.attr(_config.startDateAttr);
+            var endDate = this.attr(_config.endDateAttr);
+
+            _showModal('Edit album', name, startDate, endDate, 'Save');
+            _config.submitUrl = '/mytravelog/album/update/' + id + '/';
         });
         _config.form.submit(function (event) {
             event.preventDefault();
@@ -677,7 +692,7 @@ var EditLogModal = (function () {
         var map = new google.maps.Map(_config.mapContainer[0], options);
 
         var infoWindow = new google.maps.InfoWindow({
-           content: "<div class='map-info-window'>You were here!</div>"
+            content: "<div class='map-info-window'>You were here!</div>"
         });
 
         var marker = new google.maps.Marker({
@@ -1080,12 +1095,21 @@ function submitSimpleRequest(errorContainer, url) {
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
-    // only initialize user related handlers if the user is currently on the user page
-    if (window.location.href.indexOf('/user/') > -1) {
+    // only initialize the required modules for a particular page
+    var currentUrl = window.location.href;
+    if (currentUrl.indexOf('/user/') > -1) {
         TabNavigationHandler.init();
         WorldMapHandler.init();
+        FollowerHandler.init();
         handleAlbums();
+        handleLogs();
     }
-    handleLogs();
-    FollowerHandler.init();
+    else if (currentUrl.indexOf('/album/') > -1) {
+        handleLogs();
+        handleAlbums();
+        WorldMapHandler.init();
+    }
+    else if (currentUrl.indexOf('/search/') > -1) {
+        FollowerHandler.init();
+    }
 });
