@@ -100,11 +100,11 @@ body {
     margin: 0;
     padding: 0;
     font-weight: bold;
-    font-size: 140%;
+    font-size: 120%;
 }
 
 .search-container .results-container .city-results .city .country-name {
-    font-size: 90%;
+    font-size: 80%;
 }
 
 .search-container .results-container .user-results {
@@ -166,23 +166,25 @@ body {
 }
 
 .search-container .results-container .user-results .user .info-container .follow-button-active {
-    background-color: #428bca;
-    color: #ffffff;
+    background-color: #68bf60;
+    color: #ffffff !important;
 }
 
 .search-container .results-container .user-results .user .info-container .follow-button-active:hover {
-    background-color: #2e618d;
+    background-color: #5DAB56;
+    color: #ffffff;
 }
 
 .search-container .results-container .user-results .user .info-container .full-name {
     font-weight: bold;
-    font-size: 130%;
+    font-size: 110%;
     padding-left: 3px;
     color: #000000;
 }
 
 .search-container .results-container .user-results .user .info-container .username {
     padding-left: 3px;
+    font-size: 90%;
     color: gray;
 }
 
