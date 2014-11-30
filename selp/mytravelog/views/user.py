@@ -103,63 +103,19 @@ def sign_out(request):
 
 
 def show_user(request, username):
-    data_dict = get_permissions(username, request.user)
+    data_dict = get_all_user_permissions(get_object_or_404(User, username=username), request.user)
 
     # get user albums and attach duration to each album
-    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
-    for album in requested_user_albums:
-        duration = (album.end_date - album.start_date).days
-        album.duration = duration
-    data_dict['requested_user_albums'] = requested_user_albums
+    get_requested_user_albums(data_dict)
 
-    # get user logs and attach pictures, likes and comments to each log
-    requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
-    current_user_profile = data_dict.get('current_user_profile', None)
-    for log in requested_user_logs:
-        # attach pictures
-        log_pictures = LogPicture.objects.filter(log=log)
-        log.pictures = log_pictures
-        # attach likes and check if current user liked a log or not
-        likes = Like.objects.filter(log=log)
-        log.likes = likes
-        log.liked = False
-        for like in likes:
-            if current_user_profile is not None:
-                if like.liker_user_profile == current_user_profile:
-                    log.liked = True
-        # attach comments and check if current user can delete it or not
-        comments = Comment.objects.filter(log=log)
-        log.comments = comments
-        for comment in comments:
-            comment.can_delete = False
-            if current_user_profile is not None:
-                if comment.commenter_user_profile == current_user_profile:
-                    comment.can_delete = True
-    data_dict['requested_user_logs'] = requested_user_logs
+    # get user logs along with pictures, likes and comments for each log
+    get_requested_user_logs(data_dict)
 
-    # get user followers
-    requested_user_followers = Follower.objects.filter(following_user_profile=data_dict['requested_user_profile'])
-    for follower in requested_user_followers:
-        follower.followed = False
-        if current_user_profile is not None:
-            if len(Follower.objects.filter(follower_user_profile=current_user_profile,
-                                           following_user_profile=follower.follower_user_profile)) > 0:
-                follower.followed = True
-    data_dict['requested_user_followers'] = requested_user_followers
-
-    # get users followed by current user
-    requested_user_following = Follower.objects.filter(follower_user_profile=data_dict['requested_user_profile'])
-    if current_user_profile is not None:
-        for following in requested_user_following:
-            following.followed = True
-    data_dict['requested_user_following'] = requested_user_following
+    # get user followers and following
+    get_requested_user_followers_and_following(data_dict)
 
     # check if requested user is being followed by current user
-    is_following = False
-    if current_user_profile is not None:
-        if len(Follower.objects.filter(follower_user_profile=current_user_profile, following_user_profile=data_dict['requested_user_profile'])) > 0:
-            is_following = True
-    data_dict['is_followed'] = is_following
+    is_requested_user_followed_by_current_user(data_dict)
 
     return render(request, 'mytravelog/user.html', data_dict)
 
@@ -190,9 +146,10 @@ def validate_sign_up_form(first_name, last_name, email, username, password):
     return None
 
 
-def get_permissions(username, current_user):
+# this function returns all the necessary user permission appended to a dictionary
+# user and user profile instances are also returned as they are reused later
+def get_all_user_permissions(requested_user, current_user):
     # get requested user and user profile
-    requested_user = get_object_or_404(User, username=username)
     requested_user_profile = UserProfile.objects.get(user=requested_user)
 
     # get permissions
@@ -216,3 +173,75 @@ def get_permissions(username, current_user):
                  'current_user_profile': current_user_profile}
 
     return data_dict
+
+
+def get_requested_user_albums(data_dict):
+    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
+    for album in requested_user_albums:
+        duration = (album.end_date - album.start_date).days
+        album.duration = duration
+    data_dict['requested_user_albums'] = requested_user_albums
+
+
+def get_requested_user_logs(data_dict):
+    # get user logs along with pictures, likes and comments for each log
+    requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
+    current_user_profile = data_dict.get('current_user_profile', None)
+    requested_user_logs = attach_additional_info_to_logs(requested_user_logs, current_user_profile)
+    data_dict['requested_user_logs'] = requested_user_logs
+
+
+def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
+    for log in requested_user_logs:
+        # attach pictures
+        log_pictures = LogPicture.objects.filter(log=log)
+        log.pictures = log_pictures
+        # attach likes and check if current user liked a log or not
+        likes = Like.objects.filter(log=log)
+        log.likes = likes
+        log.liked = False
+        for like in likes:
+            if current_user_profile is not None:
+                if like.liker_user_profile == current_user_profile:
+                    log.liked = True
+        # attach comments and check if current user can delete it or not
+        comments = Comment.objects.filter(log=log)
+        log.comments = comments
+        for comment in comments:
+            comment.can_delete = False
+            if current_user_profile is not None:
+                if comment.commenter_user_profile == current_user_profile:
+                    comment.can_delete = True
+    return requested_user_logs
+
+
+def get_requested_user_followers_and_following(data_dict):
+    current_user_profile = data_dict.get('current_user_profile', None)
+    # get user followers
+    requested_user_followers = Follower.objects.filter(following_user_profile=data_dict['requested_user_profile'])
+    for follower in requested_user_followers:
+        follower.followed = False
+        if current_user_profile is not None:
+            if len(Follower.objects.filter(follower_user_profile=current_user_profile,
+                                           following_user_profile=follower.follower_user_profile)) > 0:
+                follower.followed = True
+    data_dict['requested_user_followers'] = requested_user_followers
+
+    # get users followed by current user
+    requested_user_following = Follower.objects.filter(follower_user_profile=data_dict['requested_user_profile'])
+    if current_user_profile is not None:
+        for following in requested_user_following:
+            following.followed = True
+    data_dict['requested_user_following'] = requested_user_following
+
+
+def is_requested_user_followed_by_current_user(data_dict):
+    current_user_profile = data_dict.get('current_user_profile', None)
+    is_following = False
+    if current_user_profile is not None:
+        if len(Follower.objects.filter(follower_user_profile=current_user_profile,
+                                       following_user_profile=data_dict['requested_user_profile'])) > 0:
+            is_following = True
+    data_dict['is_followed'] = is_following
+
+
