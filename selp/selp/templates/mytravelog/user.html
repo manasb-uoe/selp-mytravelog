@@ -1,132 +1,44 @@
 {% extends 'mytravelog/master/user_base.html' %}
 {% load static %}
 
+<!-- cover picture -->
+{% block cover_picture_block %}
+    <div class="cover-picture user-cover-picture" style="background-image: url('{{ requested_user_profile.cover_picture.url }}')"></div>
+{% endblock %}
+<!-- tabs bar -->
+{% block tabs-or-stats-block %}
+    <a class="tab" href="#logs">
+        <p class="tab-name">Logs</p>
+        <p class="count">{{ requested_user_logs|length }}</p>
+    </a>
+    <a class="tab" href="#albums">
+        <p class="tab-name">Albums</p>
+        <p class="count">{{ requested_user_albums|length }}</p>
+    </a>
+    <a class="tab" href="#followers">
+        <p class="tab-name">Followers</p>
+        <p class="count">{{ requested_user_followers|length }}</p>
+    </a>
+    <a class="tab" href="#following">
+        <p class="tab-name">Following</p>
+        <p class="count">{{ requested_user_following|length }}</p>
+    </a>
+
+    {% if authenticated_to_edit_profile %}
+        <button class="btn btn-primary button-add-new logs-content" id="add-new-log-button">+ Add Log</button>
+    {% endif %}
+
+    {% if authenticated_to_edit_profile %}
+        <button class="btn btn-primary button-add-new albums-content" id="add-new-album-button">+ Add Album</button>
+    {% endif %}
+
+{% endblock %}
+
 <!-- right column -->
 {% block right_column_block %}
 
     <div class="logs-content">
-        <div class="logs-container">
-            {% for log in requested_user_logs %}
-                <div class="log" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-latitude="{{ log.latitude }}" data-longitude="{{ log.longitude }}" data-album-name="{{ log.album.name }}" data-description="{{ log.description }}" data-created-at="{{ log.created_at }}">
-                    <div class="header">
-                        <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
-                        <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
-
-                        {% if authenticated_to_edit_profile %}
-                            <div class="overflow-button"></div>
-                            <div class="log-dropdown-container">
-                                <div class="log-dropdown-menu">
-                                    <p class="log-dropdown-item log-dropdown-item-share">Share</p>
-                                    <p class="log-dropdown-item log-dropdown-item-edit">Edit</p>
-                                    <p class="log-dropdown-item log-dropdown-item-delete">Delete</p>
-                                </div>
-                            </div>
-                        {% endif %}
-
-                    </div>
-
-                    {% if log.pictures|length > 0 %}
-                        <div class="log-pictures-container">
-                            {% if log.pictures|length == 1 %}
-                                <div class="log-picture log-picture-full" data-url="{{ log.pictures.0.picture.url }}" data-id="{{ log.pictures.0.id }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
-                                    <div class="mask"></div>
-                                </div>
-                            {% elif log.pictures|length == 2 %}
-                                <div class="log-picture log-picture-left" data-url="{{ log.pictures.0.picture.url }}" data-id="{{ log.pictures.0.id }}" style="background-image: url('{{ log.pictures.0.picture.url }}')">
-                                    <div class="mask"></div>
-                                </div><!--
-                                --><div class="log-picture log-picture-right" data-url="{{ log.pictures.1.picture.url }}" data-id="{{ log.pictures.1.id }}" style="background-image: url('{{ log.pictures.1.picture.url }}')">
-                                <div class="mask"></div>
-                            </div>
-                            {% else %}
-                                {% for log_picture in log.pictures %}
-                                    {% if forloop.counter == 1 %}
-                                        <div class="log-picture log-picture-left" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
-                                            <div class="mask"></div>
-                                        </div><!--
-                                    {% elif forloop.counter == 2 %}
-                                        --><div class="log-picture-right">
-                                        <div class="log-picture log-picture-right-top" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
-                                            <div class="mask"></div>
-                                        </div>
-                                        {% elif forloop.counter == 3 %}
-                                        <div class="log-picture log-picture-right-bottom" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="background-image: url('{{ log_picture.picture.url }}')">
-                                            <div class="mask"></div>
-                                        </div>
-                                    </div>
-                                    {% else %}
-                                        <div class="log-picture" data-url="{{ log_picture.picture.url }}" data-id="{{ log_picture.id }}" style="display: none"></div>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
-
-                    <p class="description">{{ log.description }}</p>
-
-                    <div class="user-info-container">
-                        <img class="profile-picture" src="{{ log.user_profile.profile_picture.url }}">
-                        <div class="name-and-timestamp-container">
-                            <p class="name">{{ log.user_profile.user.get_full_name }}</p>
-                            <p class="timestamp">{{ log.created_at }}</p>
-                        </div>
-                    </div>
-
-                    <div class="like-and-comment-count-container">
-                        <div class="like-count-container">
-                            <p class="title">Likes</p>
-                            <p class="count">{{ log.likes.count }}</p>
-                        </div>
-                        <div class="comment-count-container">
-                            <p class="title">Comments</p>
-                            <p class="count">{{ log.comments.count }}</p>
-                        </div>
-                        <div class="liker-profile-pictures">
-                            {% for like in log.likes %}
-                                <a href="/mytravelog/user/{{ like.liker_user_profile.user.username }}/" data-toggle="tooltip" title="{{ like.liker_user_profile.user.username }}">
-                                    <div class="liker-profile-picture" style="background-image: url('{{ like.liker_user_profile.profile_picture.url }}')"></div>
-                                </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <div class="like-and-comment-container">
-                        <div class="comment-container">
-                            {% for comment in log.comments %}
-                                <div class="comment">
-                                    <a href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">
-                                        <div class="comment-profile-picture" style="background-image: url('{{ comment.commenter_user_profile.profile_picture.url }}/')"></div>
-                                    </a>
-                                    <div class="comment-content">
-                                        <div class="comment-header">
-                                            <a class="comment-full-name" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">{{ comment.commenter_user_profile.user.get_full_name }}</a>
-                                            <a class="comment-username" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">@{{ comment.commenter_user_profile.user.username }}</a>
-                                            <p class="comment-timestamp">• {{ comment.created_at }}</p>
-                                        </div>
-                                        <p class="comment-body">{{ comment.body }}</p>
-                                        {% if comment.can_delete %}
-                                            <p class="comment-delete-button" data-comment-id="{{ comment.id }}">Delete</p>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        {% if authenticated_to_like_and_comment %}
-                            {% if log.liked %}
-                                <button class="like-log-button like-log-button-active" data-log-id="{{ log.id }}"></button>
-                                <input class="form-control comment-log-input" data-log-id="{{ log.id }}" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
-                            {% else %}
-                                <button class="like-log-button" data-log-id="{{ log.id }}"></button>
-                                <input class="form-control comment-log-input" data-log-id="{{ log.id }}" type="text" placeholder="Say something nice..." autocomplete="off" required="true">
-                            {% endif %}
-                        {% else %}
-                            <button class="like-log-button" data-log-id="{{ log.id }}" disabled></button>
-                            <input class="form-control comment-log-input" type="text" data-log-id="{{ log.id }}" placeholder="You need to sign in to comment" autocomplete="off" required="true" disabled>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+        {% include 'mytravelog/logs.html' %}
     </div>
 
     <div class="albums-content">
@@ -134,7 +46,7 @@
             <div class="row">
                 {% for album in requested_user_albums %}
                     <div class="col-lg-4 custom-column">
-                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
+                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}" href="/mytravelog/album/{{ album.id }}/">
                             <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
                                 <div class="mask">
                                     {% if authenticated_to_edit_profile %}

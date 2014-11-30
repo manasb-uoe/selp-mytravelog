@@ -1,0 +1,72 @@
+{% extends 'mytravelog/master/user_base.html' %}
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/base_user.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+<!-- cover picture -->
+{% block cover_picture_block %}
+    <div class="cover-picture album-cover-picture" style="background-image: url({{ requested_album.cover_picture.url }})">
+        <div class="mask">
+            <div class="title-container">
+                <p class="album-name">{{ requested_album.name }}</p>
+                <p class="album-name-label">Album</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- stats bar -->
+{% block tabs-or-stats-block %}
+    <div class="stat">
+        <p class="stat-name">Start Date</p>
+        <p class="value">{{ requested_album.start_date }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-name">End Date</p>
+        <p class="value">{{ requested_album.end_date }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-name">Duration</p>
+        <p class="value">{{ requested_album.duration }} days</p>
+    </div>
+
+    {% if authenticated_to_edit_profile %}
+        <button class="btn btn-primary" id="edit-album-button" data-id="{{ requested_album.id }}" data-name="{{ requested_album.name }}" data-start-date="{{ requested_album.start_date|date:'Y-m-d' }}" data-end-date="{{ requested_album.end_date|date:'Y-m-d' }}">Edit Album</button>
+    {% endif %}
+{% endblock %}
+
+<!-- right column -->
+{% block right_column_block %}
+    <div class="main-album-container">
+        {% if requested_album_logs|length != 0 %}
+            <p class="section-title">PHOTOS</p>
+            <div class="album-pictures-container">
+                <div class="row">
+                    {% for picture in requested_album.pictures %}
+                        <div class="col-lg-3 album-pictures-col">
+                            <div class="picture" style="background-image: url('{{ picture.picture.url }}')">
+                                <div class= "mask"></div>
+                            </div>
+                        </div>
+                        {% if forloop.counter|divisibleby:4 %}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                    {% endfor %}
+                    </div>
+            </div>
+            <hr class="divider">
+            <div class="section-title">LOGS</div>
+            <div class="album-logs-container">
+                {% include 'mytravelog/logs.html' with requested_user_logs=requested_album_logs %}
+            </div>
+        {% else %}
+            <div class="nothing-found-container">
+                <p class="nothing-found-text">Nothing found here...</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
