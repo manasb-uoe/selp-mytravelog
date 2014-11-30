@@ -56,7 +56,7 @@ var TabNavigationHandler = (function () {
 
 }());
 
-var WorldMapHandler = (function () {
+var WorldMapModal = (function () {
 
     var _config = {
         showOnMapButton: $('#show-on-map-button'),
@@ -1099,7 +1099,7 @@ $(document).ready(function () {
     var currentUrl = window.location.href;
     if (currentUrl.indexOf('/user/') > -1) {
         TabNavigationHandler.init();
-        WorldMapHandler.init();
+        WorldMapModal.init();
         FollowerHandler.init();
         handleAlbums();
         handleLogs();
@@ -1107,7 +1107,7 @@ $(document).ready(function () {
     else if (currentUrl.indexOf('/album/') > -1) {
         handleLogs();
         handleAlbums();
-        WorldMapHandler.init();
+        WorldMapModal.init();
     }
     else if (currentUrl.indexOf('/search/') > -1) {
         FollowerHandler.init();
