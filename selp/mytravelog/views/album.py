@@ -3,9 +3,12 @@ import re
 import datetime
 
 from django.http.response import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, render
 
 from mytravelog.models.album import Album
+from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
+from mytravelog.views.user import attach_additional_info_to_logs, get_all_user_permissions
 
 
 __author__ = 'Manas'
@@ -52,8 +55,32 @@ def delete_album(request, album_id):
     else:
         raise Http404
 
-# -------------------HELPER FUNCTIONS--------------------
 
+def show_album(request, album_id):
+    # get requested user album and attach duration to it
+    requested_album = get_object_or_404(Album, id=album_id)
+    duration = (requested_album.end_date - requested_album.start_date).days
+    requested_album.duration = duration
+    data_dict = get_all_user_permissions(requested_album.user_profile.user, request.user)
+
+    # get all album logs and pictures
+    requested_album_logs = attach_additional_info_to_logs(Log.objects.filter(album=requested_album),
+                                                          data_dict.get('current_user_profile', None))
+    data_dict['requested_album_logs'] = requested_album_logs
+    album_pictures = []
+    for log in requested_album_logs:
+        album_pictures += log.pictures
+    requested_album.pictures = album_pictures
+    data_dict['requested_album'] = requested_album
+
+    # get all requested albums in order to populate the Albums dropdown list while editing a log (EditLogModal)
+    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
+    data_dict['requested_user_albums'] = requested_user_albums
+
+    return render(request, 'mytravelog/album.html', data_dict)
+
+
+# -------------------HELPER FUNCTIONS--------------------
 def create_or_update_album(request, operation, album_id):
     user = request.user
     return_data = {}
