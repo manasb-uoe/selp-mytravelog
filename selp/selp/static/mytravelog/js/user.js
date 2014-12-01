@@ -153,6 +153,12 @@ var WorldMapModal = (function () {
 //--------------------Albums------------------------
 
 function handleAlbums() {
+    // go to album page when user clicks on an album
+    $('.album').click(function () {
+        var albumId = $(this).attr('data-id');
+        window.location.href = '/mytravelog/album/' + albumId + '/';
+    });
+
     AddOrEditAlbumModal.init();
     DeleteAlbumModal.init();
 }
@@ -183,7 +189,9 @@ var AddOrEditAlbumModal = (function() {
             _showModal('Add new album', '', '', '', 'Add');
             _config.submitUrl = '/mytravelog/album/create/';
         });
-        _config.dropdownItemEdit.click(function () {
+        _config.dropdownItemEdit.click(function (event) {
+            event.stopPropagation();
+
             //get all data about the selected album
             var album = $(this).parents('.album');
             var id = album.attr(_config.idAttr);
@@ -243,7 +251,9 @@ var DeleteAlbumModal = (function () {
     };
 
     function _bindUIActions() {
-        _config.dropdownItemDelete.click(function () {
+        _config.dropdownItemDelete.click(function (event) {
+            event.stopPropagation();
+
             //get required data about the selected album
             var album = $(this).parents('.album');
             var id = album.attr('data-id');

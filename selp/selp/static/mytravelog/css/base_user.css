@@ -705,7 +705,7 @@ body {
 
 .albums-container .album {
     width: 100%;
-    height: 190px;
+    height: 160px;
     display: inline-block;
     text-decoration: none;
     cursor: pointer;
@@ -745,10 +745,11 @@ body {
 
 .albums-container .album .cover-picture .mask .album-dropdown-container {
     display: none;
-    width: 150px;
+    width: 130px;
     position: absolute;
     top: 32px;
-    right: 0;
+    right: -60px;
+    z-index: 1000;
 }
 
 .albums-container .album .cover-picture .mask .album-dropdown-container:hover {
@@ -765,13 +766,14 @@ body {
     color: #000000;
     margin: 0;
     padding: 5px 15px;
+    text-decoration: none;
 }
 
 .albums-container .album .cover-picture .mask .album-dropdown-item:hover {
     color: #ffffff;
     margin: 0;
     background-color: #428bca;
-    padding: 5px 15px;
+    /*padding: 5px 15px;*/
 }
 
 

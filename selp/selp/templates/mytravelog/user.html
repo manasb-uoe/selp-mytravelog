@@ -46,7 +46,7 @@
             <div class="row">
                 {% for album in requested_user_albums %}
                     <div class="col-lg-4 custom-column">
-                        <a class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}" href="/mytravelog/album/{{ album.id }}/">
+                        <div class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
                             <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
                                 <div class="mask">
                                     {% if authenticated_to_edit_profile %}
@@ -62,7 +62,7 @@
                             </div>
                             <p class="name">{{ album.name }}</p>
                             <p class="duration">{{ album.duration }} days</p>
-                        </a>
+                        </div>
                     </div>
                     {% if forloop.counter|divisibleby:3%}
                         </div>
