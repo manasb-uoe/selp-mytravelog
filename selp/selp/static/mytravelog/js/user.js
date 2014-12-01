@@ -465,6 +465,7 @@ var LogPicturesViewer = (function () {
         modalPictureContainer: $('#log-picture-modal-picture'),
         modalPreviousButton: $('#log-picture-modal-previous-button'),
         modalNextButton: $('#log-picture-modal-next-button'),
+        modalCloseButton: $('#log-picture-modal-close-button'),
         modalIndex: $('#log-picture-modal-index'),
         currentIndex: 0,
         totalPictures: 0,
@@ -478,7 +479,7 @@ var LogPicturesViewer = (function () {
     function _bindUIActions() {
         _config.logPicture.click(function () {
             _config.logPicture = $(this);
-            _getCurrentIndexAndUrlsLog()
+            _getCurrentIndexAndUrlsLog();
             _config.modal.modal();
         });
         _config.albumPicture.click(function () {
@@ -499,6 +500,9 @@ var LogPicturesViewer = (function () {
         _config.modalPreviousButton.click(function () {
             _config.currentIndex--;
             _showCurrentPicture();
+        });
+        _config.modalCloseButton.click(function () {
+            _config.modal.modal('hide');
         });
     }
 

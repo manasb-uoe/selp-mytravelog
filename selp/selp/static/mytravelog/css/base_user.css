@@ -187,9 +187,14 @@ body {
     margin-bottom: 5px;
 }
 
+#log-picture-modal #log-picture-modal-dialog {
+    width: 60%;
+    min-width: 800px;
+}
+
 #log-picture-modal #log-picture-modal-picture {
     width: 100%;
-    height: 500px;
+    height: 600px;
     background-size: cover;
     background-position: center center;
 }
@@ -197,6 +202,25 @@ body {
 #log-picture-modal #log-picture-modal-body {
     padding: 0;
     background-color: #000000;
+}
+
+#log-picture-modal #log-picture-modal-header {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding-right: 5px;
+    padding-top: 5px;
+}
+
+#log-picture-modal #log-picture-modal-header #log-picture-modal-close-button {
+    background-image: url('/static/mytravelog/imgs/default/icon_delete.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 40px;
+    width: 40px;
+    float: right;
+    cursor: pointer;
 }
 
 #log-picture-modal #log-picture-modal-footer {
