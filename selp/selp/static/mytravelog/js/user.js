@@ -196,10 +196,10 @@ var AddOrEditAlbumModal = (function() {
         });
         _config.editAlbumButton.click(function () {
             //get all data about the selected album
-            var id = (this).attr(_config.idAttr);
-            var name = this.attr(_config.nameAttr);
-            var startDate = this.attr(_config.startDateAttr);
-            var endDate = this.attr(_config.endDateAttr);
+            var id = $(this).attr(_config.idAttr);
+            var name = $(this).attr(_config.nameAttr);
+            var startDate = $(this).attr(_config.startDateAttr);
+            var endDate = $(this).attr(_config.endDateAttr);
 
             _showModal('Edit album', name, startDate, endDate, 'Save');
             _config.submitUrl = '/mytravelog/album/update/' + id + '/';
