@@ -963,7 +963,7 @@ body {
     margin-left: 15px;
 }
 
-.main-album-container .album-pictures-container .picture {
+.main-album-container .album-pictures-container .album-picture {
     height: 120px;
     background-position: center center;
     background-size: cover;
@@ -973,13 +973,13 @@ body {
     cursor: pointer;
 }
 
-.main-album-container .album-pictures-container .picture .mask {
+.main-album-container .album-pictures-container .album-picture .mask {
     width: 100%;
     height: 100%;
     transition: 150ms
 }
 
-.main-album-container .album-pictures-container .picture .mask:hover {
+.main-album-container .album-pictures-container .album-picture .mask:hover {
     background-color: rgba(0,0,0,0.3);
 }
 

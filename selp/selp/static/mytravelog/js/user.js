@@ -283,7 +283,6 @@ var DeleteAlbumModal = (function () {
     };
 }());
 
-
 //--------------------Logs------------------------
 
 function handleLogs() {
@@ -455,10 +454,13 @@ var AddLogModal = (function () {
     };
 }());
 
+// this module handles the picture viewer modal showing the selected picture
+// it is used for viewing pictures within a log AND pictures on the album page
 var LogPicturesViewer = (function () {
 
     var _config = {
         logPicture: $('.log-picture'),
+        albumPicture: $('.album-picture'),
         modal: $('#log-picture-modal'),
         modalPictureContainer: $('#log-picture-modal-picture'),
         modalPreviousButton: $('#log-picture-modal-previous-button'),
@@ -476,7 +478,12 @@ var LogPicturesViewer = (function () {
     function _bindUIActions() {
         _config.logPicture.click(function () {
             _config.logPicture = $(this);
-            _getCurrentIndexAndUrls();
+            _getCurrentIndexAndUrlsLog()
+            _config.modal.modal();
+        });
+        _config.albumPicture.click(function () {
+            _config.albumPicture = $(this);
+            _getCurrentIndexAndUrlsAlbum();
             _config.modal.modal();
         });
         _config.modal.on('shown.bs.modal', function(){
@@ -517,7 +524,8 @@ var LogPicturesViewer = (function () {
         }
     }
 
-    function _getCurrentIndexAndUrls() {
+    // called when user clicks on a picture within a log
+    function _getCurrentIndexAndUrlsLog() {
         _config.urls = [];
         var logPicturesContainer = _config.logPicture.closest('.log-pictures-container');
         var logPictures = logPicturesContainer.find('.log-picture');
@@ -528,6 +536,26 @@ var LogPicturesViewer = (function () {
 
         //get index of selected picture
         var currentUrl = _config.logPicture.attr('data-url');
+        for (var i=0; i<_config.totalPictures; i++) {
+            if (_config.urls[i] == currentUrl) {
+                _config.currentIndex = i;
+            }
+        }
+    }
+
+    // called when user clicks on a picture on the album page photos section
+    function _getCurrentIndexAndUrlsAlbum() {
+        _config.urls = [];
+        var albumPicturesContainer = _config.albumPicture.closest('.album-pictures-container');
+        var albumPictures = albumPicturesContainer.find('.album-picture');
+        albumPictures.each(function () {
+            var pictureUrl = $(this).css('background-image').replace('url(', '').replace(')', '');
+            _config.urls.push(pictureUrl);
+        });
+        _config.totalPictures = albumPictures.length;
+
+        //get index of selected picture
+        var currentUrl = _config.albumPicture.css('background-image').replace('url(', '').replace(')', '');
         for (var i=0; i<_config.totalPictures; i++) {
             if (_config.urls[i] == currentUrl) {
                 _config.currentIndex = i;
