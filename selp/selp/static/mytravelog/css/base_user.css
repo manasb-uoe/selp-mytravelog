@@ -972,6 +972,14 @@ body {
 .tabs-or-stats-bar .tabs-or-stats-container #edit-album-button {
     float: right;
     margin-top: 12px;
+    width: 80px;
+}
+
+.tabs-or-stats-bar .tabs-or-stats-container #delete-album-button {
+    float: right;
+    margin-top: 12px;
+    margin-left: 10px;
+    width: 80px;
 }
 
 .main-album-container .section-title {

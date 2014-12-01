@@ -247,6 +247,7 @@ var DeleteAlbumModal = (function () {
         errorContainer: $('#delete-album-modal-error-container'),
         modal: $('#delete-album-modal'),
         dropdownItemDelete: $('.album-dropdown-item-delete'),
+        deleteAlbumButton: $('#delete-album-button'),
         submitUrl: ''
     };
 
@@ -263,8 +264,17 @@ var DeleteAlbumModal = (function () {
             _showModal(name, createdAt);
             _config.submitUrl = '/mytravelog/album/delete/' + id + '/';
         });
+        _config.deleteAlbumButton.click(function () {
+            //get required data about the selected album
+            var id = $(this).attr('data-id');
+            var name = $(this).attr('data-name');
+            var createdAt = $(this).attr('data-created-at');
+
+            _showModal(name, createdAt);
+            _config.submitUrl = '/mytravelog/album/delete/' + id + '/';
+        });
         _config.submitButton.click(function () {
-            submitSimpleRequest(_config.errorContainer, _config.submitUrl);
+            _sendPostRequest(_config.errorContainer, _config.submitUrl, _config.deleteAlbumButton.attr('data-current-username'));
         });
     }
 
@@ -273,6 +283,42 @@ var DeleteAlbumModal = (function () {
         _config.albumCreatedAt.text(createdAt);
         _config.modal.modal();
     }
+
+    // currentUsername is only used to go back to user page when an album is deleted successfully
+    // else, the page is simply reloaded
+    function _sendPostRequest(errorContainer, url, currentUsername) {
+    //clear and hide existing errors
+    errorContainer.empty();
+    errorContainer.hide();
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        data: {
+            csrfmiddlewaretoken: csrf_token
+        },
+        success: function (response) {
+            var redirect_to = response['redirect_to'];
+            var error_message = response['error'];
+            if (redirect_to != null) {
+                window.location.href = redirect_to;
+            }
+            else if (error_message != null) {
+                errorContainer.append('<strong>Error! </strong>' + error_message);
+                errorContainer.show();
+            }
+            else {
+                if (window.location.href.indexOf('/user/') > -1) {
+                    window.location.reload();
+                }
+                else {
+                    window.location.href = '/mytravelog/user/' + currentUsername + '/';
+                }
+            }
+        }
+    });
+}
 
     function init() {
         _bindUIActions();
