@@ -8,7 +8,8 @@ from django.shortcuts import get_object_or_404, render
 from mytravelog.models.album import Album
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, get_all_user_permissions
+from mytravelog.views.user import attach_additional_info_to_logs, get_all_user_permissions, \
+    is_requested_user_followed_by_current_user
 
 
 __author__ = 'Manas'
@@ -76,6 +77,9 @@ def show_album(request, album_id):
     # get all requested albums in order to populate the Albums dropdown list while editing a log (EditLogModal)
     requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
     data_dict['requested_user_albums'] = requested_user_albums
+
+    # check if requested user is being followed by current user
+    is_requested_user_followed_by_current_user(data_dict)
 
     return render(request, 'mytravelog/user_album.html', data_dict)
 
