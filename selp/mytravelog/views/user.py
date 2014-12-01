@@ -117,7 +117,7 @@ def show_user(request, username):
     # check if requested user is being followed by current user
     is_requested_user_followed_by_current_user(data_dict)
 
-    return render(request, 'mytravelog/user.html', data_dict)
+    return render(request, 'mytravelog/user_main.html', data_dict)
 
 
 # ----------------------Helper functions------------------------

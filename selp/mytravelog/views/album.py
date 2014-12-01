@@ -77,7 +77,7 @@ def show_album(request, album_id):
     requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
     data_dict['requested_user_albums'] = requested_user_albums
 
-    return render(request, 'mytravelog/album.html', data_dict)
+    return render(request, 'mytravelog/user_album.html', data_dict)
 
 
 # -------------------HELPER FUNCTIONS--------------------
