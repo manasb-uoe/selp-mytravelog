@@ -1223,7 +1223,8 @@ var CityWeatherForecastHandler = (function () {
         baseApiUrl: 'http://api.openweathermap.org/data/2.5/forecast/daily?',
         weatherContainer: $('.weather-container'),
         baseWeatherIconUrl: 'http://openweathermap.org/img/w/',
-        weatherProgressContainer: $('.weather-progress-container')
+        weatherProgressContainer: $('.weather-progress-container'),
+        apiKey: '016aefae726882a64d8acd52bf3d9b0b'
     };
 
     function init() {
@@ -1265,7 +1266,7 @@ var CityWeatherForecastHandler = (function () {
     }
 
     function _parseWeatherForecastJson() {
-        var apiUrl = _config.baseApiUrl + "q=" + _config.cityName + "&mode=json&units=metric&cnt=7";
+        var apiUrl = _config.baseApiUrl + "q=" + _config.cityName + "&mode=json&units=metric&cnt=7&APPID=" + _config.apiKey;
 
         $.ajax({
             url: apiUrl,
