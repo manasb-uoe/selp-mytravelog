@@ -237,3 +237,21 @@ body {
     margin: 0;
     color: gray;
 }
+
+.main-city-container .weather-progress-container {
+    display: table;
+    height: 150px;
+    width: 100%;
+    border: 1px dashed gray;
+    text-align: center;
+}
+
+.main-city-container .weather-progress-container .wrapper {
+    display: table-cell;
+    vertical-align: middle;
+    width: 100%;
+}
+
+.main-city-container .weather-progress-container .wrapper .progress-text {
+    color: gray;
+}

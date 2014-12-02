@@ -1222,7 +1222,8 @@ var CityWeatherForecastHandler = (function () {
         cityName: $('.city-name').first().text(),
         baseApiUrl: 'http://api.openweathermap.org/data/2.5/forecast/daily?',
         weatherContainer: $('.weather-container'),
-        baseWeatherIconUrl: 'http://openweathermap.org/img/w/'
+        baseWeatherIconUrl: 'http://openweathermap.org/img/w/',
+        weatherProgressContainer: $('.weather-progress-container')
     };
 
     function init() {
@@ -1299,6 +1300,9 @@ var CityWeatherForecastHandler = (function () {
     }
 
     function _showWeatherForecast(parsedData) {
+        // first hide the progress bar container
+        _config.weatherProgressContainer.hide();
+
         for (var i=0; i<parsedData.length; i++) {
             var dayWeather = parsedData[i];
             var html = [
