@@ -1,6 +1,7 @@
 body {
     background-color: #f5f8fa;
     margin-top: 50px;
+    overflow: scroll;
 }
 
 .jumbotron-home {
@@ -155,4 +156,84 @@ body {
 
 .main-city-container .info-container .info-text {
     font-size: 100%;
+}
+
+/*------------weather content------------*/
+
+.main-city-container .weather-container {
+    border-radius: 5px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.main-city-container .weather-container .day-weather {
+    clear: both;
+    margin-bottom: 10px;
+    overflow: hidden;
+    background-color: #ffffff;
+    width: 180px;
+    padding: 10px;
+    text-align: center;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.main-city-container .weather-container .day-and-description-container {
+    margin-bottom: 5px;
+}
+
+.main-city-container .weather-container .day {
+    color: gray;
+    font-size: 120%;
+    font-weight: bold;
+    margin: 0;
+}
+
+.main-city-container .weather-container .description {
+    color: gray;
+    font-size: 100%;
+    margin: 0;
+    font-style: italic;
+}
+
+.main-city-container .weather-container .icon-and-temp-container {
+    overflow: hidden;
+}
+
+.main-city-container .weather-container .icon-and-temp-container .icon-container {
+    float: left;
+    width: 50%;
+    text-align: right;
+}
+
+.main-city-container .weather-container .icon-and-temp-container .temp-container {
+    float: left;
+    width: 50%;
+    text-align: left;
+    padding-left: 10px;
+}
+
+.main-city-container .weather-container .temp-max {
+    margin: 0;
+    color: gray;
+}
+
+.main-city-container .weather-container .temp-min {
+    margin: 0;
+    color: #bababa;
+}
+
+.main-city-container .weather-container .humidity {
+    margin: 0;
+    color: gray;
+}
+
+.main-city-container .weather-container .cloudiness {
+    margin: 0;
+    color: gray;
+}
+
+.main-city-container .weather-container .wind {
+    margin: 0;
+    color: gray;
 }
