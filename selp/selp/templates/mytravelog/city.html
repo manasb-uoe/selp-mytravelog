@@ -7,7 +7,7 @@
 
 {% block body_block %}
     <!-- Main jumbotron -->
-    <div class="jumbotron jumbotron-home">
+    <div class="jumbotron-home">
         <div class="mask">
             <div class="name-container">
                 <h1 class="city-name">{{ requested_city.name }}</h1>
@@ -16,8 +16,8 @@
         </div>
     </div>
 
-    <!-- stats container -->
-    <div class="stats-bar">
+    <!-- tabs container -->
+    <div class="tabs-bar">
         <div class="container">
             <div class="col-lg-3">
                 <div class="row">
@@ -26,24 +26,17 @@
             </div>
             <div class="col-lg-9">
                 <div class="row">
-                    <div class="stats-container">
-                        <div class="stat">
-                            <p class="stat-name">Rank</p>
-                            <p class="stat-value">4</p>
-                        </div>
-                        <div class="stat">
-                            <p class="stat-name">Tourists in 2012</p>
-                            <p class="stat-value">{{ requested_city.tourist_count }}M</p>
-                        </div>
-                        <div class="stat">
-                            <p class="stat-name">Growth since 2011</p>
-                            <p class="stat-value">{{ requested_city.tourist_growth }}%</p>
-                        </div>
-                        <div class="stat">
-                            <p class="stat-name">Logs</p>
-                            <p class="stat-value">15</p>
-                        </div>
-                        <button class="btn btn-primary add-to-wishlist-button">Add to Wishlist</button>
+                    <div class="tabs-container">
+                        <a class="tab" href="#info">
+                            <p class="tab-name">Information</p>
+                        </a>
+                        <a class="tab" href="#weather">
+                            <p class="tab-name">Weather Forecast</p>
+                        </a>
+                        <a class="tab" href="#logs">
+                            <p class="tab-name">Logs in {{ requested_city.name }}</p>
+                        </a>
+                        <button class="btn btn-default add-to-wishlist-button" id="add-to-wishlist-button">Add to Wishlist</button>
                     </div>
                 </div>
             </div>
@@ -57,15 +50,45 @@
             </div>
             <p class="city-name">{{ requested_city.name }}</p>
             <p class="country-name">{{ requested_city.country_name }}</p>
+            <div class="city-stats-container">
+                <div class="stat">
+                    <p class="value">{{ requested_city.tourist_count }} million</p>
+                    <p class="title">Tourist Count (2011)</p>
+                </div>
+                <div class="stat">
+                    <p class="value">{{ requested_city.tourist_growth }}%</p>
+                    <p class="title">Tourist Growth (2011 - 2012)</p>
+                </div>
+                <div class="stat">
+                    <p class="value">#1</p>
+                    <p class="title">City Rank</p>
+                </div>
+            </div>
         </div>
         <div class="col-lg-9">
             <div class="row">
-                <div class="info-container">
-                    <p class="title">Information</p>
-                    <p class="info-text">{{ requested_city.description }}</p>
+                <!-- information content -->
+                <div class="info-content">
+                    <div class="info-container default-box-shadow">
+                        <p class="info-text">{{ requested_city.description }}</p>
+                    </div>
+                </div>
+
+                <!-- weather content -->
+                <div class="weather-content">
+                    <p>weather</p>
+                </div>
+
+                <!-- logs content -->
+                <div class="logs-content">
+                    <p>logs</p>
                 </div>
             </div>
-            <!-- logs container will go here -->
+
         </div>
     </div>
+{% endblock %}
+
+{% block load_js_block %}
+    <script src="{% static 'mytravelog/js/city.js' %}" type="application/javascript"></script>
 {% endblock %}

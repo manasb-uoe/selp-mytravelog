@@ -1,11 +1,11 @@
 body {
     background-color: #f5f8fa;
+    margin-top: 50px;
 }
 
 .jumbotron-home {
-    height: 400px;
+    height: 300px;
     margin: 0;
-    padding: 50px 0 0 0 ;
     background-image: url('/static/mytravelog/imgs/default/city-default.jpg');
     background-position: center center;
     background-repeat: no-repeat;
@@ -28,50 +28,56 @@ body {
 
 .jumbotron-home .mask .name-container .city-name {
     color: #ffffff;
-    text-shadow: 0 0 20px rgba(0,0,0,.5);
-    font-size: 300%;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-size: 250%;
     margin: 0;
     padding-bottom: 5px;
 }
 
 .jumbotron-home .mask .name-container .country-name {
     color: #ffffff;
-    text-shadow: 0 0 20px rgba(0,0,0,.5);
-    font-size: 140%;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-size: 120%;
 }
 
-.stats-bar {
+.tabs-bar {
     border-bottom: 1px solid #e1e8ed;
     height: 60px;
     background-color: #ffffff;
     position: relative;
 }
 
-.stats-bar .stats-container {
+.tabs-bar .tabs-container {
     overflow: hidden;
     position: relative;
 }
 
-.stats-bar .stats-container .stat {
-    height: 100%;
-    padding: 10px 15px;
+.tabs-bar .tabs-container .tab {
+    height: 60px;
+    padding: 12px 15px;
     display: inline-block;
+    text-align: center;
+    box-sizing: border-box;
+    border-bottom: none;
+    text-decoration: none;
+    transition: all .15s ease-in-out;
+    cursor: pointer;
 }
 
-.stats-bar .stats-container .stat .stat-name {
-    margin: 0;
-    color: #66757f;
-    font-size: 80%;
-    text-transform: uppercase;
+.tabs-bar .tabs-container .tab:hover,
+.tabs-bar .tabs-container .tab-active {
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+    border-bottom-color: #0084B4;
 }
 
-.stats-bar .stats-container .stat .stat-value {
-    margin: 0;
+.tabs-bar .tabs-container .tab .tab-name {
     color: #0084B4;
     font-size: 120%;
+    margin-top: 5px;
 }
 
-.stats-bar .stats-container .add-to-wishlist-button {
+.tabs-bar .tabs-container .add-to-wishlist-button {
     height: 100%;
     display: inline-block;
     float: right;
@@ -81,30 +87,6 @@ body {
 .main-city-container {
     margin-top: 20px;
     margin-bottom: 30px;
-}
-
-.main-city-container .info-container {
-    margin-top: 15px;
-}
-
-.main-city-container .info-container .title {
-    margin: 0 0 10px 5px;
-    font-size: 110%;
-    color: #66757f;
-    display: inline-block;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.main-city-container .info-container .info-text {
-    background-color: #ffffff;
-    border: 1px solid #e1e8ed;
-    border-radius: 5px;
-    padding: 20px;
-}
-
-.main-city-container .info-container .divider {
-    margin: 15px 0;
 }
 
 .main-city-container .country-flag-container {
@@ -123,18 +105,54 @@ body {
 }
 
 .main-city-container .city-name {
-    font-size: 170%;
+    font-size: 150%;
     font-weight: bold;
+    width: 200px;
+    text-align: center;
     margin: 5px 0 0 0;
 }
 
 .main-city-container .country-name {
-    font-size: 120%;
+    font-size: 110%;
     margin-top: -5px;
+    padding: 0;
+    width: 200px;
+    text-align: center;
+}
+
+.main-city-container .city-stats-container {
+    width: 200px;
+    padding-top: 1px;
+}
+
+.main-city-container .city-stats-container .stat {
+    margin-top: 10px;
+}
+
+.main-city-container .city-stats-container .title {
+    text-align: center;
+    font-weight: 500;
+    color: gray;
+    font-size: 80%;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.main-city-container .city-stats-container .value {
+    text-align: center;
+    margin: 0;
+    color: #0084B4;
+    font-size: 130%;
     padding: 0;
 }
 
-.main-city-container .test-container {
-    width: 600px;
-    margin-top: 20px;
+/*------------info content------------*/
+
+.main-city-container .info-container {
+    padding: 15px;
+    background-color: #ffffff;
+}
+
+.main-city-container .info-container .info-text {
+    font-size: 100%;
 }
