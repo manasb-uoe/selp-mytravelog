@@ -646,7 +646,7 @@ var DeleteLogModal = (function () {
             _config.submitUrl = '/mytravelog/log/delete/' + id + '/';
         });
         _config.submitButton.click(function () {
-            submitSimpleRequest(_config.errorContainer, _config.submitUrl);
+            _sendPostRequest(_config.errorContainer, _config.submitUrl);
         });
     }
 
@@ -655,6 +655,35 @@ var DeleteLogModal = (function () {
         _config.logCreatedAt.text(createdAt);
         _config.modal.modal();
     }
+
+    function _sendPostRequest(errorContainer, url) {
+    //clear and hide existing errors
+    errorContainer.empty();
+    errorContainer.hide();
+
+    $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        data: {
+            csrfmiddlewaretoken: csrf_token
+        },
+        success: function (response) {
+            var redirect_to = response['redirect_to'];
+            var error_message = response['error'];
+            if (redirect_to != null) {
+                window.location.href = redirect_to;
+            }
+            else if (error_message != null) {
+                errorContainer.append('<strong>Error! </strong>' + error_message);
+                errorContainer.show();
+            }
+            else {
+                window.location.reload();
+            }
+        }
+    });
+}
 
     return {
         init:init
@@ -1150,36 +1179,6 @@ function submitForm(form, errorContainer, url) {
         processData: false
     });
 }
-
-function submitSimpleRequest(errorContainer, url) {
-    //clear and hide existing errors
-    errorContainer.empty();
-    errorContainer.hide();
-
-    $.ajax({
-        url: url,
-        type: "POST",
-        dataType: "json",
-        data: {
-            csrfmiddlewaretoken: csrf_token
-        },
-        success: function (response) {
-            var redirect_to = response['redirect_to'];
-            var error_message = response['error'];
-            if (redirect_to != null) {
-                window.location.href = redirect_to;
-            }
-            else if (error_message != null) {
-                errorContainer.append('<strong>Error! </strong>' + error_message);
-                errorContainer.show();
-            }
-            else {
-                window.location.reload();
-            }
-        }
-    });
-}
-
 
 //--------------------City page modules/functions go here------------------------
 
