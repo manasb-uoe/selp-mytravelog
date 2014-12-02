@@ -312,3 +312,225 @@
     margin: 0;
     display: inline-block;
 }
+
+
+/*---------------styles for all log related modals---------------*/
+
+.form-container {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.error-container {
+    display: none;
+    padding: 10px;
+}
+
+.modal-footer-wrapper {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.modal-footer-wrapper .button-negative {
+    width: 20%;
+}
+
+.modal-footer-wrapper .button-positive {
+    width: 20%;
+}
+
+#add-log-modal-more-images-button-wrapper {
+    text-align: right;
+}
+
+#add-log-modal-more-images-button-wrapper #add-log-modal-more-images-button {
+    color: #428bca;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#add-log-modal-more-images-button-wrapper #add-log-modal-more-images-button:hover {
+    color: #2e618d;
+}
+
+#add-log-modal-map-container {
+    background-color: #f2f2f2;
+    height: 250px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#add-log-modal-image-input {
+    margin-bottom: 5px;
+}
+
+#log-picture-modal #log-picture-modal-dialog {
+    width: 60%;
+    min-width: 800px;
+}
+
+#log-picture-modal #log-picture-modal-picture {
+    width: 100%;
+    height: 600px;
+    background-size: cover;
+    background-position: center center;
+}
+
+#log-picture-modal #log-picture-modal-body {
+    padding: 0;
+    background-color: #000000;
+}
+
+#log-picture-modal #log-picture-modal-header {
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    padding-right: 5px;
+    padding-top: 5px;
+}
+
+#log-picture-modal #log-picture-modal-header #log-picture-modal-close-button {
+    background-image: url('/static/mytravelog/imgs/default/icon_delete.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 40px;
+    width: 40px;
+    float: right;
+    cursor: pointer;
+}
+
+#log-picture-modal #log-picture-modal-footer {
+    overflow: hidden;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    bottom: 0;
+    padding: 10px 15px;
+    width: 100%;
+}
+
+#log-picture-modal #log-picture-modal-index {
+    font-weight: bold;
+    display: inline-block;
+    margin: 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    width: 59%;
+}
+
+#log-picture-modal #log-picture-modal-previous-button {
+    margin: 0;
+    display: inline-block;
+    cursor: pointer;
+    /*font-weight: bold;*/
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-align: left;
+    width: 20%;
+    color: rgba(255, 255, 255, 0.7)
+}
+
+#log-picture-modal #log-picture-modal-next-button {
+    margin: 0;
+    display: inline-block;
+    cursor: pointer;
+    /*font-weight: bold;*/
+    text-align: right;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    width: 20%;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+#log-picture-modal #log-picture-modal-previous-button:hover,
+#log-picture-modal #log-picture-modal-next-button:hover {
+    color: rgba(255, 255, 255, 1);
+}
+
+#delete-log-modal #delete-log-modal-location {
+    font-weight: bold;
+}
+
+#delete-log-modal #delete-log-modal-created-at {
+    font-weight: bold;
+}
+
+#delete-log-modal .delete-log-modal-paragraph {
+    margin: 0;
+}
+
+#edit-log-modal #edit-log-modal-map-container {
+    background-color: #f2f2f2;
+    height: 250px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+#edit-log-modal #edit-log-modal-image-input {
+    margin-bottom: 5px;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper {
+    text-align: right;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper #edit-log-modal-more-images-button {
+    color: #428bca;
+    display: inline-block;
+    cursor: pointer;
+}
+
+#edit-log-modal #edit-log-modal-more-images-button-wrapper #edit-log-modal-more-images-button:hover {
+    color: #2e618d;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container {;
+    width: 100%;
+    padding: 5px 0 0 0;
+    border: 1px dashed gray;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image {
+    height: 60px;
+    width: 60px;
+    background-size: cover;
+    background-position: center center;
+    display: inline-block;
+    margin-left: 5px;
+    border-radius: 3px;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    display: table;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask .edit-log-modal-previous-image-delete-button {
+    background-position: center center;
+    background-size: contain;
+    height: 50%;
+    width: 50%;
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-previous-image .edit-log-modal-previous-image-mask .edit-log-modal-previous-image-delete-button:hover {
+    background-image: url('/static/mytravelog/imgs/default/icon_delete.png');
+}
+
+#edit-log-modal #edit-log-modal-previous-images-container .edit-log-modal-no-previous-images-text {
+    text-align: center;
+    padding: 10px;
+}
