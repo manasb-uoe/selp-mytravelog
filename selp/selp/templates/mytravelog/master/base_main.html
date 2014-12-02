@@ -73,6 +73,14 @@
 <script src="{% static 'mytravelog/js/jquery/jquery-2.1.1.min.js' %}"></script>
 <script src="{% static 'mytravelog/js/bootstrap/bootstrap.min.js' %}"></script>
 
+<!-- csrf token required for contacting the server using ajax calls -->
+<script type="application/javascript">
+    var csrf_token = "{{ csrf_token }}";
+</script>
+
+<!-- google maps javascript api -->
+<script src="//maps.googleapis.com/maps/api/js?v=3.exp&sensor=true"></script>
+
 <!-- load_js block -->
 {% block load_js_block %}
 {% endblock %}
