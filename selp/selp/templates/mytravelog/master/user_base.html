@@ -54,7 +54,7 @@
                     <button class="btn btn-primary world-map-button" id="show-on-map-button" data-requested-user-username="{{ requested_user.username }}" data-requested-user-first-name="{{ requested_user.first_name }}">Show on Map</button>
                 </div>
                 <!-- main follow button -->
-                {% if authenticated_to_like_and_comment and requested_user != user %}
+                {% if can_follow %}
                     {% if is_followed %}
                         <button class="btn follow-button follow-button-active" id="main-follow-button" data-following-user-profile-id="{{ requested_user_profile.id }}">Following</button>
                     {% else %}

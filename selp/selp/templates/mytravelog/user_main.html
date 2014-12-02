@@ -24,11 +24,11 @@
         <p class="count">{{ requested_user_following|length }}</p>
     </a>
 
-    {% if authenticated_to_edit_profile %}
+    {% if can_edit_profile %}
         <button class="btn btn-primary button-add-new logs-content" id="add-new-log-button">+ Add Log</button>
     {% endif %}
 
-    {% if authenticated_to_edit_profile %}
+    {% if can_edit_profile %}
         <button class="btn btn-primary button-add-new albums-content" id="add-new-album-button">+ Add Album</button>
     {% endif %}
 
@@ -49,7 +49,7 @@
                         <div class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
                             <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
                                 <div class="mask">
-                                    {% if authenticated_to_edit_profile %}
+                                    {% if can_edit_profile %}
                                         <div class="overflow-button"></div>
                                         <div class="album-dropdown-container">
                                             <div class="album-dropdown-menu">
@@ -85,8 +85,8 @@
                                     <img class="profile-picture" src="{{ follower.follower_user_profile.profile_picture.url }}">
                                 </div>
                                 <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="full-name">{{ follower.follower_user_profile.user.get_full_name }}</a>
-                                {% if authenticated_to_like_and_comment and follower.follower_user_profile.user != user %}
-                                    {% if follower.followed %}
+                                {% if follower.can_follow %}
+                                    {% if follower.is_followed %}
                                         <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Following</button>
                                     {% else %}
                                         <button class="btn follow-button" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Follow</button>
@@ -118,12 +118,10 @@
                                     <img class="profile-picture" src="{{ following.following_user_profile.profile_picture.url }}">
                                 </div>
                                 <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="full-name">{{ following.following_user_profile.user.get_full_name }}</a>
-                                {% if authenticated_to_like_and_comment and following.following_user_profile.user != user %}
-                                    {% if following.followed %}
-                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
-                                    {% else %}
-                                        <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
-                                    {% endif %}
+                                {% if following.is_followed %}
+                                    <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
+                                {% else %}
+                                    <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
                                 {% endif %}
                                 <br>
                                 <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="username">@{{ following.following_user_profile.user.username }}</a>

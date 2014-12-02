@@ -33,7 +33,7 @@
         <p class="value">{{ requested_album.duration }} days</p>
     </div>
 
-    {% if authenticated_to_edit_profile %}
+    {% if can_edit_profile %}
         <button class="btn btn-danger" id="delete-album-button" data-id="{{ requested_album.id }}" data-name="{{ requested_album.name }}" data-created-at="{{ requested_album.created_at }}" data-current-username="{{ user.username }}">Delete</button>
         <button class="btn btn-primary" id="edit-album-button" data-id="{{ requested_album.id }}" data-name="{{ requested_album.name }}" data-start-date="{{ requested_album.start_date|date:'Y-m-d' }}" data-end-date="{{ requested_album.end_date|date:'Y-m-d' }}">Edit</button>
     {% endif %}

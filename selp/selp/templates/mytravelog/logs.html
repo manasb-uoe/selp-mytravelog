@@ -7,7 +7,7 @@
                 <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
                 <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
 
-                {% if authenticated_to_edit_profile %}
+                {% if log.can_edit %}
                     <div class="overflow-button"></div>
                     <div class="log-dropdown-container">
                         <div class="log-dropdown-menu">
@@ -106,7 +106,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                {% if authenticated_to_like_and_comment %}
+                {% if current_user_profile %}
                     {% if log.liked %}
                         <button class="like-log-button like-log-button-active" data-log-id="{{ log.id }}"></button>
                         <input class="form-control comment-log-input" data-log-id="{{ log.id }}" type="text" placeholder="Say something nice..." autocomplete="off" required="true">

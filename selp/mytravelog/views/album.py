@@ -8,8 +8,7 @@ from django.shortcuts import get_object_or_404, render
 from mytravelog.models.album import Album
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, get_all_user_permissions, \
-    is_requested_user_followed_by_current_user
+from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user
 
 
 __author__ = 'Manas'
@@ -62,25 +61,52 @@ def show_album(request, album_id):
     requested_album = get_object_or_404(Album, id=album_id)
     duration = (requested_album.end_date - requested_album.start_date).days
     requested_album.duration = duration
-    data_dict = get_all_user_permissions(requested_album.user_profile.user, request.user)
+
+    # get current user and user profile
+    current_user = request.user
+    current_user_profile = None
+    if current_user.is_authenticated():
+        current_user_profile = UserProfile.objects.get(user=current_user)
+
+    # get requested user and user profile
+    requested_user_profile = requested_album.user_profile
+    requested_user = requested_user_profile.user
 
     # get all album logs and pictures
     requested_album_logs = attach_additional_info_to_logs(Log.objects.filter(album=requested_album),
-                                                          data_dict.get('current_user_profile', None))
-    data_dict['requested_album_logs'] = requested_album_logs
+                                                          current_user_profile)
     album_pictures = []
     for log in requested_album_logs:
         album_pictures += log.pictures
     requested_album.pictures = album_pictures
-    data_dict['requested_album'] = requested_album
 
-    # get all requested albums in order to populate the Albums dropdown list while editing a log (EditLogModal)
-    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
-    data_dict['requested_user_albums'] = requested_user_albums
+    # get all requested albums in order to populate the Albums drop-down list while editing a log (EditLogModal)
+    requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
 
-    # check if requested user is being followed by current user
-    is_requested_user_followed_by_current_user(data_dict)
+    # check if requested user can be followed by current user
+    # if yes, then check if requested user is being followed by current user
+    can_follow = False
+    is_followed = False
+    if current_user != requested_user:
+        can_follow = True
+        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
+    # check if current user can edit profile
+    can_edit_profile = False
+    if current_user == requested_user:
+        can_edit_profile = True
+
+    data_dict = {
+        'requested_user': requested_user,
+        'requested_user_profile': requested_user_profile,
+        'current_user_profile': current_user_profile,
+        'requested_user_albums': requested_user_albums,
+        'requested_album': requested_album,
+        'requested_album_logs': requested_album_logs,
+        'can_follow': can_follow,
+        'is_followed': is_followed,
+        'can_edit_profile': can_edit_profile
+    }
     return render(request, 'mytravelog/user_album.html', data_dict)
 
 

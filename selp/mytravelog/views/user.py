@@ -103,20 +103,51 @@ def sign_out(request):
 
 
 def show_user(request, username):
-    data_dict = get_all_user_permissions(get_object_or_404(User, username=username), request.user)
+    # get current user and user profile
+    current_user = request.user
+    current_user_profile = None
+    if current_user.is_authenticated():
+        current_user_profile = UserProfile.objects.get(user=current_user)
+
+    # get requested user and user profile
+    requested_user = get_object_or_404(User, username=username)
+    requested_user_profile = UserProfile.objects.get(user=requested_user)
 
     # get user albums and attach duration to each album
-    get_requested_user_albums(data_dict)
+    requested_user_albums = get_requested_user_albums(requested_user_profile)
 
     # get user logs along with pictures, likes and comments for each log
-    get_requested_user_logs(data_dict)
+    requested_user_logs = get_requested_user_logs_with_additional_info(requested_user_profile, current_user_profile)
 
     # get user followers and following
-    get_requested_user_followers_and_following(data_dict)
+    requested_user_followers = get_requested_user_followers(requested_user_profile, current_user_profile)
+    requested_user_following = get_requested_user_following(requested_user_profile, current_user_profile)
 
-    # check if requested user is being followed by current user
-    is_requested_user_followed_by_current_user(data_dict)
+    # check if requested user can be followed by current user
+    # if yes, then check if requested user is being followed by current user
+    can_follow = False
+    is_followed = False
+    if current_user != requested_user:
+        can_follow = True
+        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
+    # check if current user can edit profile
+    can_edit_profile = False
+    if current_user == requested_user:
+        can_edit_profile = True
+
+    data_dict = {
+        'requested_user': requested_user,
+        'requested_user_profile': requested_user_profile,
+        'current_user_profile': current_user_profile,
+        'requested_user_albums': requested_user_albums,
+        'requested_user_logs': requested_user_logs,
+        'requested_user_followers': requested_user_followers,
+        'requested_user_following': requested_user_following,
+        'can_follow': can_follow,
+        'is_followed': is_followed,
+        'can_edit_profile': can_edit_profile
+    }
     return render(request, 'mytravelog/user_main.html', data_dict)
 
 
@@ -146,49 +177,19 @@ def validate_sign_up_form(first_name, last_name, email, username, password):
     return None
 
 
-# this function returns all the necessary user permission appended to a dictionary
-# user and user profile instances are also returned as they are reused later
-def get_all_user_permissions(requested_user, current_user):
-    # get requested user and user profile
-    requested_user_profile = UserProfile.objects.get(user=requested_user)
-
-    # get permissions
-    authenticated_to_edit_profile = False
-    authenticated_to_like_and_comment = False
-    if current_user.is_authenticated():
-        authenticated_to_like_and_comment = True
-        if current_user.username == requested_user.username:
-            authenticated_to_edit_profile = True
-
-    # get current user profile only if authenticated
-    current_user_profile = None
-    if authenticated_to_like_and_comment:
-        current_user_profile = get_object_or_404(UserProfile, user=current_user)
-
-    # load all the required data and permissions into a dict
-    data_dict = {'requested_user': requested_user,
-                 'requested_user_profile': requested_user_profile,
-                 'authenticated_to_edit_profile': authenticated_to_edit_profile,
-                 'authenticated_to_like_and_comment': authenticated_to_like_and_comment,
-                 'current_user_profile': current_user_profile}
-
-    return data_dict
-
-
-def get_requested_user_albums(data_dict):
-    requested_user_albums = Album.objects.filter(user_profile=data_dict['requested_user_profile'])
+def get_requested_user_albums(requested_user_profile):
+    requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
     for album in requested_user_albums:
         duration = (album.end_date - album.start_date).days
         album.duration = duration
-    data_dict['requested_user_albums'] = requested_user_albums
+    return requested_user_albums
 
 
-def get_requested_user_logs(data_dict):
+def get_requested_user_logs_with_additional_info(requested_user_profile, current_user_profile):
     # get user logs along with pictures, likes and comments for each log
-    requested_user_logs = Log.objects.filter(user_profile=data_dict['requested_user_profile'])
-    current_user_profile = data_dict.get('current_user_profile', None)
+    requested_user_logs = Log.objects.filter(user_profile=requested_user_profile)
     requested_user_logs = attach_additional_info_to_logs(requested_user_logs, current_user_profile)
-    data_dict['requested_user_logs'] = requested_user_logs
+    return requested_user_logs
 
 
 def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
@@ -212,36 +213,43 @@ def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
             if current_user_profile is not None:
                 if comment.commenter_user_profile == current_user_profile:
                     comment.can_delete = True
+        # attach edit permission
+        if log.user_profile == current_user_profile:
+            log.can_edit = True
+        else:
+            log.can_edit = False
     return requested_user_logs
 
 
-def get_requested_user_followers_and_following(data_dict):
-    current_user_profile = data_dict.get('current_user_profile', None)
-    # get user followers
-    requested_user_followers = Follower.objects.filter(following_user_profile=data_dict['requested_user_profile'])
+def get_requested_user_followers(requested_user_profile, current_user_profile):
+    requested_user_followers = Follower.objects.filter(following_user_profile=requested_user_profile)
     for follower in requested_user_followers:
-        follower.followed = False
+        follower.is_followed = False
         if current_user_profile is not None:
             if len(Follower.objects.filter(follower_user_profile=current_user_profile,
                                            following_user_profile=follower.follower_user_profile)) > 0:
-                follower.followed = True
-    data_dict['requested_user_followers'] = requested_user_followers
+                follower.is_followed = True
+            if follower.follower_user_profile != current_user_profile:
+                follower.can_follow = True
+            else:
+                follower.can_follow = False
+    return requested_user_followers
 
-    # get users followed by current user
-    requested_user_following = Follower.objects.filter(follower_user_profile=data_dict['requested_user_profile'])
+
+def get_requested_user_following(requested_user_profile, current_user_profile):
+    requested_user_following = Follower.objects.filter(follower_user_profile=requested_user_profile)
     if current_user_profile is not None:
         for following in requested_user_following:
-            following.followed = True
-    data_dict['requested_user_following'] = requested_user_following
+            following.is_followed = True
+    return requested_user_following
 
 
-def is_requested_user_followed_by_current_user(data_dict):
-    current_user_profile = data_dict.get('current_user_profile', None)
-    is_following = False
+def is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile):
+    is_followed = False
     if current_user_profile is not None:
         if len(Follower.objects.filter(follower_user_profile=current_user_profile,
-                                       following_user_profile=data_dict['requested_user_profile'])) > 0:
-            is_following = True
-    data_dict['is_followed'] = is_following
+                                       following_user_profile=requested_user_profile)) > 0:
+            is_followed = True
+    return is_followed
 
 
