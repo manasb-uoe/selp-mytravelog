@@ -1,10 +1,11 @@
 /**
  * Created by Manas on 11/1/2014.
  */
+//--------------------User related modules/functions go here------------------------
 
-//--------------------Base------------------------
+//-----Base-----
 
-var TabNavigationHandler = (function () {
+var UserTabNavigationHandler = (function () {
 
     var _config = {
         addNewLogButton: $('#add-new-log-button'),
@@ -150,7 +151,7 @@ var WorldMapModal = (function () {
 
 }());
 
-//--------------------Albums------------------------
+//-----Albums------
 
 function handleAlbums() {
     // go to album page when user clicks on an album
@@ -329,7 +330,7 @@ var DeleteAlbumModal = (function () {
     };
 }());
 
-//--------------------Logs------------------------
+//-----Logs-----
 
 function handleLogs() {
     AddLogModal.init();
@@ -1033,7 +1034,7 @@ var CommentHandler = (function () {
 
 }());
 
-//--------------------Followers------------------------
+//-----Followers-----
 
 var FollowerHandler = (function () {
 
@@ -1113,7 +1114,7 @@ var FollowerHandler = (function () {
 
 }());
 
-//--------------------Helper functions------------------------
+//-----Helper functions go here-----
 
 function submitForm(form, errorContainer, url) {
     //clear and hide existing errors
@@ -1180,13 +1181,237 @@ function submitSimpleRequest(errorContainer, url) {
 }
 
 
+//--------------------City page modules/functions go here------------------------
+
+var CityTabNavigationHandler = (function () {
+
+    function init() {
+        // navigate to #info if no hash found
+        if (window.location.hash == '') {
+            window.location.href = window.location.href + '#info'
+        }
+        _navigateToActiveTab();
+
+        // navigate to active tab every time the hash changes
+        $(window).on('hashchange', function () {
+            _navigateToActiveTab();
+        });
+    }
+
+    function _navigateToActiveTab() {
+        var hash = window.location.hash;
+
+        // only mark selected tab as active
+        var activeTab = $('a[href="' + hash +'"]');
+        activeTab.siblings().removeClass('tab-active');
+        activeTab.addClass('tab-active');
+
+        // only show active tab content
+        var activeContent = $('.' + hash.substr(1) + '-content');
+        activeContent.show();
+        activeContent.siblings('div[class$=content]').hide();
+    }
+
+    return {
+        init: init
+    };
+}());
+
+var CityWeatherForecastHandler = (function () {
+
+    var _config = {
+        cityName: $('.city-name').first().text(),
+        baseApiUrl: 'http://api.openweathermap.org/data/2.5/forecast/daily?',
+        weatherContainer: $('.weather-container'),
+        baseWeatherIconUrl: 'http://openweathermap.org/img/w/'
+    };
+
+    function init() {
+        _parseWeatherForecastJson();
+    }
+
+    function DayWeather(day, min, max, description, icon, humidity, windSpeed, cloudiness) {
+        var daysOfAWeek = {
+            0: "Sunday",
+            1: "Monday",
+            2: "Tuesday",
+            3: "Wednesday",
+            4: "Thursday",
+            5: "Friday",
+            6: "Saturday"
+        };
+
+        var currentDate = new Date();
+        var today = currentDate.getDay();
+        currentDate.setDate(currentDate.getDate() + 1);
+        var tomorrow = currentDate.getDay();
+
+        if (day == today) {
+            this.day = "Today"
+        }
+        else if (day == tomorrow) {
+            this.day = "Tomorrow"
+        }
+        else {
+            this.day = daysOfAWeek[day];
+        }
+        this.min = min;
+        this.max = max;
+        this.description = description;
+        this.icon = icon;
+        this.humidity = humidity;
+        this.windSpeed = windSpeed;
+        this.cloudiness = cloudiness;
+    }
+
+    function _parseWeatherForecastJson() {
+        var apiUrl = _config.baseApiUrl + "q=" + _config.cityName + "&mode=json&units=metric&cnt=7";
+
+        $.ajax({
+            url: apiUrl,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                var parsedData = [];
+                var currentDate = new Date();
+                var list =  response.list;
+                for (var key in list) {
+                    if (list.hasOwnProperty(key)) {
+                        var listItem = list[key];
+                        var temp = listItem.temp;
+                        var weather = listItem.weather[0];
+
+                        parsedData.push(new DayWeather(
+                            currentDate.getDay(),
+                            temp.min,
+                            temp.max,
+                            weather.description,
+                            weather.icon,
+                            listItem.humidity,
+                            listItem.speed,
+                            listItem.clouds
+                        ));
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                }
+                _showWeatherForecast(parsedData);
+            }
+        });
+    }
+
+    function _showWeatherForecast(parsedData) {
+        for (var i=0; i<parsedData.length; i++) {
+            var dayWeather = parsedData[i];
+            var html = [
+                '<div class="day-weather default-box-shadow">',
+                '<div class="day-and-description-container">',
+                '<p class="day">' + dayWeather.day + '</p>',
+                '<p class="description">' + dayWeather.description + '</p>',
+                '</div>',
+                '<div class="icon-and-temp-container">',
+                '<div class="icon-container">',
+                '<img class="icon" src="' + _config.baseWeatherIconUrl + dayWeather.icon + '.png">',
+                '</div>',
+                '<div class="temp-container">',
+                '<p class="temp-max">' + dayWeather.max + '°C</p>',
+                '<p class="temp-min">' + dayWeather.min + '°C</p>',
+                '</div>',
+                '</div>',
+                '<p class="humidity">Humidity: ' + dayWeather.humidity +'%</p>',
+                '<p class="cloudiness">Cloudiness: ' + dayWeather.cloudiness + '%</p>',
+                '<p class="wind">Wind: ' + dayWeather.windSpeed + ' mps</p>',
+                '</div>'
+            ].join('\n');
+            _config.weatherContainer.append(html);
+        }
+    }
+
+    return {
+        init: init
+    };
+}());
+
+//--------------------Home page modules/functions go here------------------------
+
+function scrollToPopularCities() {
+    $('.explore-popular-cities').click(function () {
+        $('body, html').animate({
+            scrollTop: $('.divider').offset().top - $('.navbar').height()
+        }, 400);
+    });
+}
+
+var CityAutocompleteSuggestionsHandler = (function () {
+
+    var _config = {
+        inputCityText: $('.input-city-text'),
+        suggestionsContainer: $('.autocomplete-suggestions-container'),
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.inputCityText.keyup(function () {
+            _populateSuggestionsContainer();
+        });
+        _config.suggestionsContainer.on('click', '.suggestion-light, .suggestion-dark', function () {
+            _handleSuggestionClick($(this));
+        });
+    }
+
+    function _populateSuggestionsContainer() {
+        var search_term = _config.inputCityText.val();
+        if (search_term.length > 1) {
+            $.ajax({
+                url: "/mytravelog/city/autocomplete/?search_term=" + search_term,
+                type: "get",
+                dataType: "json",
+                success: function(data) {
+                    // clear suggestions container for populating it
+                    _config.suggestionsContainer.empty();
+                    var counter = 1;
+                    for (var key in data) {
+                        if (data.hasOwnProperty(key)) {
+                            if (counter % 2 == 0) {
+                                _config.suggestionsContainer.append('<div class="suggestion suggestion-light">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
+                            }
+                            else {
+                                _config.suggestionsContainer.append('<div class="suggestion suggestion-dark">' + data[key]['city'] + ", " + data[key]['country'] + '</div>');
+                            }
+                            counter++;
+                        }
+                    }
+                }
+            });
+        }
+        else {
+            _config.suggestionsContainer.empty();
+        }
+    }
+
+    function _handleSuggestionClick(suggestion) {
+        var search_term = suggestion.text();
+        var city_name = search_term.substring(0, search_term.indexOf(','));
+        _config.inputCityText.val(city_name);
+        _config.suggestionsContainer.empty();
+        window.location.href = '/mytravelog/search/?query=' + city_name;
+    }
+
+    return {
+        init: init
+    };
+
+}());
+
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
-    // only initialize the required modules for a particular page
+    // only initialize the modules required for the current page
     var currentUrl = window.location.href;
     if (currentUrl.indexOf('/user/') > -1) {
-        TabNavigationHandler.init();
+        UserTabNavigationHandler.init();
         WorldMapModal.init();
         FollowerHandler.init();
         handleAlbums();
@@ -1199,5 +1424,13 @@ $(document).ready(function () {
     }
     else if (currentUrl.indexOf('/search/') > -1) {
         FollowerHandler.init();
+    }
+    else if (currentUrl.indexOf('/city/') > -1) {
+        CityTabNavigationHandler.init();
+        CityWeatherForecastHandler.init();
+    }
+    else if (currentUrl.indexOf('/mytravelog/', currentUrl.length - '/mytravelog/'.length) > -1) {
+        scrollToPopularCities();
+        CityAutocompleteSuggestionsHandler.init();
     }
 });

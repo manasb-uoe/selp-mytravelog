@@ -3,6 +3,7 @@
 
 {% block head_block %}
     <link href="{% static 'mytravelog/css/city.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'mytravelog/css/logs.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block body_block %}
@@ -82,7 +83,7 @@
 
                 <!-- logs content -->
                 <div class="logs-content">
-                    <p>logs</p>
+                    {% include 'mytravelog/logs.html' with requested_user_logs=requested_city_logs %}
                 </div>
             </div>
 
@@ -91,5 +92,5 @@
 {% endblock %}
 
 {% block load_js_block %}
-    <script src="{% static 'mytravelog/js/city.js' %}" type="application/javascript"></script>
+    <script src="{% static 'mytravelog/js/user.js' %}" type="application/javascript"></script>
 {% endblock %}
