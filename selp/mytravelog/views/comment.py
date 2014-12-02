@@ -5,6 +5,7 @@ from django.http.response import HttpResponse, Http404
 from mytravelog.models.comment import Comment
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 
 __author__ = 'Manas'
@@ -34,7 +35,7 @@ def create_log_comment(request, log_id):
                 return_data['profile_picture_url'] = user_profile.profile_picture.url
                 return_data['full_name'] = user.get_full_name()
                 return_data['body'] = comment.body
-                return_data['created_at'] = str(comment.created_at)
+                return_data['created_at'] = naturaltime(comment.created_at)
                 return_data['comment_id'] = comment.id
         else:
             return_data['redirect_to'] = "/mytravelog/sign_in/"

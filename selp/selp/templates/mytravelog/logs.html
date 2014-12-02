@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 
 <div class="logs-container">
     {% for log in requested_user_logs %}
@@ -63,7 +64,7 @@
                 <img class="profile-picture" src="{{ log.user_profile.profile_picture.url }}">
                 <div class="name-and-timestamp-container">
                     <p class="name">{{ log.user_profile.user.get_full_name }}</p>
-                    <p class="timestamp">{{ log.created_at }}</p>
+                    <p class="timestamp">{{ log.created_at|naturaltime }}</p>
                 </div>
             </div>
 
@@ -96,7 +97,7 @@
                                 <div class="comment-header">
                                     <a class="comment-full-name" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">{{ comment.commenter_user_profile.user.get_full_name }}</a>
                                     <a class="comment-username" href="/mytravelog/user/{{ comment.commenter_user_profile.user.username }}/">@{{ comment.commenter_user_profile.user.username }}</a>
-                                    <p class="comment-timestamp">• {{ comment.created_at }}</p>
+                                    <p class="comment-timestamp">• {{ comment.created_at|naturaltime }}</p>
                                 </div>
                                 <p class="comment-body">{{ comment.body }}</p>
                                 {% if comment.can_delete %}
