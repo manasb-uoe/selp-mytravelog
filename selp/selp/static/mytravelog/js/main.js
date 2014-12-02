@@ -1432,6 +1432,7 @@ $(document).ready(function () {
     else if (currentUrl.indexOf('/city/') > -1) {
         CityTabNavigationHandler.init();
         CityWeatherForecastHandler.init();
+        handleLogs();
     }
     else if (currentUrl.indexOf('/mytravelog/', currentUrl.length - '/mytravelog/'.length) > -1) {
         scrollToPopularCities();

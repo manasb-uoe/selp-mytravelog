@@ -1,8 +1,12 @@
 import json
 from django.db.models.query_utils import Q
-from django.http.response import Http404, HttpResponseRedirect, HttpResponse
+from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
+from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.log import Log
+from mytravelog.models.user_profile import UserProfile
+from mytravelog.views.user import attach_additional_info_to_logs
 
 __author__ = 'Manas'
 
@@ -11,12 +15,29 @@ def show_city(request, city_url_name):
     # get city using the url name provided
     # else, show 404 error
     requested_city = get_object_or_404(City, url_name=city_url_name)
-
     # convert city tourist count to millions
     tourist_count = requested_city.tourist_count
     requested_city.tourist_count = tourist_count/1000000.0
 
-    data_dict = {'requested_city': requested_city}
+    # get current user and user profile
+    current_user = request.user
+    current_user_profile = None
+    if current_user.is_authenticated():
+        current_user_profile = UserProfile.objects.get(user=current_user)
+
+    # get all albums for the current user in order to populate the Albums drop-down list while
+    # editing a log (EditLogModal)
+    current_user_albums = Album.objects.filter(user_profile=current_user_profile)
+
+    # get all city logs
+    requested_city_logs = attach_additional_info_to_logs(Log.objects.filter(city=requested_city), current_user_profile)
+
+    data_dict = {
+        'requested_city': requested_city,
+        'current_user_profile': current_user_profile,
+        'requested_city_logs': requested_city_logs,
+        'current_user_albums': current_user_albums
+    }
     return render(request, 'mytravelog/city.html', data_dict)
 
 
