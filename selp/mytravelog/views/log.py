@@ -1,12 +1,19 @@
 import json
+import datetime
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.db.models.query_utils import Q
 from django.http.response import Http404, HttpResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+import math
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.comment import Comment
+from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
+from mytravelog.views.user import attach_additional_info_to_logs
 
 __author__ = 'Manas'
 
@@ -168,6 +175,43 @@ def get_log_positions(request, username):
         raise Http404
 
 
+def show_live_feed(request):
+    # get current user and user profile
+    current_user = request.user
+    current_user_profile = None
+    if current_user.is_authenticated():
+        current_user_profile = UserProfile.objects.get(user=current_user)
+
+    # get all logs sorted by decreasing order of score
+    all_logs = Log.objects.order_by('-score')
+
+    # paginate the logs
+    paginator = Paginator(all_logs, 10)
+    page_num = request.GET.get('page')
+    try:
+        requested_page_logs = paginator.page(page_num)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        requested_page_logs = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        requested_page_logs = paginator.page(paginator.num_pages)
+
+    # attach additional info (likes, comments and pictures) to page logs
+    requested_page_logs = attach_additional_info_to_logs(requested_page_logs, current_user_profile)
+
+    # get all albums for the current user in order to populate the Albums drop-down list while
+    # editing a log (EditLogModal)
+    current_user_albums = Album.objects.filter(user_profile=current_user_profile)
+
+    data_dict = {
+        'current_user_profile': current_user_profile,
+        'current_user_albums': current_user_albums,
+        'requested_page_logs': requested_page_logs
+    }
+    return render(request, 'mytravelog/live_feed.html', data_dict)
+
+
 # ---------------Helper functions----------------
 
 def validate_log_form(location, latitude, longitude, description, number_of_pictures):
@@ -194,3 +238,18 @@ def validate_edit_log_form(description, number_of_pictures_to_delete, number_of_
         return "At least one image is required"
     else:
         return None
+
+
+# score function: log_score = log10(z) + (time_since_epoch/45000)
+# where z = num_likes + num_comments (z=1 if (num_likes + num_comments) == 0)
+def get_log_score(log_to_score):
+    # only consider likes and comments made my other users, and not the user who created the log
+    num_comments = Comment.objects.filter(Q(log=log_to_score) & ~Q(commenter_user_profile=log_to_score.user_profile)).count()
+    num_likes = Like.objects.filter(Q(log=log_to_score) & ~Q(liker_user_profile=log_to_score.user_profile)).count()
+    log_created_at = log_to_score.created_at.replace(tzinfo=None)  # remove time zone awareness
+    time_since_epoch = (log_created_at - datetime.datetime(1970, 1, 1)).total_seconds() / 45000
+    z = (num_likes + num_comments)
+    if z == 0:
+        z = 1
+    score = round(math.log(z, 10) + time_since_epoch, 7)
+    return score
