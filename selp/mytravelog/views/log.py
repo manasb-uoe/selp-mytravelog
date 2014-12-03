@@ -234,6 +234,8 @@ def validate_log_form(location, latitude, longitude, description, number_of_pict
         output['error'] = "Your location could not be verified"
     elif len(description) == 0:
         output['error'] = "Description is required"
+    elif len(description) > 1000:
+        output['error'] = "Description length cannot exceed 1000 characters"
     elif number_of_pictures == 0:
         output['error'] = "At least one image is required"
     else:
@@ -248,6 +250,8 @@ def validate_log_form(location, latitude, longitude, description, number_of_pict
 def validate_edit_log_form(description, number_of_pictures_to_delete, number_of_pictures_to_add, total_number_of_pictures):
     if len(description) == 0:
         return "Description is required"
+    elif len(description) > 1000:
+        return "Description length cannot exceed 1000 characters"
     elif (total_number_of_pictures - number_of_pictures_to_delete + number_of_pictures_to_add) == 0:
         return "At least one image is required"
     else:
