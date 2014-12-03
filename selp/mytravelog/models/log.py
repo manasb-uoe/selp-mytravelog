@@ -16,6 +16,7 @@ class Log(models.Model):
     description = models.CharField(max_length=1000, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    score = models.DecimalField(max_digits=100, decimal_places=7, null=False)
 
     def __unicode__(self):
         return self.city.name + ": " + self.user_profile.user.get_full_name()
