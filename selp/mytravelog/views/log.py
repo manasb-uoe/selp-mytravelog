@@ -46,6 +46,11 @@ def create_log(request):
                 new_log.longitude = longitude
                 new_log.album = album
                 new_log.description = description
+                new_log.score = 0
+                new_log.save()
+
+                # now that we have created_at, update the log score and re-save
+                new_log.score = get_log_score(new_log)
                 new_log.save()
 
                 # create new log picture for every image submitted by user
