@@ -1438,4 +1438,7 @@ $(document).ready(function () {
         scrollToPopularCities();
         CityAutocompleteSuggestionsHandler.init();
     }
+    else if (currentUrl.indexOf('/live/') > -1) {
+        handleLogs();
+    }
 });
