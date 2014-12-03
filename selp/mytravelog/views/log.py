@@ -3,12 +3,13 @@ import datetime
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query_utils import Q
-from django.http.response import Http404, HttpResponse
+from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 import math
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.comment import Comment
+from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
@@ -182,11 +183,24 @@ def show_live_feed(request):
     if current_user.is_authenticated():
         current_user_profile = UserProfile.objects.get(user=current_user)
 
-    # get all logs sorted by decreasing order of score
-    all_logs = Log.objects.order_by('-score')
+    # filter logs based on the url and sort them by decreasing order of score
+    current_url = request.get_full_path()
+    if 'live_feed/all' in current_url:
+        # get all logs
+        requested_filter = 'all'
+        requested_logs = Log.objects.order_by('-score')
+    else:
+        # check if user is authenticated
+        if current_user_profile is not None:
+            # only get logs of users followed by current user
+            requested_filter = 'following'
+            current_user_following = Follower.objects.filter(follower_user_profile=current_user_profile).values('following_user_profile')
+            requested_logs = Log.objects.filter(user_profile__in=current_user_following)
+        else:
+            return HttpResponseRedirect('/mytravelog/sign_in')
 
     # paginate the logs
-    paginator = Paginator(all_logs, 10)
+    paginator = Paginator(requested_logs, 10)
     page_num = request.GET.get('page')
     try:
         requested_page_logs = paginator.page(page_num)
@@ -207,7 +221,8 @@ def show_live_feed(request):
     data_dict = {
         'current_user_profile': current_user_profile,
         'current_user_albums': current_user_albums,
-        'requested_page_logs': requested_page_logs
+        'requested_page_logs': requested_page_logs,
+        'requested_filter': requested_filter
     }
     return render(request, 'mytravelog/live_feed.html', data_dict)
 
