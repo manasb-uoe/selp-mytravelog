@@ -25,21 +25,21 @@ def search_for_cities_and_users(request):
                                                        Q(user__last_name__startswith=search_query))
             # check if each user profile returned is being followed by current user
             user = request.user
-            authenticated_to_follow = False
+            can_follow = False
             if user.is_authenticated():
-                authenticated_to_follow = True
+                can_follow = True
                 current_user_profile = UserProfile.objects.get(user=user)
                 for user_profile in user_profiles:
-                    user_profile.followed = False
+                    user_profile.is_followed = False
                     if len(Follower.objects.filter(follower_user_profile=current_user_profile, following_user_profile=user_profile)) > 0:
-                        user_profile.followed = True
+                        user_profile.is_followed = True
 
             results_count = len(cities) + len(user_profiles)
             data_dict = {'cities': cities,
                          'user_profiles': user_profiles,
                          'results_count': results_count,
                          'query': search_query,
-                         'authenticated_to_follow': authenticated_to_follow}
+                         'can_follow': can_follow}
             return render(request, 'mytravelog/search.html', data_dict)
     else:
         raise Http404

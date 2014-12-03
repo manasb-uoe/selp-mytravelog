@@ -51,8 +51,8 @@
                                         </div>
 
                                         <a href="/mytravelog/user/{{ user_profile.user.username }}" class="full-name">{{ user_profile.user.get_full_name }}</a>
-                                        {% if authenticated_to_follow and user_profile.user != user %}
-                                            {% if user_profile.followed %}
+                                        {% if can_follow and user_profile.user != user %}
+                                            {% if user_profile.is_followed %}
                                                 <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ user_profile.id }}">Following</button>
                                             {% else %}
                                                 <button class="btn follow-button" data-following-user-profile-id="{{ user_profile.id }}">Follow</button>
