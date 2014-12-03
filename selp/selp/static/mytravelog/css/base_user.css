@@ -208,6 +208,10 @@ body {
 
 /*----------------logs content----------------*/
 
+.logs-content {
+    display: none;
+}
+
 /*in a separate file: logs.css*/
 
 /*----------------albums content----------------*/
