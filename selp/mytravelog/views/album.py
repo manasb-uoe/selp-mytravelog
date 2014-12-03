@@ -87,7 +87,7 @@ def show_album(request, album_id):
     # if yes, then check if requested user is being followed by current user
     can_follow = False
     is_followed = False
-    if current_user != requested_user:
+    if current_user != requested_user and current_user_profile is not None:
         can_follow = True
         is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 

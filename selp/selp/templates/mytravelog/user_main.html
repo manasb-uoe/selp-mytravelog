@@ -118,10 +118,12 @@
                                     <img class="profile-picture" src="{{ following.following_user_profile.profile_picture.url }}">
                                 </div>
                                 <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="full-name">{{ following.following_user_profile.user.get_full_name }}</a>
-                                {% if following.is_followed %}
-                                    <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
-                                {% else %}
-                                    <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
+                                {% if following.can_follow %}
+                                    {% if following.is_followed %}
+                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
+                                    {% else %}
+                                        <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
+                                    {% endif %}
                                 {% endif %}
                                 <br>
                                 <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="username">@{{ following.following_user_profile.user.username }}</a>

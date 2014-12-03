@@ -127,7 +127,7 @@ def show_user(request, username):
     # if yes, then check if requested user is being followed by current user
     can_follow = False
     is_followed = False
-    if current_user != requested_user:
+    if current_user != requested_user and current_user_profile is not None:
         can_follow = True
         is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
@@ -241,6 +241,10 @@ def get_requested_user_following(requested_user_profile, current_user_profile):
     if current_user_profile is not None:
         for following in requested_user_following:
             following.is_followed = True
+            if following.following_user_profile != current_user_profile:
+                following.can_follow = True
+            else:
+                following.can_follow = False
     return requested_user_following
 
 
