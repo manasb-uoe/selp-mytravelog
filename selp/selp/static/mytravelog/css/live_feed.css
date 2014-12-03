@@ -1,0 +1,40 @@
+body {
+    background-color: #f5f8fa;
+    margin-top: 50px;
+}
+
+.jumbotron-page-title {
+    height: 250px;
+    margin: 0;
+    /*background-image: url('/static/mytravelog/imgs/default/city-default.jpg');*/
+    /*background-position: center center;*/
+    /*background-repeat: no-repeat;*/
+    background-size: cover;
+}
+
+.jumbotron-page-title .mask {
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    display: table;
+    text-align: center;
+    background-color: rgba(0,0,0,0.2);
+}
+
+.jumbotron-page-title .mask .title {
+    display: table-cell;
+    vertical-align: middle;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-size: 250%;
+    margin: 0;
+}
+
+.main-feed-container {
+    margin-top: 20px;
+}
+
+.main-feed-container .log {
+    margin-left: auto;
+    margin-right: auto;
+}

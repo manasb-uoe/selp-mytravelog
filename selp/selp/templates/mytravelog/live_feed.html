@@ -1,0 +1,42 @@
+{% extends 'mytravelog/master/base_main.html' %}
+
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/live_feed.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'mytravelog/css/logs.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block body_block %}
+    <!-- Main jumbotron -->
+    <div class="jumbotron-page-title">
+        <div class="mask">
+            <p class="title">Live Feed</p>
+        </div>
+    </div>
+
+    <div class="container main-feed-container">
+        <div class="logs-content">
+            {% include 'mytravelog/logs.html' with requested_user_logs=requested_page_logs requested_user_albums=current_user_albums %}
+        </div>
+
+        <nav>
+            <ul class="pager">
+                {% if requested_page_logs.has_previous %}
+                    <li class="previous"><a href="?page={{ requested_page_logs.previous_page_number }}"><span aria-hidden="true">&larr;</span> Previous</a></li>
+                {% else %}
+                    <li class="previous disabled"><a><span aria-hidden="true">&larr;</span> Previous</a></li>
+                {% endif %}
+                {% if requested_page_logs.has_next %}
+                    <li class="next"><a href="?page={{ requested_page_logs.next_page_number }}">Next <span aria-hidden="true">&rarr;</span></a></li>
+                {% else %}
+                    <li class="next disabled"><a>Next <span aria-hidden="true">&rarr;</span></a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block load_js_block %}
+    <script src="{% static 'mytravelog/js/main.js' %}" type="application/javascript"></script>
+{% endblock %}
