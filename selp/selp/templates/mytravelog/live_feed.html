@@ -8,10 +8,20 @@
 {% endblock %}
 
 {% block body_block %}
-    <!-- Main jumbotron -->
-    <div class="jumbotron-page-title">
-        <div class="mask">
-            <p class="title">Live Feed</p>
+    <div class="title-container">
+        <p class="title">Live Feed</p>
+        <div class="btn-group feed-filter-container" role="group" aria-label="...">
+            {% if requested_filter == 'all' %}
+                <a type="button" class="btn btn-default btn-primary filter" href="/mytravelog/live_feed/all/" id="filter-all">All users</a>
+                {% if current_user_profile %}
+                    <a type="button" class="btn btn-default filter" href="/mytravelog/live_feed/following/" id="filter-following">Users followed by me</a>
+                {% else %}
+                    <a type="button" class="btn btn-default filter disabled" href="/mytravelog/live_feed/following/" id="filter-following">Users followed by me</a>
+                {% endif %}
+            {% elif requested_filter == 'following' %}
+                <a type="button" class="btn btn-default filter" href="/mytravelog/live_feed/all/" id="filter-all">All users</a>
+                <a type="button" class="btn btn-default btn-primary filter" href="/mytravelog/live_feed/following/" id="filter-following">Users followed by me</a>
+            {% endif %}
         </div>
     </div>
 
