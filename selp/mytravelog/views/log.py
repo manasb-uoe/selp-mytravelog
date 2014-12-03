@@ -176,28 +176,27 @@ def get_log_positions(request, username):
         raise Http404
 
 
-def show_live_feed(request):
+def show_live_feed(request, feed_filter):
     # get current user and user profile
     current_user = request.user
     current_user_profile = None
     if current_user.is_authenticated():
         current_user_profile = UserProfile.objects.get(user=current_user)
 
-    # filter logs based on the url and sort them by decreasing order of score
-    current_url = request.get_full_path()
-    if 'live_feed/all' in current_url:
+    # filter logs based on feed filter and sort them by decreasing order of score
+    if feed_filter == 'all':
         # get all logs
-        requested_filter = 'all'
         requested_logs = Log.objects.order_by('-score')
-    else:
+    elif feed_filter == 'following':
         # check if user is authenticated
         if current_user_profile is not None:
             # only get logs of users followed by current user
-            requested_filter = 'following'
             current_user_following = Follower.objects.filter(follower_user_profile=current_user_profile).values('following_user_profile')
             requested_logs = Log.objects.filter(user_profile__in=current_user_following)
         else:
             return HttpResponseRedirect('/mytravelog/sign_in')
+    else:
+        raise Http404
 
     # paginate the logs
     paginator = Paginator(requested_logs, 10)
@@ -222,7 +221,7 @@ def show_live_feed(request):
         'current_user_profile': current_user_profile,
         'current_user_albums': current_user_albums,
         'requested_page_logs': requested_page_logs,
-        'requested_filter': requested_filter
+        'requested_filter': feed_filter
     }
     return render(request, 'mytravelog/live_feed.html', data_dict)
 

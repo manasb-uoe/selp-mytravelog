@@ -28,6 +28,5 @@ urlpatterns = patterns(
     url(r'^comment/delete/(?P<comment_id>\w+)/$', comment.delete_log_comment),
     url(r'follower/create/(?P<following_user_profile_id>\w+)/$', follower.create_follower),
     url(r'follower/delete/(?P<following_user_profile_id>\w+)/$', follower.delete_follower),
-    url(r'^live_feed/all/$', log.show_live_feed),
-    url(r'^live_feed/following/$', log.show_live_feed)
+    url(r'^live_feed/(?P<feed_filter>\w+)/$', log.show_live_feed)
 )
