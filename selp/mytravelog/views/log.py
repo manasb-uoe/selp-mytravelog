@@ -192,7 +192,7 @@ def show_live_feed(request, feed_filter):
         if current_user_profile is not None:
             # only get logs of users followed by current user
             current_user_following = Follower.objects.filter(follower_user_profile=current_user_profile).values('following_user_profile')
-            requested_logs = Log.objects.filter(user_profile__in=current_user_following)
+            requested_logs = Log.objects.filter(user_profile__in=current_user_following).order_by('-score')
         else:
             return HttpResponseRedirect('/mytravelog/sign_in')
     else:
