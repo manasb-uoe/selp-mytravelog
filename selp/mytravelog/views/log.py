@@ -14,7 +14,7 @@ from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs
+from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user
 
 __author__ = 'Manas'
 
@@ -155,6 +155,52 @@ def edit_log(request, log_id):
             return_data['redirect_to'] = '/mytravelog/sign_in/'
     else:
         raise Http404
+
+
+def show_log(request, log_id):
+    # get requested user log and put it in a list, since logs template and helper functions only accept a list of logs
+    requested_log = [get_object_or_404(Log, id=log_id)]
+
+    # get current user and user profile
+    current_user = request.user
+    current_user_profile = None
+    if current_user.is_authenticated():
+        current_user_profile = UserProfile.objects.get(user=current_user)
+
+    # get requested user and user profile
+    requested_user_profile = requested_log[0].user_profile
+    requested_user = requested_user_profile.user
+
+    # attach additional info to the requested log (likes, comments and pictures)
+    attach_additional_info_to_logs(requested_log, current_user_profile)
+
+    # get all requested albums in order to populate the Albums drop-down list while editing a log (EditLogModal)
+    requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
+
+    # check if requested user can be followed by current user
+    # if yes, then check if requested user is being followed by current user
+    can_follow = False
+    is_followed = False
+    if current_user != requested_user and current_user_profile is not None:
+        can_follow = True
+        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
+
+    # check if current user can edit profile
+    can_edit_profile = False
+    if current_user == requested_user:
+        can_edit_profile = True
+
+    data_dict = {
+        'requested_user': requested_user,
+        'requested_user_profile': requested_user_profile,
+        'current_user_profile': current_user_profile,
+        'requested_user_albums': requested_user_albums,
+        'requested_log': requested_log,
+        'can_follow': can_follow,
+        'is_followed': is_followed,
+        'can_edit_profile': can_edit_profile
+    }
+    return render(request, 'mytravelog/user_log.html', data_dict)
 
 
 def get_log_positions(request, username):
