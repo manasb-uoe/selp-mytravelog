@@ -188,9 +188,6 @@ body {
     color: gray;
 }
 
-.search-container .results-container .no-results-text {
-    font-size: 150%;
-    color: gray;
-    text-align: center;
-    margin-top: 10%;
+.search-container .nothing-found-container {
+    margin-bottom: 20px;
 }

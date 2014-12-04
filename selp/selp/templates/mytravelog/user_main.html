@@ -38,104 +38,128 @@
 {% block right_column_block %}
 
     <div class="logs-content">
-        {% include 'mytravelog/logs.html' %}
+        {% if requested_user_logs|length != 0 %}
+            {% include 'mytravelog/logs.html' %}
+        {% else %}
+            <div class="nothing-found-container">
+                <p class="nothing-found-text">Nothing found here</p>
+            </div>
+        {% endif %}
     </div>
 
     <div class="albums-content">
         <div class="albums-container">
-            <div class="row">
-                {% for album in requested_user_albums %}
-                    <div class="col-lg-4 custom-column">
-                        <div class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
-                            <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
-                                <div class="mask">
-                                    {% if can_edit_profile %}
-                                        <div class="overflow-button"></div>
-                                        <div class="album-dropdown-container">
-                                            <div class="album-dropdown-menu">
-                                                <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
-                                                <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+            {% if requested_user_albums|length != 0 %}
+                <div class="row">
+                    {% for album in requested_user_albums %}
+                        <div class="col-lg-4 custom-column">
+                            <div class="album" data-id="{{ album.id }}" data-start-date="{{ album.start_date|date:'Y-m-d' }}" data-end-date="{{ album.end_date|date:'Y-m-d' }}" data-created-at="{{ album.created_at }}">
+                                <div class="cover-picture" style="background-image: url('{{ album.cover_picture.url }}')">
+                                    <div class="mask">
+                                        {% if can_edit_profile %}
+                                            <div class="overflow-button"></div>
+                                            <div class="album-dropdown-container">
+                                                <div class="album-dropdown-menu">
+                                                    <p class="album-dropdown-item album-dropdown-item-edit">Edit</p>
+                                                    <p class="album-dropdown-item album-dropdown-item-delete">Delete</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
                                 </div>
+                                <p class="name">{{ album.name }}</p>
+                                <p class="duration">{{ album.duration }} days</p>
                             </div>
-                            <p class="name">{{ album.name }}</p>
-                            <p class="duration">{{ album.duration }} days</p>
                         </div>
+                        {% if forloop.counter|divisibleby:3%}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                    {% endfor %}
                     </div>
-                    {% if forloop.counter|divisibleby:3%}
-                        </div>
-                        <div class="row">
-                    {% endif %}
-                {% endfor %}
+            {% else %}
+                <div class="nothing-found-container">
+                    <p class="nothing-found-text">Nothing found here</p>
                 </div>
+            {% endif %}
         </div>
     </div>
 
     <div class="followers-content">
         <div class="followers-container">
-            <div class="row">
-                {% for follower in requested_user_followers %}
-                    <div class="col-lg-4">
-                        <div class="follower">
-                            <div class="cover-picture" style="background-image: url({{ follower.follower_user_profile.cover_picture.url }})"></div>
-                            <div class="info-container">
-                                <div class="profile-picture-container">
-                                    <img class="profile-picture" src="{{ follower.follower_user_profile.profile_picture.url }}">
-                                </div>
-                                <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="full-name">{{ follower.follower_user_profile.user.get_full_name }}</a>
-                                {% if follower.can_follow %}
-                                    {% if follower.is_followed %}
-                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Following</button>
-                                    {% else %}
-                                        <button class="btn follow-button" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Follow</button>
+            {% if requested_user_followers|length != 0 %}
+                <div class="row">
+                    {% for follower in requested_user_followers %}
+                        <div class="col-lg-4">
+                            <div class="follower">
+                                <div class="cover-picture" style="background-image: url({{ follower.follower_user_profile.cover_picture.url }})"></div>
+                                <div class="info-container">
+                                    <div class="profile-picture-container">
+                                        <img class="profile-picture" src="{{ follower.follower_user_profile.profile_picture.url }}">
+                                    </div>
+                                    <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="full-name">{{ follower.follower_user_profile.user.get_full_name }}</a>
+                                    {% if follower.can_follow %}
+                                        {% if follower.is_followed %}
+                                            <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Following</button>
+                                        {% else %}
+                                            <button class="btn follow-button" data-following-user-profile-id="{{ follower.follower_user_profile.id }}">Follow</button>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
-                                <br>
-                                <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="username">@{{ follower.follower_user_profile.user.username }}</a>
+                                    <br>
+                                    <a href="/mytravelog/user/{{ follower.follower_user_profile.user.username }}" class="username">@{{ follower.follower_user_profile.user.username }}</a>
+                                </div>
                             </div>
                         </div>
+                        {% if forloop.counter|divisibleby:3 %}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                    {% endfor %}
                     </div>
-                    {% if forloop.counter|divisibleby:3 %}
-                        </div>
-                        <div class="row">
-                    {% endif %}
-                {% endfor %}
+            {% else %}
+                <div class="nothing-found-container">
+                    <p class="nothing-found-text">Nothing found here</p>
                 </div>
+            {% endif %}
         </div>
     </div>
 
     <div class="following-content">
         <div class="followers-container">
-            <div class="row">
-                {% for following in requested_user_following %}
-                    <div class="col-lg-4">
-                        <div class="follower">
-                            <div class="cover-picture" style="background-image: url({{ following.following_user_profile.cover_picture.url }})"></div>
-                            <div class="info-container">
-                                <div class="profile-picture-container">
-                                    <img class="profile-picture" src="{{ following.following_user_profile.profile_picture.url }}">
-                                </div>
-                                <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="full-name">{{ following.following_user_profile.user.get_full_name }}</a>
-                                {% if following.can_follow %}
-                                    {% if following.is_followed %}
-                                        <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
-                                    {% else %}
-                                        <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
+            {% if requested_user_following|length != 0 %}
+                <div class="row">
+                    {% for following in requested_user_following %}
+                        <div class="col-lg-4">
+                            <div class="follower">
+                                <div class="cover-picture" style="background-image: url({{ following.following_user_profile.cover_picture.url }})"></div>
+                                <div class="info-container">
+                                    <div class="profile-picture-container">
+                                        <img class="profile-picture" src="{{ following.following_user_profile.profile_picture.url }}">
+                                    </div>
+                                    <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="full-name">{{ following.following_user_profile.user.get_full_name }}</a>
+                                    {% if following.can_follow %}
+                                        {% if following.is_followed %}
+                                            <button class="btn follow-button follow-button-active" data-following-user-profile-id="{{ following.following_user_profile.id }}">Following</button>
+                                        {% else %}
+                                            <button class="btn follow-button" data-following-user-profile-id="{{ following.following_user_profile.id }}">Follow</button>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
-                                <br>
-                                <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="username">@{{ following.following_user_profile.user.username }}</a>
+                                    <br>
+                                    <a href="/mytravelog/user/{{ following.following_user_profile.user.username }}" class="username">@{{ following.following_user_profile.user.username }}</a>
+                                </div>
                             </div>
                         </div>
+                        {% if forloop.counter|divisibleby:3 %}
+                            </div>
+                            <div class="row">
+                        {% endif %}
+                    {% endfor %}
                     </div>
-                    {% if forloop.counter|divisibleby:3 %}
-                        </div>
-                        <div class="row">
-                    {% endif %}
-                {% endfor %}
+            {% else %}
+                <div class="nothing-found-container">
+                    <p class="nothing-found-text">Nothing found here</p>
                 </div>
+            {% endif %}
         </div>
 
     </div>

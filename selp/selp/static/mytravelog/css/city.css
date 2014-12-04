@@ -149,6 +149,10 @@ body {
 
 /*------------info content------------*/
 
+.info-content {
+    display: none;
+}
+
 .main-city-container .info-container {
     padding: 15px;
     background-color: #ffffff;
@@ -159,6 +163,10 @@ body {
 }
 
 /*------------weather content------------*/
+
+.weather-content {
+    display: none;
+}
 
 .main-city-container .weather-container {
     border-radius: 5px;
@@ -254,4 +262,10 @@ body {
 
 .main-city-container .weather-progress-container .wrapper .progress-text {
     color: gray;
+}
+
+/*------------logs content------------*/
+
+.logs-content {
+    display: none;
 }

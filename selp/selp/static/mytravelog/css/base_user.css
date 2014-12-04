@@ -524,20 +524,6 @@ body {
     margin-top: 10px;
 }
 
-.main-album-container .nothing-found-container {
-    border: 1px dashed darkgray;
-    display: table;
-    text-align: center;
-    width: 100%;
-    height: 150px;
-}
-
-.main-album-container .nothing-found-container .nothing-found-text {
-    display: table-cell;
-    vertical-align: middle;
-    font-size: 130%;
-    color: darkgray;
-}
 
 /*----------------user log page----------------*/
 

@@ -61,7 +61,7 @@
                     <p class="title">Tourist Growth (2011 - 2012)</p>
                 </div>
                 <div class="stat">
-                    <p class="value">#1</p>
+                    <p class="value">#{{ requested_city.rank }}</p>
                     <p class="title">City Rank</p>
                 </div>
             </div>
@@ -89,7 +89,13 @@
 
                 <!-- logs content -->
                 <div class="logs-content">
-                    {% include 'mytravelog/logs.html' with requested_user_logs=requested_city_logs requested_user_albums=current_user_albums %}
+                    {% if requested_city_logs|length != 0 %}
+                        {% include 'mytravelog/logs.html' with requested_user_logs=requested_city_logs requested_user_albums=current_user_albums %}
+                    {% else %}
+                        <div class="nothing-found-container">
+                            <p class="nothing-found-text">Nothing found here</p>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
 
