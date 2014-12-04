@@ -63,7 +63,7 @@ var WorldMapModal = (function () {
         showOnMapButton: $('#show-on-map-button'),
         modal: $('#world-map-modal'),
         mapContainer: $('#world-map-modal-map-container'),
-        getPositionsBaseURL: 'mytravelog/log/get_positions/',
+        getInfoForMapBaseUrl: 'mytravelog/log/get_info_for_map/',
         usernameAttr: 'data-requested-user-username',
         firstNameAttr: 'data-requested-user-first-name'
     };
@@ -76,10 +76,10 @@ var WorldMapModal = (function () {
 
     function _showModal() {
         _config.modal.modal();
-        _getPositionsFromServer();
+        _getUserLogsInfoFromServer();
     }
 
-    function _showPositionsOnMap(allPositions, firstName) {
+    function _showOnMap(userLogsInfo, firstName) {
         var centerLatLng = new google.maps.LatLng(51.4800, 0.0000);
 
         var options = {
@@ -94,21 +94,22 @@ var WorldMapModal = (function () {
 
         var map = new google.maps.Map(_config.mapContainer[0], options);
 
-        for (var key in allPositions) {
-            if (allPositions.hasOwnProperty(key)) {
-                var latlng = new google.maps.LatLng(allPositions[key]['latitude'], allPositions[key]['longitude']);
+        for (var key in userLogsInfo) {
+            if (userLogsInfo.hasOwnProperty(key)) {
+                var latlng = new google.maps.LatLng(userLogsInfo[key]['latitude'], userLogsInfo[key]['longitude']);
 
                 var infoWindow = new google.maps.InfoWindow({
                     content: [
-                        firstName + " was in <strong>" + allPositions[key]['city'] + "</strong> <br>",
-                        " on " + new Date(allPositions[key]['date_and_time']).toDateString() + "<br>",
-                        " at " + new Date(allPositions[key]['date_and_time']).toLocaleTimeString()
+                        firstName + " was in <strong>" + userLogsInfo[key]['city'] + "</strong> <br>",
+                        " on " + new Date(userLogsInfo[key]['date_and_time']).toDateString() + "<br>",
+                        " at " + new Date(userLogsInfo[key]['date_and_time']).toLocaleTimeString() + "<br>",
+                        "<a href=" + userLogsInfo[key]['url'] +">Go to log</a>"
                     ].join('\n')
                 });
 
 
                 var markerIcon = new google.maps.MarkerImage(
-                    "http://www.google.com/mapfiles/marker" + allPositions[key]['city'].substring(0, 1) + ".png"
+                    "http://www.google.com/mapfiles/marker" + userLogsInfo[key]['city'].substring(0, 1) + ".png"
                 );
 
                 var marker = new google.maps.Marker({
@@ -128,14 +129,14 @@ var WorldMapModal = (function () {
         }
     }
 
-    function _getPositionsFromServer() {
+    function _getUserLogsInfoFromServer() {
         $.ajax({
-            url: _config.getPositionsBaseURL + _config.showOnMapButton.attr(_config.usernameAttr) + "/",
+            url: _config.getInfoForMapBaseUrl + _config.showOnMapButton.attr(_config.usernameAttr) + "/",
             type: 'GET',
             dataType: "json",
             success: function (response) {
                 setTimeout(function () {
-                    _showPositionsOnMap(response['all_positions'], _config.showOnMapButton.attr(_config.firstNameAttr));
+                    _showOnMap(response['user_logs_info'], _config.showOnMapButton.attr(_config.firstNameAttr));
                 }, 1000);
             }
         })

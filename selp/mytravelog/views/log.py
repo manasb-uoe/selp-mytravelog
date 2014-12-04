@@ -203,17 +203,20 @@ def show_log(request, log_id):
     return render(request, 'mytravelog/user_log.html', data_dict)
 
 
-def get_log_positions(request, username):
+def get_log_info_for_map(request, username):
     return_data = {}
     if request.is_ajax():
         all_user_logs = Log.objects.filter(user_profile__user=get_object_or_404(User, username=username))
-        log_positions = {}
+        user_logs_info = {}
         for log in all_user_logs:
-            log_positions[log.id] = {'city': log.city.name,
-                                     'date_and_time': str(log.created_at),
-                                     'latitude': str(log.latitude),
-                                     'longitude': str(log.longitude)}
-        return_data['all_positions'] = log_positions
+            user_logs_info[log.id] = {
+                'city': log.city.name,
+                'date_and_time': str(log.created_at),
+                'latitude': str(log.latitude),
+                'longitude': str(log.longitude),
+                'url': '/mytravelog/log/' + str(log.id) + '/'
+            }
+        return_data['user_logs_info'] = user_logs_info
 
         return_data = json.dumps(return_data)
         mimetype = "application/json"

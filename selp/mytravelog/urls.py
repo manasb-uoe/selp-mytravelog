@@ -22,7 +22,7 @@ urlpatterns = patterns(
     url(r'^log/delete/(?P<log_id>\w+)/$', log.delete_log),
     url(r'^log/edit/(?P<log_id>\w+)/$', log.edit_log),
     url(r'log/(?P<log_id>\w+)/$', log.show_log),
-    url(r'log/get_positions/(?P<username>\w+)/$', log.get_log_positions),
+    url(r'log/get_info_for_map/(?P<username>\w+)/$', log.get_log_info_for_map),
     url(r'^like/create/(?P<log_id>\w+)/$', like.like_log),
     url(r'^like/delete/(?P<log_id>\w+)/$', like.dislike_log),
     url(r'^comment/create/(?P<log_id>\w+)/$', comment.create_log_comment),
