@@ -288,38 +288,38 @@ var DeleteAlbumModal = (function () {
     // currentUsername is only used to go back to user page when an album is deleted successfully
     // else, the page is simply reloaded
     function _sendPostRequest(errorContainer, url, currentUsername) {
-    //clear and hide existing errors
-    errorContainer.empty();
-    errorContainer.hide();
+        //clear and hide existing errors
+        errorContainer.empty();
+        errorContainer.hide();
 
-    $.ajax({
-        url: url,
-        type: "POST",
-        dataType: "json",
-        data: {
-            csrfmiddlewaretoken: csrf_token
-        },
-        success: function (response) {
-            var redirect_to = response['redirect_to'];
-            var error_message = response['error'];
-            if (redirect_to != null) {
-                window.location.href = redirect_to;
-            }
-            else if (error_message != null) {
-                errorContainer.append('<strong>Error! </strong>' + error_message);
-                errorContainer.show();
-            }
-            else {
-                if (window.location.href.indexOf('/user/') > -1) {
-                    window.location.reload();
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: {
+                csrfmiddlewaretoken: csrf_token
+            },
+            success: function (response) {
+                var redirect_to = response['redirect_to'];
+                var error_message = response['error'];
+                if (redirect_to != null) {
+                    window.location.href = redirect_to;
+                }
+                else if (error_message != null) {
+                    errorContainer.append('<strong>Error! </strong>' + error_message);
+                    errorContainer.show();
                 }
                 else {
-                    window.location.href = '/mytravelog/user/' + currentUsername + '/';
+                    if (window.location.href.indexOf('/user/') > -1) {
+                        window.location.reload();
+                    }
+                    else {
+                        window.location.href = '/mytravelog/user/' + currentUsername + '/';
+                    }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
     function init() {
         _bindUIActions();
@@ -626,6 +626,7 @@ var DeleteLogModal = (function () {
         submitButton: $('#delete-log-modal-submit-button'),
         errorContainer: $('#delete-log-modal-error-container'),
         dropdownItemDelete: $('.log-dropdown-item-delete'),
+        deleteLogButton: $('#delete-log-button'),
         modal: $('#delete-log-modal'),
         submitUrl: ''
     };
@@ -635,9 +636,15 @@ var DeleteLogModal = (function () {
     }
 
     function _bindUIActions() {
-        _config.dropdownItemDelete.click(function () {
-            //get required data about the selected log
+        _config.dropdownItemDelete.add(_config.deleteLogButton).click(function () {
+            // if dropdown delete item is clicked, then log would be its closest parent
+            // but, if delete button is clicked (on log page), then there would be only one log in the body of the page
             var log = $(this).closest('.log');
+            if (log.length == 0) {
+                log = $('body').find('.log');
+            }
+
+            //get required data about the selected log
             var id = log.attr('data-id');
             var location = log.attr('data-location');
             var createdAt = log.attr('data-created-at');
@@ -646,7 +653,7 @@ var DeleteLogModal = (function () {
             _config.submitUrl = '/mytravelog/log/delete/' + id + '/';
         });
         _config.submitButton.click(function () {
-            _sendPostRequest(_config.errorContainer, _config.submitUrl);
+            _sendPostRequest(_config.errorContainer, _config.submitUrl, _config.deleteLogButton.attr('data-current-username'));
         });
     }
 
@@ -656,34 +663,39 @@ var DeleteLogModal = (function () {
         _config.modal.modal();
     }
 
-    function _sendPostRequest(errorContainer, url) {
-    //clear and hide existing errors
-    errorContainer.empty();
-    errorContainer.hide();
+    function _sendPostRequest(errorContainer, url, currentUsername) {
+        //clear and hide existing errors
+        errorContainer.empty();
+        errorContainer.hide();
 
-    $.ajax({
-        url: url,
-        type: "POST",
-        dataType: "json",
-        data: {
-            csrfmiddlewaretoken: csrf_token
-        },
-        success: function (response) {
-            var redirect_to = response['redirect_to'];
-            var error_message = response['error'];
-            if (redirect_to != null) {
-                window.location.href = redirect_to;
+        $.ajax({
+            url: url,
+            type: "POST",
+            dataType: "json",
+            data: {
+                csrfmiddlewaretoken: csrf_token
+            },
+            success: function (response) {
+                var redirect_to = response['redirect_to'];
+                var error_message = response['error'];
+                if (redirect_to != null) {
+                    window.location.href = redirect_to;
+                }
+                else if (error_message != null) {
+                    errorContainer.append('<strong>Error! </strong>' + error_message);
+                    errorContainer.show();
+                }
+                else {
+                    if (window.location.href.indexOf('/user/') > -1) {
+                        window.location.reload();
+                    }
+                    else {
+                        window.location.href = '/mytravelog/user/' + currentUsername + '/';
+                    }
+                }
             }
-            else if (error_message != null) {
-                errorContainer.append('<strong>Error! </strong>' + error_message);
-                errorContainer.show();
-            }
-            else {
-                window.location.reload();
-            }
-        }
-    });
-}
+        });
+    }
 
     return {
         init:init
@@ -704,6 +716,7 @@ var EditLogModal = (function () {
         moreImagesButton: $('#edit-log-modal-more-images-button'),
         modal: $('#edit-log-modal'),
         dropdownItemEdit: $('.log-dropdown-item-edit'),
+        editLogButton: $('#edit-log-button'),
         additionalImageCounter: 0,
         previousImagesContainer: $('#edit-log-modal-previous-images-container'),
         inputPreviousImagesToDelete: $('#edit-log-modal-images-to-delete'),
@@ -715,9 +728,15 @@ var EditLogModal = (function () {
     }
 
     function _bindUIActions() {
-        _config.dropdownItemEdit.click(function () {
-            //get required data about the selected log
+        _config.dropdownItemEdit.add(_config.editLogButton).click(function () {
+            // if dropdown edit item is clicked, then log would be its closest parent
+            // but, if edit button is clicked (on log page), then there would be only one log in the body of the page
             var log = $(this).closest('.log');
+            if (log.length == 0) {
+                log = $('body').find('.log');
+            }
+
+            //get required data about the selected log
             var id = log.attr('data-id');
             var location = log.attr('data-location');
             var latitude = log.attr('data-latitude');
@@ -1425,6 +1444,11 @@ $(document).ready(function () {
         handleLogs();
         handleAlbums();
         WorldMapModal.init();
+    }
+    else if (currentUrl.indexOf('/log/') > -1) {
+        handleLogs();
+        WorldMapModal.init();
+        FollowerHandler.init();
     }
     else if (currentUrl.indexOf('/search/') > -1) {
         FollowerHandler.init();
