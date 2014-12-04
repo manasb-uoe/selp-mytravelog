@@ -126,10 +126,10 @@ def create_or_update_album(request, operation, album_id):
         album_to_update = None
         user_profile = UserProfile.objects.get(user=user)
         if operation == 'create':
-            error = validate_album_form(operation, user_profile, name, start_date, end_date, None)
+            error = validate_album_form(operation, user_profile, name, start_date, end_date, None, cover_picture)
         else:
             album_to_update = Album.objects.get(id=album_id)
-            error = validate_album_form(operation, user_profile, name, start_date, end_date, album_to_update)
+            error = validate_album_form(operation, user_profile, name, start_date, end_date, album_to_update, cover_picture)
         if error is not None:
             return_data['error'] = error
         else:
@@ -168,7 +168,7 @@ def create_or_update_album(request, operation, album_id):
     return return_data
 
 
-def validate_album_form(operation, user_profile, name, start_date, end_date, album_to_update):
+def validate_album_form(operation, user_profile, name, start_date, end_date, album_to_update, cover_picture):
     if len(name) == 0:
         return "Album name is required"
     if name.lower() == "none":
@@ -191,6 +191,9 @@ def validate_album_form(operation, user_profile, name, start_date, end_date, alb
         return "Start date is required"
     if len(end_date) == 0:
         return "End date is required"
+    if cover_picture is not None:
+        if cover_picture._size > 2048*1024:
+            return "Max image size allowed is 2 mb"
     return None
 
 
