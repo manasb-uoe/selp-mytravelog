@@ -30,7 +30,7 @@ def sign_up(request):
             cover_picture = file_data.get('cover_picture', None)
 
             # validate user input
-            error = validate_sign_up_form(first_name, last_name, email, username, password)
+            error = validate_sign_up_form(first_name, last_name, email, username, password, profile_picture, cover_picture)
             if error is None:
                 # create new user
                 new_user = User()
@@ -153,7 +153,7 @@ def show_user(request, username):
 
 # ----------------------Helper functions------------------------
 
-def validate_sign_up_form(first_name, last_name, email, username, password):
+def validate_sign_up_form(first_name, last_name, email, username, password, profile_picture, cover_picture):
     if len(first_name) == 0:
         return "First name is required"
     if len(last_name) == 0:
@@ -174,6 +174,12 @@ def validate_sign_up_form(first_name, last_name, email, username, password):
         return "Password must be at least 6 characters long"
     if len(User.objects.filter(username=username)) > 0:
         return "That username is not available"
+    if profile_picture is not None:
+        if profile_picture._size > 2048*1024:
+            return "Max image size allowed is 2 mb"
+    if cover_picture is not None:
+        if cover_picture._size > 2048*1024:
+            return "Max image size allowed is 2 mb"
     return None
 
 
