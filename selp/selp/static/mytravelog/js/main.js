@@ -333,6 +333,13 @@ var DeleteAlbumModal = (function () {
 //-----Logs-----
 
 function handleLogs() {
+    // go to log page when user clicks on an dropdown item: view
+    $('.log-dropdown-item-view').click(function () {
+        var log = $(this).closest('.log');
+        var logId = log.attr('data-id');
+        window.location.href = '/mytravelog/log/' + logId + '/';
+    });
+
     AddLogModal.init();
     DeleteLogModal.init();
     LogPicturesViewer.init();
