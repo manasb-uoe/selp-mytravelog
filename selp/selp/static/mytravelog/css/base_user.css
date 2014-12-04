@@ -581,9 +581,3 @@ body {
     margin-left: 10px;
     width: 80px;
 }
-
-/* hide edit and delete options from the dropdown menu since they are already present in the tabs-or-stats bar */
-.main-log-container .log-dropdown-item-edit,
-.main-log-container .log-dropdown-item-delete {
-    display: none;
-}

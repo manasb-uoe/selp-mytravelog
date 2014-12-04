@@ -8,17 +8,18 @@
                 <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
                 <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
 
-                {% if log.can_edit %}
-                    <div class="overflow-button"></div>
-                    <div class="log-dropdown-container">
-                        <div class="log-dropdown-menu">
-                            <p class="log-dropdown-item log-dropdown-item-view">View</p>
-                            <p class="log-dropdown-item log-dropdown-item-share">Share</p>
+                <div class="overflow-button"></div>
+                <div class="log-dropdown-container">
+                    <div class="log-dropdown-menu">
+                        <p class="log-dropdown-item log-dropdown-item-view">View</p>
+                        <p class="log-dropdown-item log-dropdown-item-share">Share</p>
+                        {% if log.can_edit %}
                             <p class="log-dropdown-item log-dropdown-item-edit">Edit</p>
                             <p class="log-dropdown-item log-dropdown-item-delete">Delete</p>
-                        </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
+
 
             </div>
 
