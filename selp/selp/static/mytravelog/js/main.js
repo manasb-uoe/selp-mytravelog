@@ -780,7 +780,6 @@ var EditLogModal = (function () {
             if (remainingImagesCounter == 0) {
                 _config.previousImagesContainer.append('<p class="edit-log-modal-no-previous-images-text">No more images remaining</p>');
             }
-            console.log(remainingImagesCounter);
         });
     }
 
