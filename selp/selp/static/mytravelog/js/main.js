@@ -346,6 +346,7 @@ function handleLogs() {
     EditLogModal.init();
     LikeHandler.init();
     CommentHandler.init();
+    ShareLogModal.init();
 }
 
 var AddLogModal = (function () {
@@ -1084,6 +1085,63 @@ var CommentHandler = (function () {
 
     return {
         init:init
+    };
+
+}());
+
+var ShareLogModal = (function () {
+
+    var _config = {
+        facebookBaseUrl: 'https://www.facebook.com/sharer/sharer.php?u=',
+        twitterBaseUrl: 'https://twitter.com/home?status=',
+        gplusBaseUrl: 'https://plus.google.com/share?url=',
+        dropdownItemShare: $('.log-dropdown-item-share'),
+        logBaseUrl: window.location.host + '/mytravelog/log/',
+        modal: $('#share-log-modal'),
+        iconsContainer: $('#share-log-modal-icons-container'),
+        logLocation: $('#share-log-modal-location'),
+        logCreatedAt: $('#share-log-modal-created-at')
+    };
+
+    function init() {
+        _bindUIActions();
+    }
+
+    function _bindUIActions() {
+        _config.dropdownItemShare.click(function () {
+            var log = $(this).closest('.log');
+            var location = log.attr('data-location');
+            var createdAt = log.attr('data-created-at');
+            var id = log.attr('data-id');
+            var urlToShare = _config.logBaseUrl + id;
+
+            _showModal(location, createdAt, urlToShare);
+        });
+    }
+
+    function _showModal(location, createdAt, urlToShare) {
+        _config.logLocation.text(location);
+        _config.logCreatedAt.text(createdAt);
+
+        _config.iconsContainer.empty();
+        var html = [
+            '<a class="share-log-modal-icon icon-facebook" href="' + _config.facebookBaseUrl + urlToShare + '">',
+            '<div class="share-log-modal-icon-mask"></div>',
+            '</a>',
+            '<a class="share-log-modal-icon icon-twitter" href="' + _config.twitterBaseUrl + urlToShare + '">',
+            '<div class="share-log-modal-icon-mask"></div>',
+            '</a>',
+            '<a class="share-log-modal-icon icon-gplus" href="' + _config.gplusBaseUrl + urlToShare + '">',
+            '<div class="share-log-modal-icon-mask"></div>',
+            '</a>'
+        ].join('\n');
+        _config.iconsContainer.append(html);
+
+        _config.modal.modal();
+    }
+
+    return {
+        init: init
     };
 
 }());
