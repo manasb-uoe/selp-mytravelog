@@ -1,4 +1,5 @@
 import json
+from re import sub
 from django.db.models.query_utils import Q
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
@@ -54,3 +55,27 @@ def get_autocomplete_suggestions(request):
             mimetype = "application/json"
             return HttpResponse(return_data, mimetype)
     raise Http404
+
+
+# ---------------------Helper functions---------------------
+
+def add_new_city(**kwargs):
+    name = kwargs.get('name')
+    url_name = sub(r'\s', '_', name)
+    country_name = kwargs.get('country_name')
+    country_url_name = sub('\s', '_', country_name)
+    City.objects.create(name=name,
+                        url_name=url_name,
+                        country_name=country_name,
+                        country_url_name=country_url_name,
+                        tourist_count=kwargs.get('tourist_count'),
+                        tourist_growth=kwargs.get('tourist_growth'),
+                        description=kwargs.get('description'))
+
+    # get all cities and update their ranks
+    cities = City.objects.order_by('-tourist_count')
+    rank = 1
+    for city in cities:
+        city.rank = rank
+        city.save()
+        rank += 1
