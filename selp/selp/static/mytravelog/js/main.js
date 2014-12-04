@@ -1444,6 +1444,7 @@ $(document).ready(function () {
         handleLogs();
         handleAlbums();
         WorldMapModal.init();
+        FollowerHandler.init();
     }
     else if (currentUrl.indexOf('/log/') > -1) {
         handleLogs();
