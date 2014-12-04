@@ -35,12 +35,11 @@ def create_log(request):
             description = post_data.get('description', '')
 
             # validate log data
-            validation_output = validate_log_form(location, latitude, longitude, description, len(file_data))
-            error = validation_output.get('error', None)
+            error = validate_add_log_form(location, latitude, longitude, description, file_data)
             if error is None:
                 # get user_profile, album and city associated with this log
                 user_profile = UserProfile.objects.get(user=user)
-                city = validation_output['city']
+                city = City.objects.get(name=location)
                 if album_name != "None":
                     album = Album.objects.get(name=album_name, user_profile=user_profile)
                 else:
@@ -121,7 +120,7 @@ def edit_log(request, log_id):
                 log_pictures = LogPicture.objects.filter(log=log_to_edit)
 
                 # validate log data
-                error = validate_edit_log_form(description, len(delete_picture_ids), len(file_data), len(log_pictures))
+                error = validate_edit_log_form(description, len(delete_picture_ids), file_data, len(log_pictures))
                 if error is None:
                     # update existing log
                     user_profile = UserProfile.objects.get(user=user)
@@ -277,34 +276,40 @@ def show_live_feed(request, feed_filter):
 
 # ---------------Helper functions----------------
 
-def validate_log_form(location, latitude, longitude, description, number_of_pictures):
-    output = {}
+def validate_add_log_form(location, latitude, longitude, description, file_data):
     if len(location) == 0 or len(latitude) == 0 or len(longitude) == 0:
-        output['error'] = "Your location could not be verified"
-    elif len(description) == 0:
-        output['error'] = "Description is required"
-    elif len(description) > 1000:
-        output['error'] = "Description length cannot exceed 1000 characters"
-    elif number_of_pictures == 0:
-        output['error'] = "At least one image is required"
-    else:
-        city = City.objects.filter(name=location)
-        if len(city) == 1:
-            output['city'] = city[0]
-        else:
-            output['error'] = "No city named '" + location + "' in the database"
-    return output
-
-
-def validate_edit_log_form(description, number_of_pictures_to_delete, number_of_pictures_to_add, total_number_of_pictures):
+        return "Your location could not be verified"
     if len(description) == 0:
         return "Description is required"
-    elif len(description) > 1000:
+    if len(description) > 1000:
         return "Description length cannot exceed 1000 characters"
-    elif (total_number_of_pictures - number_of_pictures_to_delete + number_of_pictures_to_add) == 0:
+    if len(file_data) == 0:
         return "At least one image is required"
-    else:
-        return None
+    if len(file_data) > 10:
+        return "At most 10 images are allowed"
+    for key, image_file in file_data.iteritems():
+        if (image_file._size > 2048*1024):
+            return "Max image size allowed is 2 mb"
+    if City.objects.filter(name=location).count() == 0:
+        return "No city named '" + location + "' in the database"
+    return None
+
+
+def validate_edit_log_form(description, number_of_pictures_to_delete, file_data, total_number_of_pictures):
+    if len(description) == 0:
+        return "Description is required"
+    if len(description) > 1000:
+        return "Description length cannot exceed 1000 characters"
+    number_of_pictures_to_add = len(file_data)
+    remaining_pictures = total_number_of_pictures - number_of_pictures_to_delete + number_of_pictures_to_add
+    if remaining_pictures == 0:
+        return "At least one image is required"
+    if remaining_pictures > 10:
+        return "At most 10 images are allowed"
+    for key, image_file in file_data.iteritems():
+        if (image_file._size > 2048*1024):
+            return "Max image size allowed is 2 mb"
+    return None
 
 
 # score function: log_score = log10(z) + (time_since_epoch/45000)
