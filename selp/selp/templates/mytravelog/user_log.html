@@ -1,0 +1,59 @@
+{% extends 'mytravelog/master/user_base.html' %}
+{% load static %}
+
+{% block head_block %}
+    <link href="{% static 'mytravelog/css/base_user.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'mytravelog/css/logs.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+<!-- cover picture -->
+{% block cover_picture_block %}
+    <div class="cover-picture log-cover-picture" style="background-image: url({{ requested_log.0.pictures.0.picture.url }})">
+        <div class="mask">
+            <div class="title-container">
+                <p class="log-city-name">{{ requested_log.0.city.name }}</p>
+                <p class="log-label">Log</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+<!-- stats bar -->
+{% block tabs-or-stats-block %}
+    <div class="stat">
+        <p class="stat-name">Created At</p>
+        <p class="value">{{ requested_log.0.created_at }}</p>
+    </div>
+    <div class="stat">
+        <p class="stat-name">Last Updated At</p>
+        <p class="value">{{ requested_log.0.updated_at }}</p>
+    </div>
+    {% if requested_log.0.album %}
+        <a class="stat" href="/mytravelog/album/{{ requested_log.0.album.id }}/">
+            <p class="stat-name">Album</p>
+            {% if requested_log.0.album.name|length > 20 %}
+                <p class="value">{{ requested_log.0.album.name|slice:":17" }}...</p>
+            {% else %}
+                <p class="value">{{ requested_log.0.album.name }}</p>
+            {% endif %}
+        </a>
+    {% else %}
+        <div class="stat">
+            <p class="stat-name">Album</p>
+            <p class="value">None</p>
+        </div>
+    {% endif %}
+
+    {% if can_edit_profile %}
+        <button class="btn btn-danger" id="delete-log-button" data-current-username="{{ user.username }}">Delete</button>
+        <button class="btn btn-primary" id="edit-log-button">Edit</button>
+    {% endif %}
+{% endblock %}
+
+<!-- right column -->
+{% block right_column_block %}
+    <div class="main-log-container">
+        {% include 'mytravelog/logs.html' with requested_user_logs=requested_log %}
+    </div>
+{% endblock %}
+

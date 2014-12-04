@@ -463,7 +463,7 @@ body {
 
 .tabs-or-stats-bar .tabs-or-stats-container .stat .value {
     color: #0084B4;
-    font-size: 125%;
+    font-size: 120%;
 }
 
 .tabs-or-stats-bar .tabs-or-stats-container #edit-album-button {
@@ -537,4 +537,53 @@ body {
     vertical-align: middle;
     font-size: 130%;
     color: darkgray;
+}
+
+/*----------------user log page----------------*/
+
+.log-cover-picture .mask {
+    background-color: rgba(0, 0, 0, 0.2);
+    width: 100%;
+    height: 100%;
+    display: table;
+    text-align: center;
+}
+
+.log-cover-picture .mask .title-container {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.log-cover-picture .mask .title-container .log-city-name {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    font-size: 250%;
+    margin: 0;
+}
+
+.log-cover-picture .mask .title-container .log-label {
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0,0,0,.8);
+    font-size: 120%;
+    padding: 0;
+    margin: 0;
+}
+
+.tabs-or-stats-bar .tabs-or-stats-container #edit-log-button {
+    float: right;
+    margin-top: 12px;
+    width: 80px;
+}
+
+.tabs-or-stats-bar .tabs-or-stats-container #delete-log-button {
+    float: right;
+    margin-top: 12px;
+    margin-left: 10px;
+    width: 80px;
+}
+
+/* hide edit and delete options from the dropdown menu since they are already present in the tabs-or-stats bar */
+.main-log-container .log-dropdown-item-edit,
+.main-log-container .log-dropdown-item-delete {
+    display: none;
 }
