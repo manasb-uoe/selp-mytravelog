@@ -3,7 +3,7 @@
 
 <div class="logs-container">
     {% for log in requested_user_logs %}
-        <div class="log extra-box-shadow" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-latitude="{{ log.latitude }}" data-longitude="{{ log.longitude }}" data-album-name="{{ log.album.name }}" data-description="{{ log.description }}" data-created-at="{{ log.created_at }}">
+        <div class="log default-box-shadow" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-latitude="{{ log.latitude }}" data-longitude="{{ log.longitude }}" data-album-name="{{ log.album.name }}" data-description="{{ log.description }}" data-created-at="{{ log.created_at }}">
             <div class="header">
                 <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
                 <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>

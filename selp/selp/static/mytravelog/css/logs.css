@@ -2,7 +2,7 @@
 .logs-container .log {
     background-color: #ffffff;
     width: 600px;
-    border: 1px solid #e1e8ed;
+    /*border: 1px solid #e1e8ed;*/
     border-radius: 5px;
     margin-bottom: 20px;
 }

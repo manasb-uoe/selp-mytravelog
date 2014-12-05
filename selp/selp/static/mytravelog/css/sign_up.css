@@ -13,10 +13,8 @@ body {
     margin-left: auto;
     margin-right: auto;
     padding: 30px;
-    border: 1px solid #ccc;
     border-radius: 5px;
     overflow: hidden;
-    box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
 .form-container .form-signup .title {
