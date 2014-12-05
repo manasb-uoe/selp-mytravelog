@@ -67,6 +67,9 @@ def create_log(request):
                     new_log_picture.picture = image_file
                     new_log_picture.save()
 
+                # finally, update user travel stats
+                update_user_travel_stats(user_profile)
+
             else:
                 return_data['error'] = error
 
@@ -87,8 +90,9 @@ def delete_log(request, log_id):
             log_to_delete = Log.objects.get(id=log_id)
             # check if log belongs to current user
             if log_to_delete.user_profile.user == user:
-                # delete log
+                # delete log and update user travel stats
                 log_to_delete.delete()
+                update_user_travel_stats(UserProfile.objects.get(user=user))
             else:
                 return_data['error'] = "This log does not belong to you"
         else:
@@ -325,3 +329,15 @@ def get_log_score(log_to_score):
         z = 1
     score = round(math.log(z, 10) + time_since_epoch, 7)
     return score
+
+
+def update_user_travel_stats(user_profile):
+    city_set = set()
+    country_set = set()
+    all_user_logs = Log.objects.filter(user_profile=user_profile)
+    for log in all_user_logs:
+        city_set.add(log.city.id)
+        country_set.add(log.city.country_name)
+    user_profile.city_count = len(city_set)
+    user_profile.country_count = len(country_set)
+    user_profile.save()

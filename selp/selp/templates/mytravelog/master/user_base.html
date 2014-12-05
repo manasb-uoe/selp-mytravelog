@@ -38,15 +38,19 @@
             <div class="left-column">
                 <div class="travel-stats-container">
                     <div class="stat-container">
-                        <p class="count">{{ requested_user_profile.country_count }}</p>
+                        <p class="count">{{ requested_user_profile.city_count }}</p>
                         <p class="title">Countries</p>
                     </div>
                     <div class="stat-container">
-                        <p class="count">{{ requested_user_profile.city_count }}</p>
+                        <p class="count">{{ requested_user_profile.country_count }}</p>
                         <p class="title">Cities</p>
                     </div>
                     <div class="stat-container">
-                        <p class="count">1</p>
+                        {% if requested_user_profile.rank == -1 %}
+                            <p class="count">N/A</p>
+                        {% else %}
+                            <p class="count">{{ requested_user_profile.rank }}</p>
+                        {% endif %}
                         <p class="title">Rank</p>
                     </div>
 
