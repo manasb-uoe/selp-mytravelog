@@ -11,10 +11,10 @@
     <div class="title-container">
         <p class="title">Leaderboard</p>
         <div class="btn-group leaderboard-model-switcher" role="group" aria-label="...">
-            {% if requested_model == 'users' %}
+            {% if model == 'users' %}
                 <a type="button" class="btn btn-default btn-primary model" href="/mytravelog/leaderboard/users/" id="model-users">Users</a>
                 <a type="button" class="btn btn-default model" href="/mytravelog/leaderboard/cities/" id="model-cities">Cities</a>
-            {% elif requested_model == 'cities' %}
+            {% elif model == 'cities' %}
                 <a type="button" class="btn btn-default model" href="/mytravelog/leaderboard/users/" id="model-users">Users</a>
                 <a type="button" class="btn btn-default btn-primary model" href="/mytravelog/leaderboard/cities/" id="model-cities">Cities</a>
             {% endif %}
@@ -22,55 +22,70 @@
     </div>
 
     <div class="container main-leaderboard-container">
-        <table class="table table-bordered table-custom table-striped table-hover extra-box-shadow">
-            {% if requested_model == 'users' %}
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Full Name</th>
-                    <th>Username</th>
-                    <th>Cities Visited</th>
-                    <th>Countries Visited</th>
-                    <th>Logs Posted</th>
-                    <th>Followers</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for user_profile in requested_page_items %}
-                    <tr>
-                        <td>{{ user_profile.rank }}</td>
-                        <td><div class="profile-picture" style="background-image: url('{{ user_profile.profile_picture.url }}')"></div>{{ user_profile.user.get_full_name }}</td>
-                        <td>{{ user_profile.user.username }}</td>
-                        <td>{{ user_profile.city_count }}</td>
-                        <td>{{ user_profile.country_count }}</td>
-                        <td>{{ user_profile.log_count }}</td>
-                        <td>{{ user_profile.follower_count }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
+        <form class="search-form" method="get">
+            {% if model == 'users' %}
+                <input class="input-search" type="text" name="query" placeholder="Search by name or username" value="{{ query }}" required="">
             {% else %}
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>City</th>
-                    <th>Country</th>
-                    <th>Tourist Count (2012)</th>
-                    <th>Growth % (2011-2012)</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for city in requested_page_items %}
-                    <tr>
-                        <td>{{ city.rank }}</td>
-                        <td>{{ city.name }}</td>
-                        <td><img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:city.country_url_name|add:'.jpg' %}"> {{ city.country_name }}</td>
-                        <td>{{ city.tourist_count|intword }}</td>
-                        <td>{{ city.tourist_growth }}%</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
+                <input class="input-search" type="text" name="query" placeholder="Search by city or country name" value="{{ query }}" required="">
             {% endif %}
-        </table>
+            <button class="button-search" type="submit"><img class="image-search" src="{% static 'mytravelog/imgs/default/icon_search_2.png' %}"></button>
+        </form>
+
+        {% if requested_page_items|length != 0 %}
+            <table class="table table-bordered table-custom table-striped table-hover extra-box-shadow">
+                {% if model == 'users' %}
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Username</th>
+                        <th>Cities Visited</th>
+                        <th>Countries Visited</th>
+                        <th>Logs Posted</th>
+                        <th>Followers</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user_profile in requested_page_items %}
+                        <tr>
+                            <td>{{ user_profile.rank }}</td>
+                            <td><div class="profile-picture" style="background-image: url('{{ user_profile.profile_picture.url }}')"></div>{{ user_profile.user.get_full_name }}</td>
+                            <td>{{ user_profile.user.username }}</td>
+                            <td>{{ user_profile.city_count }}</td>
+                            <td>{{ user_profile.country_count }}</td>
+                            <td>{{ user_profile.log_count }}</td>
+                            <td>{{ user_profile.follower_count }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% else %}
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>City</th>
+                        <th>Country</th>
+                        <th>Tourist Count (2012)</th>
+                        <th>Growth % (2011-2012)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for city in requested_page_items %}
+                        <tr>
+                            <td>{{ city.rank }}</td>
+                            <td>{{ city.name }}</td>
+                            <td><img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:city.country_url_name|add:'.jpg' %}"> {{ city.country_name }}</td>
+                            <td>{{ city.tourist_count|intword }}</td>
+                            <td>{{ city.tourist_growth }}%</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                {% endif %}
+            </table>
+        {% else %}
+            <div class="nothing-found-container">
+                <p class="nothing-found-text">Nothing found here</p>
+            </div>
+        {% endif %}
 
         {#        <nav>#}
         {#            <ul class="pager">#}

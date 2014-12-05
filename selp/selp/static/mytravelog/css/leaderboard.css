@@ -37,7 +37,7 @@ body {
 }
 
 .main-leaderboard-container .table-custom .profile-picture {
-    width: 30px;
+    width: 25px;
     height: 20px;
     display: inline-block;
     margin-right: 7px;
@@ -48,4 +48,36 @@ body {
 .main-leaderboard-container .nav-pagination {
     width: 100%;
     text-align: center;
+}
+
+.main-leaderboard-container .search-form {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    width: 600px;
+    height: 40px;
+    margin: 10px auto 35px auto;
+    border-radius: 4px;
+}
+
+.main-leaderboard-container .search-form .input-search {
+    width: 92%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    font-size: 120%;
+    padding: 15px;
+}
+
+.main-leaderboard-container .search-form .button-search {
+    width: 7%;
+    height: 100%;
+    background-color: transparent;
+    border: none;
+    float: right;
+}
+
+.main-leaderboard-container .search-form .button-search .image-search {
+    width: 22px;
+    height: 22px;
 }
