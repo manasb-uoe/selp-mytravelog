@@ -1,0 +1,51 @@
+body {
+    background-color: #f5f8fa;
+    margin-top: 70px;
+}
+
+.title-container {
+    text-align: center;
+    padding-bottom: 10px;
+}
+
+.title-container .title {
+    color: #000000;
+    font-size: 250%;
+    margin: 0;
+}
+
+.title-container .leaderboard-model-switcher {
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.title-container .leaderboard-model-switcher .model {
+    width: 170px;
+}
+
+.main-leaderboard-container .table-custom {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: #ffffff;
+}
+
+.main-leaderboard-container .table-custom .country-flag {
+    width: 30px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.main-leaderboard-container .table-custom .profile-picture {
+    width: 30px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 7px;
+    background-position: center center;
+    background-size: contain;
+}
+
+.main-leaderboard-container .nav-pagination {
+    width: 100%;
+    text-align: center;
+}
