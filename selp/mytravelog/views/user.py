@@ -263,3 +263,13 @@ def is_requested_user_followed_by_current_user(requested_user_profile, current_u
     return is_followed
 
 
+def update_user_travel_stats(user_profile):
+    city_set = set()
+    country_set = set()
+    all_user_logs = Log.objects.filter(user_profile=user_profile)
+    for log in all_user_logs:
+        city_set.add(log.city.id)
+        country_set.add(log.city.country_name)
+    user_profile.city_count = len(city_set)
+    user_profile.country_count = len(country_set)
+    user_profile.save()

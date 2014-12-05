@@ -14,7 +14,8 @@ from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user
+from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user, \
+    update_user_travel_stats
 
 __author__ = 'Manas'
 
@@ -330,14 +331,3 @@ def get_log_score(log_to_score):
     score = round(math.log(z, 10) + time_since_epoch, 7)
     return score
 
-
-def update_user_travel_stats(user_profile):
-    city_set = set()
-    country_set = set()
-    all_user_logs = Log.objects.filter(user_profile=user_profile)
-    for log in all_user_logs:
-        city_set.add(log.city.id)
-        country_set.add(log.city.country_name)
-    user_profile.city_count = len(city_set)
-    user_profile.country_count = len(country_set)
-    user_profile.save()
