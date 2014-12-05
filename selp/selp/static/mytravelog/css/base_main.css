@@ -5,14 +5,13 @@
 
 .navbar-brand-custom {
     color: gray !important;
-    font-size: 150%;
-    font-family: "Verdana";
+    font-size: 130%;
 }
 
 .navbar .a-signin {
     border: 2px solid #c2c9d4;
     border-radius: 3px;
-    padding: 5px 15px;
+    padding: 4px 15px;
     margin: 9px 5px;
 }
 
@@ -39,7 +38,7 @@
 }
 
 .footer-container .footer-divider {
-    border-color: #ccc;
+    border-color: lightgray;
 }
 
 .footer-container .footer-text {
@@ -55,6 +54,10 @@
 /* General classes */
 .default-box-shadow {
     box-shadow: 0 1px 4px 0 rgba(0,0,0,0.2);
+}
+
+.extra-box-shadow {
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
 }
 
 .nothing-found-container {

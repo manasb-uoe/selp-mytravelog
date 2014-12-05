@@ -43,7 +43,7 @@ body {
 
 .tabs-bar {
     border-bottom: 1px solid #e1e8ed;
-    height: 60px;
+    height: 55px;
     background-color: #ffffff;
     position: relative;
 }
@@ -54,7 +54,7 @@ body {
 }
 
 .tabs-bar .tabs-container .tab {
-    height: 60px;
+    height: 55px;
     padding: 12px 15px;
     display: inline-block;
     text-align: center;
@@ -82,7 +82,7 @@ body {
     height: 100%;
     display: inline-block;
     float: right;
-    margin-top: 12px;
+    margin-top: 10px;
 }
 
 .main-city-container {
