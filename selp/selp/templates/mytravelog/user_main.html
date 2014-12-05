@@ -38,9 +38,8 @@
 {% block right_column_block %}
 
     <div class="logs-content">
-        {% if requested_user_logs|length != 0 %}
-            {% include 'mytravelog/logs.html' %}
-        {% else %}
+        {% include 'mytravelog/logs.html' %}
+        {% if requested_user_logs|length == 0 %}
             <div class="nothing-found-container">
                 <p class="nothing-found-text">Nothing found here</p>
             </div>
