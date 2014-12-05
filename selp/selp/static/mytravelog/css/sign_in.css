@@ -1,6 +1,6 @@
 
 body {
-    background-color: #f2f2f2;
+    background-color: #f5f8fa;
 }
 
 .form-container {
@@ -9,7 +9,7 @@ body {
 
 .form-container .form-signin {
     width: 550px;
-    /*box-shadow: 3px 3px 16px -5px rgba(0,0,0,0.75);*/
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
     background-color: #ffffff;
     margin-left: auto;
     margin-right: auto;
@@ -21,6 +21,7 @@ body {
 
 .form-container .form-signin .title {
     margin: 0;
+    font-size: 150%;
 }
 
 .form-container .form-signin .divider {
