@@ -23,6 +23,7 @@
     font-size: 100%;
     font-weight: bold;
     margin-left: 5px;
+    color: #000000;
 }
 
 .logs-container .log .header .overflow-button {
@@ -141,10 +142,14 @@
     margin-right: 8px;
 }
 
+.logs-container .log .user-info-container .name-and-timestamp-container {
+    margin-top: -4px;
+}
+
 .logs-container .log .user-info-container .name {
-    margin: -4px 0 0 0;
     padding: 0;
     font-weight: bold;
+    color: #000000;
 }
 
 .logs-container .log .user-info-container .timestamp {

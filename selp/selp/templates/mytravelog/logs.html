@@ -5,8 +5,10 @@
     {% for log in requested_user_logs %}
         <div class="log default-box-shadow" data-id="{{ log.id }}" data-location="{{ log.city.name }}, {{ log.city.country_name }}" data-latitude="{{ log.latitude }}" data-longitude="{{ log.longitude }}" data-album-name="{{ log.album.name }}" data-description="{{ log.description }}" data-created-at="{{ log.created_at }}">
             <div class="header">
-                <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
-                <p class="location">{{ log.city.name }}, {{ log.city.country_name }}</p>
+                <a href="/mytravelog/city/{{ log.city.url_name }}/">
+                    <img class="country-flag" src="{% static 'mytravelog/imgs/flags/'|add:log.city.country_url_name|add:'.jpg' %}">
+                </a>
+                <a href="/mytravelog/city/{{ log.city.url_name }}/" class="location">{{ log.city.name }}, {{ log.city.country_name }}</a>
 
                 <div class="overflow-button"></div>
                 <div class="log-dropdown-container">
@@ -63,9 +65,11 @@
             <p class="description">{{ log.description }}</p>
 
             <div class="user-info-container">
-                <img class="profile-picture" src="{{ log.user_profile.profile_picture.url }}">
+                <a href="/mytravelog/user/{{ log.user_profile.user.username }}">
+                    <img class="profile-picture" src="{{ log.user_profile.profile_picture.url }}">
+                </a>
                 <div class="name-and-timestamp-container">
-                    <p class="name">{{ log.user_profile.user.get_full_name }}</p>
+                    <a href="/mytravelog/user/{{ log.user_profile.user.username }}" class="name">{{ log.user_profile.user.get_full_name }}</a>
                     <p class="timestamp">{{ log.created_at|naturaltime }}</p>
                 </div>
             </div>
