@@ -2,19 +2,20 @@ import json
 import re
 from unittest.case import skip
 
+from django.contrib.auth.models import User
 from django.core.urlresolvers import resolve
 from django.http.request import HttpRequest
 from django.http.response import Http404
-
 from django.template.loader import render_to_string
 from django.test import TestCase
 
 from mytravelog.models.city import City
+from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
-
 from mytravelog.views.home import show_home
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
+from mytravelog.views.user import sign_up, sign_in, sign_out
 
 
 class HomeTest(TestCase):
@@ -144,3 +145,173 @@ class SearchTest(TestCase):
         request = HttpRequest()
         request.GET['query'] = 'city'
         self.assertRaises(Http404, search_for_cities_and_users, HttpRequest())
+
+
+class UserAuthenticationTest(TestCase):
+
+    sign_in_url = '/mytravelog/sign_in/'
+    sign_up_url = '/mytravelog/sign_up/'
+    sign_out_url = '/mytravelog/sign_out/'
+    home_url = '/mytravelog/'
+    user_url = '/mytravelog/user/' + util.user1_sample_data['username'] + '/'
+
+    def test_urls_resolve_to_current_functions(self):
+        # check sign up url
+        found = resolve(self.sign_up_url)
+        self.assertEqual(found.func, sign_up)
+        
+        # check sign in url
+        found = resolve(self.sign_in_url)
+        self.assertEqual(found.func, sign_in)
+        
+        # check sign out url
+        found = resolve(self.sign_out_url)
+        self.assertEqual(found.func, sign_out)
+
+    def test_views_return_correct_html(self):
+        # check sign_up view
+        response = self.client.get(self.sign_up_url)
+        expected_html = render_to_string('mytravelog/sign_up.html', {'csrf_token': self.client.cookies['csrftoken'].value})
+        self.assertEqual(response.content, expected_html)
+
+        # check sign_in view
+        response = self.client.get(self.sign_in_url)
+        expected_html = render_to_string('mytravelog/sign_in.html', {'csrf_token': self.client.cookies['csrftoken'].value})
+        self.assertEqual(response.content, expected_html)
+
+    def test_sign_out_view_redirects_anonymous_users_to_sign_in(self):
+        response = self.client.get(self.sign_out_url, None, follow=True)
+        self.assertRedirects(response, self.sign_in_url, status_code=302, target_status_code=200)
+
+    def test_sign_in_and_sign_up_views_redirect_authenticated_users_to_their_profiles(self):
+        # create and sign in a new user
+        util.create_new_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # auth user gets redirected to user profile page if they try to sign in or sign up
+        response = self.client.post(self.sign_in_url, util.user1_sample_data, follow=True)
+        self.assertRedirects(response, self.user_url, status_code=302, target_status_code=200)
+        self.client.post(self.sign_up_url, util.user1_sample_data, follow=True)
+        self.assertRedirects(response, self.user_url, status_code=302, target_status_code=200)
+
+    def test_sign_up_creates_new_user_and_user_profile(self):
+        # on success, a new user and user profile should be created and the user should get redirected to user page
+        response = self.client.post(self.sign_up_url, util.user1_sample_data, follow=True)
+        self.assertRedirects(response, self.user_url, status_code=302, target_status_code=200)
+        new_user = User.objects.get(username=util.user1_sample_data['username'])
+        new_user_profile = UserProfile.objects.get(user=new_user)
+
+        # check if all saved data are correct
+        self.assertEqual(new_user.username, util.user1_sample_data['username'])
+        self.assertEqual(new_user.first_name, util.user1_sample_data['first_name'])
+        self.assertEqual(new_user.last_name, util.user1_sample_data['last_name'])
+        self.assertEqual(new_user_profile.city_count, 0)
+        self.assertEqual(new_user_profile.country_count, 0)
+        self.assertEqual(new_user_profile.rank, -1)
+
+    def test_sign_in_view_logs_in_registered_user(self):
+        # a user that has never registered before gets an error saying 'Incorrect username or password'
+        response = self.client.post(self.sign_in_url, util.user1_sample_data, follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Incorrect username or password')
+
+        # an already registered user should get signed in and be redirected to user page
+        util.create_new_user_and_user_profile(util.user1_sample_data)
+        response = self.client.post(self.sign_in_url, util.user1_sample_data, follow=True)
+        self.assertRedirects(response, self.user_url, status_code=302, target_status_code=200)
+
+    def test_sign_out_view_signs_out_an_authenticated_user(self):
+        util.create_new_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+    def test_sign_up_validation(self):
+        # test all possible validation errors (including uploaded file size errors)
+        response = self.client.post(self.sign_up_url, {})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'First name is required')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name']})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Last name is required')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name']})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Email is required')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': 'email'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Email is missing the \'@\' symbol')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email']})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Username is required')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': 'user'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Username must be at least 6 characters long')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': 'user user'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Username cannot contain spaces')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': util.user1_sample_data['username']})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Password is required')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': util.user1_sample_data['username'],
+                                                       'password': 'pass'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Password must be at least 6 characters long')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': util.user1_sample_data['username'],
+                                                       'password': util.user1_sample_data['password'],
+                                                       'profile_picture': util.get_large_image()})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Max image size allowed is 2 mb')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': util.user1_sample_data['username'],
+                                                       'password': util.user1_sample_data['password'],
+                                                       'profile_picture': util.get_small_image(),
+                                                       'cover_picture': util.get_large_image()})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['error'], 'Max image size allowed is 2 mb')
+
+        response = self.client.post(self.sign_up_url, {'first_name': util.user1_sample_data['first_name'],
+                                                       'last_name': util.user1_sample_data['last_name'],
+                                                       'email': util.user1_sample_data['email'],
+                                                       'username': util.user1_sample_data['username'],
+                                                       'password': util.user1_sample_data['password'],
+                                                       'profile_picture': util.get_small_image(),
+                                                       'cover_picture': util.get_small_image()}, follow=True)
+        self.assertRedirects(response, self.user_url, status_code=302, target_status_code=200)
+
+
+
