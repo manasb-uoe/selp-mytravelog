@@ -18,11 +18,9 @@ def search_for_cities_and_users(request):
         if len(city) == 1:
             return HttpResponseRedirect('/mytravelog/city/' + city[0].url_name + '/')
         else:
-            cities = City.objects.filter(Q(name__startswith=search_query) |
-                                         Q(country_name__startswith=search_query))
-            user_profiles = UserProfile.objects.filter(Q(user__username__startswith=search_query) |
-                                                       Q(user__first_name__startswith=search_query) |
-                                                       Q(user__last_name__startswith=search_query))
+            results = get_search_results(search_query)
+            cities = results['cities']
+            user_profiles = results['user_profiles']
             # check if each user profile returned is being followed by current user
             user = request.user
             can_follow = False
@@ -44,3 +42,16 @@ def search_for_cities_and_users(request):
     else:
         raise Http404
 
+
+# ---------Helper functions-----------
+
+def get_search_results(query):
+    cities = City.objects.filter(Q(name__startswith=query) |
+                                 Q(country_name__startswith=query))
+    user_profiles = UserProfile.objects.filter(Q(user__username__startswith=query) |
+                                               Q(user__first_name__startswith=query) |
+                                               Q(user__last_name__startswith=query))
+    return {
+        'cities': cities,
+        'user_profiles': user_profiles
+    }
