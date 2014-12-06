@@ -1493,6 +1493,112 @@ var CityAutocompleteSuggestionsHandler = (function () {
 
 }());
 
+//--------------------Leaderboard modules go here------------------------
+
+var LeaderBoardHandler = (function () {
+
+    var _config = {
+        searchInput: $('#input-search'),
+        downCaretHtml: '<span class="dropdown"><span class="caret"></span></span>',
+        upCaretHtml: '<span class="dropup"><span class="caret"></span></span>',
+        tableCol: $('th'),
+        paginationButton: $('.pagination-button')
+    };
+
+    function init() {
+        _bindUIActions();
+        _showCaretOnHeading();
+    }
+
+    function _bindUIActions() {
+        (_config.tableCol).click(function () {
+            var query = _config.searchInput.val();
+            var orderBy = $(this).attr('data-order-by');
+            var order = null;
+            if ($(this).children('.dropdown').length > 0) {
+                order = 'asc'
+            }
+            else {
+                order = 'desc'
+            }
+            var params = _getParamsFromUrl();
+            params.query = query;
+            params.orderBy = orderBy;
+            params.order = order;
+            window.location.href = _generateUrl(params);
+        });
+        _config.paginationButton.click(function () {
+            var params = _getParamsFromUrl();
+            var pageToGoTo = $(this).attr('data-href');
+            params.page = pageToGoTo;
+
+            if (pageToGoTo != undefined) {
+                window.location.href = _generateUrl(params);
+            }
+        });
+    }
+
+    function _showCaretOnHeading() {
+        var params = _getParamsFromUrl();
+        var allHeadings = $('body').find('th');
+        allHeadings.each(function () {
+            if ($(this).attr('data-order-by') == params.orderBy) {
+                if (params.order == 'asc') {
+                    $(this).append(_config.upCaretHtml);
+                }
+                else {
+                    $(this).append(_config.downCaretHtml);
+                }
+            }
+        });
+    }
+
+    function _getParamsFromUrl() {
+        var params = window.location.search.substr(1).split('&');
+        var page = null;
+        var query = null;
+        var orderBy = null;
+        var order = null;
+        for (var i=0; i < params.length; i++) {
+            if (params[i].indexOf('order_by') > -1) {
+                orderBy = params[i].substr(9);
+            }
+            if (params[i].indexOf('order') > -1) {
+                order = params[i].substr(6);
+            }
+            if (params[i].indexOf('page') > -1) {
+                page = params[i].substr(5);
+            }
+            if (params[i].indexOf('query') > -1) {
+                query = params[i].substr(6);
+            }
+        }
+        return {
+            page: page,
+            query: query,
+            orderBy: orderBy,
+            order: order
+        }
+    }
+
+    function _generateUrl(params) {
+        var page = params.page || 1;
+        var query = params.query || '';
+        var orderBy = params.orderBy || 'rank';
+        var order = params.order || 'asc';
+
+        var url = window.location.href;
+        if (url.indexOf('?') > -1) {
+            url = url.substr(0, url.indexOf('?'));
+        }
+        return url + '?page=' + page + '&query=' + query + '&order_by=' + orderBy + '&order=' + order;
+    }
+
+    return {
+        init: init
+    };
+}());
+
 //--------------------Function calls go here------------------------
 
 $(document).ready(function () {
@@ -1530,5 +1636,8 @@ $(document).ready(function () {
     }
     else if (currentUrl.indexOf('/live_feed/') > -1) {
         handleLogs();
+    }
+    else if (currentUrl.indexOf('/leaderboard/') > -1) {
+        LeaderBoardHandler.init();
     }
 });
