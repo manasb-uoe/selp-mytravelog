@@ -14,6 +14,7 @@ from mytravelog.unit_tests import util
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 
 from mytravelog.views.home import show_home
+from mytravelog.views.search import search_for_cities_and_users, get_search_results
 
 
 class HomeTest(TestCase):
@@ -100,3 +101,46 @@ class CityTest(TestCase):
                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(util.city1_sample_data['name'], json.loads(response.content)[0]['city'])
         self.assertEqual(util.city1_sample_data['country_name'], json.loads(response.content)[0]['country'])
+
+
+class SearchTest(TestCase):
+
+    def test_search_url_resolves_to_correct_function(self):
+        found = resolve('/mytravelog/search/')
+        self.assertEqual(found.func, search_for_cities_and_users)
+
+    @skip('no users registered yet')
+    def test_search_for_cities_and_users_returns_correct_html(self):
+        request = HttpRequest()
+        request.GET['query'] = 'city'
+        response = search_for_cities_and_users(request)
+        expected_html = render_to_string('mytravelog/search.html')
+        self.assertEqual(re.sub('NOTPROVIDED', '', response.content.decode()), expected_html)
+
+    def test_correct_search_results_are_returned(self):
+        # no cities or user profiles should be returned since they don't exist in the database yet
+        results = get_search_results(util.city1_sample_data['name'])
+        self.assertEqual(len(results['cities']), 0)
+        self.assertEqual(len(results['user_profiles']), 0)
+
+        # add two sample cities
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_city(util.city2_sample_data)
+
+        # if query = 'city1' then only city1 should be returned
+        results = get_search_results(util.city1_sample_data['name'])
+        self.assertEqual(len(results['cities']), 1)
+        self.assertEqual(results['cities'][0].name, util.city1_sample_data['name'])
+        self.assertEqual(len(results['user_profiles']), 0)
+
+        # if query = 'city' then both cities should be returned
+        results = get_search_results('city')
+        self.assertEqual(len(results['cities']), 2)
+        self.assertEqual(len(results['user_profiles']), 0)
+
+        # TODO add user profile tests
+
+    def test_Http404_is_raised_when_no_query_provided(self):
+        request = HttpRequest()
+        request.GET['query'] = 'city'
+        self.assertRaises(Http404, search_for_cities_and_users, HttpRequest())
