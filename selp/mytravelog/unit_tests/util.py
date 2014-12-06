@@ -5,6 +5,17 @@ from mytravelog.views.city import add_new_city
 
 __author__ = 'Manas'
 
+urls = {
+    'home': '/mytravelog/',
+    'sign_up': '/mytravelog/sign_up/',
+    'sign_in': '/mytravelog/sign_in/',
+    'sign_out': '/mytravelog/sign_out/',
+    'user_base': '/mytravelog/user/',
+    'city_base': '/mytravelog/city/',
+    'city_autocomplete': '/mytravelog/city/autocomplete/',
+    'search_base': '/mytravelog/search/'
+}
+
 city1_sample_data = {
     'name': 'city1',
     'country_name': 'country1',
@@ -41,7 +52,7 @@ def add_sample_city(city_sample_data):
                  description=city_sample_data['description'])
 
 
-def create_new_user_and_user_profile(user_sample_data):
+def add_sample_user_and_user_profile(user_sample_data):
     user = User()
     user.username = user_sample_data['username']
     user.set_password(user_sample_data['password'])
