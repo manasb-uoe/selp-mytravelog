@@ -1,5 +1,7 @@
 {% extends 'mytravelog/master/base_main.html' %}
+
 {% load static %}
+{% load humanize %}
 
 {% block head_block %}
     <link href="{% static 'mytravelog/css/city.css' %}" rel="stylesheet" type="text/css">
@@ -53,7 +55,7 @@
             <p class="country-name">{{ requested_city.country_name }}</p>
             <div class="city-stats-container">
                 <div class="stat">
-                    <p class="value">{{ requested_city.tourist_count }} million</p>
+                    <p class="value">{{ requested_city.tourist_count|intword }}</p>
                     <p class="title">Tourist Count (2011)</p>
                 </div>
                 <div class="stat">
