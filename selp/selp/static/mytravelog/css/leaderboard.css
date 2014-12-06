@@ -29,6 +29,10 @@ body {
     background-color: #ffffff;
 }
 
+.main-leaderboard-container .table-custom th {
+    cursor: pointer;
+}
+
 .main-leaderboard-container .table-custom .country-flag {
     width: 30px;
     height: 20px;
@@ -80,4 +84,8 @@ body {
 .main-leaderboard-container .search-form .button-search .image-search {
     width: 22px;
     height: 22px;
+}
+
+.main-leaderboard-container .nav-pagination .pagination-button {
+    cursor: pointer;
 }
