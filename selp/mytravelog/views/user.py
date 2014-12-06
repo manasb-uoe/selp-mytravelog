@@ -1,11 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.db.models.aggregates import Avg
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+
 from mytravelog.models.album import Album
-from mytravelog.models.city import City
 from mytravelog.models.comment import Comment
 from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
@@ -13,12 +12,14 @@ from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 
+
 __author__ = 'Manas'
 
 
 def sign_up(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect('/mytravelog/')
+    user = request.user
+    if user.is_authenticated():
+        return HttpResponseRedirect('/mytravelog/user/' + user.username + '/')
     else:
         data_dict = {}
         if request.method == "POST":
@@ -49,7 +50,6 @@ def sign_up(request):
                 new_user_profile.city_count = 0
                 new_user_profile.country_count = 0
                 new_user_profile.log_count = 0
-                new_user_profile.total_score = 0
                 if profile_picture is not None:
                     new_user_profile.profile_picture = profile_picture
                 if cover_picture is not None:
@@ -60,7 +60,7 @@ def sign_up(request):
                 # now, sign in the user
                 new_user_to_be_signed_in = authenticate(username=username, password=password)
                 login(request, new_user_to_be_signed_in)
-                return HttpResponseRedirect('/mytravelog/')
+                return HttpResponseRedirect('/mytravelog/user/' + new_user.username + '/')
             else:
                 data_dict['error'] = error
                 data_dict['previous_post_data'] = post_data
@@ -68,8 +68,9 @@ def sign_up(request):
 
 
 def sign_in(request):
-    if request.user.is_authenticated():
-        return HttpResponseRedirect('/mytravelog/')
+    user = request.user
+    if user.is_authenticated():
+        return HttpResponseRedirect('/mytravelog/user/' + user.username + '/')
     else:
         data_dict = {}
         if request.method == "POST":
@@ -88,7 +89,7 @@ def sign_in(request):
                     if user.is_active:
                         # now, sign in in the user
                         login(request, user)
-                        return HttpResponseRedirect('/mytravelog/')
+                        return HttpResponseRedirect('/mytravelog/user/' + user.username + '/')
                     else:
                         data_dict['error'] = "Your account is disabled"
                 else:
@@ -98,7 +99,8 @@ def sign_in(request):
 
 
 def sign_out(request):
-    if request.user.is_authenticated():
+    user = request.user
+    if user.is_authenticated():
         logout(request)
         return HttpResponseRedirect('/mytravelog/')
     else:
