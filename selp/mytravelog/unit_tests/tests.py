@@ -809,6 +809,13 @@ class LogTest(TestCase):
 
 class LikeTest(TestCase):
 
+    def setUp(self):
+        # first we need to create a log since like_log view needs a log id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
     def test_create_and_delete_like_urls_resolve_to_correct_functions(self):
         found = resolve(util.urls['like_create_base'] + '0/')
         self.assertEqual(found.func, like_log)
@@ -817,12 +824,6 @@ class LikeTest(TestCase):
         self.assertEqual(found.func, dislike_log)
 
     def test_like_log_view(self):
-        # first we need to create a log since like_log view needs a log id as an argument
-        util.add_sample_city(util.city1_sample_data)
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
-
         log_to_like = Log.objects.all()[0]
 
         # non ajax request raises 404 error
@@ -850,12 +851,6 @@ class LikeTest(TestCase):
         self.assertEqual(len(Like.objects.filter(log=log_to_like)), 1)
 
     def test_dislike_log_view(self):
-        # first we need to create a log since dislike_log view needs a log id as an argument
-        util.add_sample_city(util.city1_sample_data)
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
-
         # now we need to create a like which needs to be deleted
         log_to_dislike = Log.objects.all()[0]
         liker_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
@@ -890,6 +885,17 @@ class LikeTest(TestCase):
 
 class CommentTest(TestCase):
 
+    def setUp(self):
+        # create a log since create_log_comment and delete_log_comment views needs a log id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+        self.log_to_comment_on = Log.objects.all()[0]
+
+        # data dict used for comment creation
+        self.comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
+
     def test_create_and_delete_comment_urls_resolve_to_currect_functions(self):
         found = resolve(util.urls['comment_create_base'] + '0/')
         self.assertEqual(found.func, create_log_comment)
@@ -898,25 +904,14 @@ class CommentTest(TestCase):
         self.assertEqual(found.func, delete_log_comment)
 
     def test_create_log_comment_view(self):
-        # first we need to create a log since create_log_comment view needs a log id as an argument
-        util.add_sample_city(util.city1_sample_data)
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
-
-        log_to_comment_on = Log.objects.all()[0]
-
-        # data dict used for comment creation
-        comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
-
         # non ajax request raises 404 error
-        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
-                                    data=comment_data_dict)
+        response = self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
+                                    data=self.comment_data_dict)
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
-        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
-                                    data=comment_data_dict,
+        response = self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
+                                    data=self.comment_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -926,39 +921,28 @@ class CommentTest(TestCase):
         self.assertTrue(is_successful)
 
         # as the user is now authenticated, comment should be created successfully
-        self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
-                         data=comment_data_dict,
+        self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
+                         data=self.comment_data_dict,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+        self.assertEqual(len(Comment.objects.filter(log=self.log_to_comment_on,
                                                     commenter_user_profile__user__username=util.user1_sample_data['username'])), 1)
 
     def test_delete_log_comment_view(self):
-        # first we need to create a log since and comment on it since delete_log_comment view needs
-        # a comment id as an argument
-        util.add_sample_city(util.city1_sample_data)
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
-
-        # data dict used for comment creation
-        comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
-
         # now we need to create a comment  which needs to be deleted
-        log_to_comment_on = Log.objects.all()[0]
         commenter_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
-        comment_to_delete = Comment.objects.create(log=log_to_comment_on,
+        comment_to_delete = Comment.objects.create(log=self.log_to_comment_on,
                                                    commenter_user_profile=commenter_user_profile,
-                                                   body=comment_data_dict['body'])
-        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on)), 1)
+                                                   body=self.comment_data_dict['body'])
+        self.assertEqual(len(Comment.objects.filter(log=self.log_to_comment_on)), 1)
 
         # non ajax request raises 404 error
         response = self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
-                                    data=comment_data_dict)
+                                    data=self.comment_data_dict)
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
         response = self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
-                                    data=comment_data_dict,
+                                    data=self.comment_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -969,19 +953,12 @@ class CommentTest(TestCase):
 
         # as the user is now authenticated, comment should be deleted successfully
         self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
-                         data=comment_data_dict,
+                         data=self.comment_data_dict,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+        self.assertEqual(len(Comment.objects.filter(log=self.log_to_comment_on,
                                                     commenter_user_profile__user__username=util.user1_sample_data['username'])), 0)
 
     def test_comment_validation(self):
-        # first we need to create a log to comment on
-        util.add_sample_city(util.city1_sample_data)
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
-        log_to_comment_on = Log.objects.all()[0]
-
         # sign in the use we just created
         is_successful = self.client.login(username=util.user1_sample_data['username'],
                                           password=util.user1_sample_data['password'])
@@ -990,23 +967,23 @@ class CommentTest(TestCase):
         # now that the user is authenticated and we have a log to comment on, we can test all our validation checks
         # by starting with an empty dict
         comment_data_dict = {}
-        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+        response = self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
                                     data=comment_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['error'], 'Comment cannot be left blank')
 
         comment_data_dict['body'] = util.comment_sample_bodies['long_comment']
-        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+        response = self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
                                     data=comment_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['error'], 'Comment length cannot exceed 150 characters')
 
         comment_data_dict['body'] = util.comment_sample_bodies['short_comment']
-        self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+        self.client.post(util.urls['comment_create_base'] + str(self.log_to_comment_on.id) + '/',
                          data=comment_data_dict,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         # now that all validation checks have passed, a new comment should successfully be created
-        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+        self.assertEqual(len(Comment.objects.filter(log=self.log_to_comment_on,
                                                     commenter_user_profile__user__username=util.user1_sample_data['username'])), 1)
 
 
@@ -1017,6 +994,9 @@ class FollowerTest(TestCase):
         util.add_sample_user_and_user_profile(util.user1_sample_data)
         util.add_sample_user_and_user_profile(util.user2_sample_data)
 
+        self.follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        self.following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
     def test_create_and_delete_follower_urls_resolve_to_correct_functions(self):
         found = resolve(util.urls['follower_create_base'] + '0/')
         self.assertEqual(found.func, create_follower)
@@ -1025,15 +1005,12 @@ class FollowerTest(TestCase):
         self.assertEqual(found.func, delete_follower)
 
     def test_create_follower_view(self):
-        follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
-        following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
-
         # non ajax request raises 404 error
-        response = self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/')
+        response = self.client.post(util.urls['follower_create_base'] + str(self.following_user_profile.id) + '/')
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
-        response = self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+        response = self.client.post(util.urls['follower_create_base'] + str(self.following_user_profile.id) + '/',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -1043,39 +1020,36 @@ class FollowerTest(TestCase):
         self.assertTrue(is_successful)
 
         # now that the user is authenticated, a follower should be successfully created
-        self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+        self.client.post(util.urls['follower_create_base'] + str(self.following_user_profile.id) + '/',
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Follower.objects.filter(following_user_profile=following_user_profile,
-                                                     follower_user_profile=follower_user_profile)), 1)
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=self.following_user_profile,
+                                                     follower_user_profile=self.follower_user_profile)), 1)
 
         # if user tries to follow themselves, no new follower should be created
-        self.client.post(util.urls['follower_create_base'] + str(follower_user_profile.id) + '/',
+        self.client.post(util.urls['follower_create_base'] + str(self.follower_user_profile.id) + '/',
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Follower.objects.filter(following_user_profile=follower_user_profile,
-                                                     follower_user_profile=follower_user_profile)), 0)
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=self.follower_user_profile,
+                                                     follower_user_profile=self.follower_user_profile)), 0)
 
         # if user tries the follow the same user again, no new follow should be created
-        self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+        self.client.post(util.urls['follower_create_base'] + str(self.following_user_profile.id) + '/',
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Follower.objects.filter(following_user_profile=following_user_profile,
-                                                     follower_user_profile=follower_user_profile)), 1)
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=self.following_user_profile,
+                                                     follower_user_profile=self.follower_user_profile)), 1)
 
     def test_delete_follower_view(self):
-        follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
-        following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
-
         # create a follower which needs to be deleted
-        Follower.objects.create(follower_user_profile=follower_user_profile,
-                                following_user_profile=following_user_profile)
-        self.assertEqual(len(Follower.objects.filter(follower_user_profile=follower_user_profile,
-                                                     following_user_profile=following_user_profile)), 1)
+        Follower.objects.create(follower_user_profile=self.follower_user_profile,
+                                following_user_profile=self.following_user_profile)
+        self.assertEqual(len(Follower.objects.filter(follower_user_profile=self.follower_user_profile,
+                                                     following_user_profile=self.following_user_profile)), 1)
 
         # non ajax request raises 404 error
-        response = self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/')
+        response = self.client.post(util.urls['follower_delete_base'] + str(self.following_user_profile.id) + '/')
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
-        response = self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/',
+        response = self.client.post(util.urls['follower_delete_base'] + str(self.following_user_profile.id) + '/',
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -1085,7 +1059,7 @@ class FollowerTest(TestCase):
         self.assertTrue(is_successful)
 
         # since the user is authenticated, follower should now get deleted successfully
-        self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/',
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(len(Follower.objects.filter(follower_user_profile=follower_user_profile,
-                                                     following_user_profile=following_user_profile)), 0)
+        self.client.post(util.urls['follower_delete_base'] + str(self.following_user_profile.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Follower.objects.filter(follower_user_profile=self.follower_user_profile,
+                                                     following_user_profile=self.following_user_profile)), 0)
