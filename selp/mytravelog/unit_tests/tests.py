@@ -1,11 +1,13 @@
 import json
 
 from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 from django.core.urlresolvers import resolve
 from django.http.request import HttpRequest
 from django.http.response import Http404
 from django.template.loader import render_to_string
 from django.test import TestCase
+from django.utils.encoding import smart_str
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
@@ -20,6 +22,7 @@ from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.comment import create_log_comment, delete_log_comment
 from mytravelog.views.follower import create_follower, delete_follower
 from mytravelog.views.home import show_home
+from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
@@ -1037,3 +1040,115 @@ class FollowerTest(TestCase):
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(len(Follower.objects.filter(follower_user_profile=self.follower_user_profile,
                                                      following_user_profile=self.following_user_profile)), 0)
+
+
+class LeaderBoardTest(TestCase):
+
+    def test_leaderboard_url_resolves_to_correct_function(self):
+        found = resolve(util.urls['leaderboard_show_base'] + 'model/')
+        self.assertEqual(found.func, show_leaderboard)
+
+    # def test_show_leaderboard_view_returns_correct_html(self):
+    #     # add 2 cities
+    #     util.add_sample_city(util.city1_sample_data)
+    #     util.add_sample_city(util.city2_sample_data)
+    #
+    #     # paginate all items
+    #     items = City.objects.all()
+    #     paginator = Paginator(items, 10)
+    #     items = paginator.page(1)
+    #
+    #     # check if both the cities that we added appear in cities leaderboard
+    #     response = self.client.get(util.urls['leaderboard_show_base'] + 'cities/')
+    #     expected_html = render_to_string('mytravelog/leaderboard.html', {'csrf_token': self.client.cookies['csrftoken'].value,
+    #                                                                      'requested_page_items': items,
+    #                                                                      'model': 'cities',
+    #                                                                      'query': ''})
+    #     self.assertEqual(smart_str(response.content), smart_str(expected_html))
+
+    def test_leaderboard_cities_search(self):
+        # add and retrieve two cities
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_city(util.city2_sample_data)
+        city1 = City.objects.get(name=util.city1_sample_data['name'])
+        city2 = City.objects.get(name=util.city2_sample_data['name'])
+
+        # -------test order-------
+        results = get_results('', 'cities', 'rank', 'asc')
+        self.assertEqual(results[0], city2)
+        self.assertEqual(results[1], city1)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'cities', 'rank', 'desc')
+        self.assertEqual(results[0], city1)
+        self.assertEqual(results[1], city2)
+        self.assertEqual(len(results), 2)
+
+        # -------test query-------
+        results = get_results('city1', 'cities', 'rank', 'asc')
+        self.assertItemsEqual(results, [city1])
+
+        # -------test order_by-------
+        results = get_results('', 'cities', 'name', 'asc')
+        self.assertEqual(results[0], city1)
+        self.assertEqual(results[1], city2)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'cities', 'tourist_count', 'asc')
+        self.assertEqual(results[0], city1)
+        self.assertEqual(results[1], city2)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'cities', 'tourist_growth', 'asc')
+        self.assertEqual(results[0], city1)
+        self.assertEqual(results[1], city2)
+        self.assertEqual(len(results), 2)
+
+    def test_leaderboard_users_search(self):
+        # add and retrieve two user profiles
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+        user_profile_1 = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        user_profile_2 = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
+        # attach a log to user_profile_1
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        # attach a follower to user_profile_2
+        Follower.objects.create(following_user_profile=user_profile_2, follower_user_profile=user_profile_1)
+
+        # -------test order-------
+        results = get_results('', 'users', 'username', 'asc')
+        self.assertEqual(results[0], user_profile_1)
+        self.assertEqual(results[1], user_profile_2)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'users', 'username', 'desc')
+        self.assertEqual(results[0], user_profile_2)
+        self.assertEqual(results[1], user_profile_1)
+        self.assertEqual(len(results), 2)
+
+        # -------test query-------
+        results = get_results('username1', 'users', 'username', 'asc')
+        self.assertItemsEqual(results, [user_profile_1])
+
+        # -------test order_by-------
+        results = get_results('', 'users', 'first_name', 'asc')
+        self.assertEqual(results[0], user_profile_1)
+        self.assertEqual(results[1], user_profile_2)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'users', 'follower_count', 'asc')
+        self.assertEqual(results[0], user_profile_1)
+        self.assertEqual(results[1], user_profile_2)
+        self.assertEqual(len(results), 2)
+
+        results = get_results('', 'users', 'log_count', 'asc')
+        self.assertEqual(results[0], user_profile_2)
+        self.assertEqual(results[1], user_profile_1)
+        self.assertEqual(len(results), 2)
+
+
+
