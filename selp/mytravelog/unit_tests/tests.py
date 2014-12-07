@@ -147,8 +147,25 @@ class SearchTest(TestCase):
         results = get_search_results('city')
         self.assertEqual(len(results['cities']), 2)
         self.assertEqual(len(results['user_profiles']), 0)
+        self.assertEqual(results['cities'][0].name, util.city1_sample_data['name'])
+        self.assertEqual(results['cities'][1].name, util.city2_sample_data['name'])
 
-        # TODO add user profile tests
+        # add 2 sample users and user profiles
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+
+        # if query = 'username1' then only one user should be returned
+        results = get_search_results(util.user1_sample_data['username'])
+        self.assertEqual(len(results['cities']), 0)
+        self.assertEqual(len(results['user_profiles']), 1)
+        self.assertEqual(results['user_profiles'][0].user.username, util.user1_sample_data['username'])
+
+        # if query = 'username' then both users should be returned
+        results = get_search_results('username')
+        self.assertEqual(len(results['cities']), 0)
+        self.assertEqual(len(results['user_profiles']), 2)
+        self.assertEqual(results['user_profiles'][0].user.username, util.user1_sample_data['username'])
+        self.assertEqual(results['user_profiles'][1].user.username, util.user2_sample_data['username'])
 
     def test_Http404_is_raised_when_no_query_provided(self):
         request = HttpRequest()
@@ -984,7 +1001,7 @@ class CommentTest(TestCase):
         self.assertEqual(json.loads(response.content)['error'], 'Comment length cannot exceed 150 characters')
 
         comment_data_dict['body'] = util.comment_sample_bodies['short_comment']
-        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+        self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
                                     data=comment_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         # now that all validation checks have passed, a new comment should successfully be created

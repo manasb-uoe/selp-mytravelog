@@ -59,6 +59,14 @@ user1_sample_data = {
     'email': 'email@email.com'
 }
 
+user2_sample_data = {
+    'username': 'username2',
+    'password': 'password',
+    'first_name': 'user',
+    'last_name': '2',
+    'email': 'email@email.com'
+}
+
 album1_sample_data = {
     'name': 'album1',
     'start_date': '2014-8-24',
