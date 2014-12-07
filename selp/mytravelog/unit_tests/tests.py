@@ -330,6 +330,12 @@ class UserAuthenticationTest(TestCase):
 
 class AlbumTest(TestCase):
 
+    def setUp(self):
+        # add a new album
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        self.album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+
     def test_urls_resolve_to_correct_functions(self):
         # check show album url
         found = resolve(util.urls['album_show_base'] + '0/')
@@ -348,19 +354,15 @@ class AlbumTest(TestCase):
         self.assertEqual(found.func, delete_album)
 
     def test_show_album_view_returns_correct_html(self):
-        # add a new album since show_album view needs an id
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
         user_dict = util.get_user_and_user_profile(util.user1_sample_data)
         user = user_dict['user']
         user_profile = user_dict['user_profile']
 
-        response = self.client.get(util.urls['album_show_base'] + str(album.id) + '/')
+        response = self.client.get(util.urls['album_show_base'] + str(self.album.id) + '/')
         expected_html = render_to_string('mytravelog/user_album.html',
                                          {'csrf_token': self.client.cookies['csrftoken'].value,
-                                          'requested_album': album,
-                                          'requested_user_albums': [album],
+                                          'requested_album': self.album,
+                                          'requested_user_albums': [self.album],
                                           'requested_album_logs': [],
                                           'requested_user': user,
                                           'requested_user_profile': user_profile,
@@ -378,8 +380,7 @@ class AlbumTest(TestCase):
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
-        # create and sign in a new user
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        # sign in the user
         is_successful = self.client.login(username=util.user1_sample_data['username'],
                                           password=util.user1_sample_data['password'])
         self.assertTrue(is_successful)
@@ -396,18 +397,13 @@ class AlbumTest(TestCase):
         self.assertEqual(album.end_date, convert_string_to_date(util.album1_sample_data['end_date']))
 
     def test_update_album_view(self):
-        # create and retrieve an album to be edited
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
-
         # non ajax request raises 404 error
-        response = self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+        response = self.client.post(util.urls['album_update_base'] + str(self.album.id) + '/',
                                     data=util.album2_sample_data)
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
-        response = self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+        response = self.client.post(util.urls['album_update_base'] + str(self.album.id) + '/',
                                     data=util.album2_sample_data,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
@@ -418,7 +414,7 @@ class AlbumTest(TestCase):
         self.assertTrue(is_successful)
 
         # as the user is now authenticated, album should be updated successfully
-        self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+        self.client.post(util.urls['album_update_base'] + str(self.album.id) + '/',
                          data=util.album2_sample_data,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
@@ -429,18 +425,13 @@ class AlbumTest(TestCase):
         self.assertEqual(album.end_date, convert_string_to_date(util.album2_sample_data['end_date']))
 
     def test_delete_album_view(self):
-        # create and retrieve an album to be delete
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
-        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
-        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
-
         # non ajax request raises 404 error
-        response = self.client.post(util.urls['album_delete_base'] + str(album.id) + '/',
+        response = self.client.post(util.urls['album_delete_base'] + str(self.album.id) + '/',
                                     data=util.album1_sample_data)
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
-        response = self.client.post(util.urls['album_delete_base'] + str(album.id) + '/',
+        response = self.client.post(util.urls['album_delete_base'] + str(self.album.id) + '/',
                                     data=util.album1_sample_data,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
@@ -451,7 +442,7 @@ class AlbumTest(TestCase):
         self.assertTrue(is_successful)
 
         # as the user is now authenticated, album should be deleted successfully
-        self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+        self.client.post(util.urls['album_update_base'] + str(self.album.id) + '/',
                          data=util.album2_sample_data,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
@@ -460,16 +451,16 @@ class AlbumTest(TestCase):
                                                   user_profile__user__username=util.user1_sample_data['username'])), 0)
 
     def test_album_form_validation(self):
-        # create and sign in a new user
-        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        # first delete album created in setUp
+        Album.objects.all().delete()
+
+        # sign in user
         is_successful = self.client.login(username=util.user1_sample_data['username'],
                                           password=util.user1_sample_data['password'])
         self.assertTrue(is_successful)
 
         # as the user is now authenticated, we can start our validation checks with an empty dict passed to create_album
-        album_data_dict = {
-
-        }
+        album_data_dict = {}
         response = self.client.post(util.urls['album_create'],
                                     data=album_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -524,6 +515,13 @@ class AlbumTest(TestCase):
 
 class LogTest(TestCase):
 
+    def setUp(self):
+        # log data to be used for log creation
+        self.log_sample_data = util.log1_sample_data
+        self.log_sample_data['log_picture_1'] = util.get_small_image()
+        self.log_sample_data['location'] = util.city1_sample_data['name']
+        self.log_sample_data['album_name'] = util.album1_sample_data['name']
+
     def test_urls_resolve_to_correct_functions(self):
         # check create log url
         found = resolve(util.urls['log_create'])
@@ -542,12 +540,6 @@ class LogTest(TestCase):
         self.assertEqual(found.func, show_log)
 
     def test_show_log_view_returns_correct_html(self):
-        # log data to be used for log creation
-        log_sample_data = util.log1_sample_data
-        log_sample_data['log_picture_1'] = util.get_small_image()
-        log_sample_data['location'] = util.city1_sample_data['name']
-        log_sample_data['album_name'] = util.album1_sample_data['name']
-
         # first we need to create a log since show_album needs a log id
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_user_and_user_profile(util.user1_sample_data)
@@ -575,17 +567,11 @@ class LogTest(TestCase):
         self.assertEqual(response.content.decode(), expected_html)
 
     def test_create_log_view(self):
-        # log data to be used for log creation
-        log_sample_data = util.log1_sample_data
-        log_sample_data['log_picture_1'] = util.get_small_image()
-        log_sample_data['location'] = util.city1_sample_data['name']
-        log_sample_data['album_name'] = util.album1_sample_data['name']
-
         # non ajax request raises 404 error
         self.assertRaises(Http404, create_log, HttpRequest())
         # anon user gets redirected to sign in page
         response = self.client.post(util.urls['log_create'],
-                                    data=log_sample_data,
+                                    data=self.log_sample_data,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -601,18 +587,18 @@ class LogTest(TestCase):
 
         # as the user is now authenticated, album should be created successfully
         self.client.post(util.urls['log_create'],
-                         data=log_sample_data,
+                         data=self.log_sample_data,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         # check if all saved data is correct
         log = Log.objects.all()
         self.assertEqual(len(log), 1)
         log = log[0]
-        self.assertEqual(log.album.name, log_sample_data['album_name'])
-        self.assertEqual(log.city.name, log_sample_data['location']),
-        self.assertEqual(log.latitude, log_sample_data['latitude'])
-        self.assertEqual(log.longitude, log_sample_data['longitude'])
-        self.assertEqual(log.description, log_sample_data['description'])
+        self.assertEqual(log.album.name, self.log_sample_data['album_name'])
+        self.assertEqual(log.city.name, self.log_sample_data['location']),
+        self.assertEqual(log.latitude, self.log_sample_data['latitude'])
+        self.assertEqual(log.longitude, self.log_sample_data['longitude'])
+        self.assertEqual(log.description, self.log_sample_data['description'])
         self.assertEqual(log.user_profile.user.username, util.user1_sample_data['username'])
 
     def test_update_log_view(self):
@@ -661,12 +647,6 @@ class LogTest(TestCase):
         self.assertEqual(updated_log.user_profile.user.username, util.user1_sample_data['username'])
 
     def test_delete_album_view(self):
-        # log data to be used for log creation
-        log_sample_data = util.log1_sample_data
-        log_sample_data['log_picture_1'] = util.get_small_image()
-        log_sample_data['location'] = util.city1_sample_data['name']
-        log_sample_data['album_name'] = util.album1_sample_data['name']
-
         # first we need to create a log since update_log view needs a log id
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_user_and_user_profile(util.user1_sample_data)
@@ -677,12 +657,12 @@ class LogTest(TestCase):
 
         # non ajax request raises 404 error
         response = self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
-                                    data=log_sample_data)
+                                    data=self.log_sample_data)
         self.assertEqual(response.status_code, 404)
 
         # anon user gets redirected to sign in page
         response = self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
-                                    data=log_sample_data,
+                                    data=self.log_sample_data,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
 
@@ -693,18 +673,12 @@ class LogTest(TestCase):
 
         # as the user is now authenticated, log should be deleted successfully
         self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
-                         data=log_sample_data,
+                         data=self.log_sample_data,
                          HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.assertEqual(len(Log.objects.all()), 0)
 
     def test_get_log_info_for_map_view(self):
-        # log data to be used for log creation
-        log_sample_data = util.log1_sample_data
-        log_sample_data['log_picture_1'] = util.get_small_image()
-        log_sample_data['location'] = util.city1_sample_data['name']
-        log_sample_data['album_name'] = util.album1_sample_data['name']
-
         # first we need to create a log since get_log_info_for_map returns all logs for a particular user
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_user_and_user_profile(util.user1_sample_data)
