@@ -1,13 +1,11 @@
 import json
 
 from django.contrib.auth.models import User
-from django.core.paginator import Paginator
 from django.core.urlresolvers import resolve
 from django.http.request import HttpRequest
 from django.http.response import Http404
 from django.template.loader import render_to_string
 from django.test import TestCase
-from django.utils.encoding import smart_str
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
@@ -24,9 +22,11 @@ from mytravelog.views.follower import create_follower, delete_follower
 from mytravelog.views.home import show_home
 from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
-from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
+from mytravelog.views.log import create_log, edit_log, delete_log, show_log
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
-from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs
+from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs, show_user, \
+    get_requested_user_albums, get_requested_user_logs_with_additional_info, get_requested_user_followers, \
+    get_requested_user_following, is_requested_user_followed_by_current_user
 
 
 class HomeTest(TestCase):
@@ -1151,4 +1151,90 @@ class LeaderBoardTest(TestCase):
         self.assertEqual(len(results), 2)
 
 
+class UserTest(TestCase):
 
+    def setUp(self):
+        # add and retrieve two user profiles
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+        self.user_profile_1 = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        self.user_profile_2 = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
+        # attach a log and album to user_profile_1
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        # attach follower to user_profile_2
+        Follower.objects.create(following_user_profile=self.user_profile_2, follower_user_profile=self.user_profile_1)
+
+    def test_user_page_url_resolves_to_correct_functiona(self):
+        found = resolve(util.urls['user_base'] + 'username/')
+        self.assertEqual(found.func, show_user)
+
+    def test_get_requested_user_albums(self):
+        # get user1 albums
+        # should return 1 album
+        albums_expected = Album.objects.filter(user_profile=self.user_profile_1)
+        albums_returned = get_requested_user_albums(self.user_profile_1)
+        self.assertEqual(len(albums_returned), 1)
+        self.assertItemsEqual(albums_expected, albums_returned)
+
+        # get user2 albums
+        # should return 0 albums
+        albums_expected = Album.objects.filter(user_profile=self.user_profile_2)
+        albums_returned = get_requested_user_albums(self.user_profile_2)
+        self.assertEqual(len(albums_returned), 0)
+        self.assertItemsEqual(albums_expected, albums_returned)
+
+    def test_get_requested_user_logs_with_additional_info(self):
+        # get user1 logs
+        # should return 1 log
+        logs_expected = Log.objects.filter(user_profile=self.user_profile_1)
+        logs_returned = get_requested_user_logs_with_additional_info(self.user_profile_1, None)
+        self.assertEqual(len(logs_returned), 1)
+        self.assertItemsEqual(logs_expected, logs_returned)
+
+        # get user2 logs
+        # should return 0 logs
+        logs_expected = Log.objects.filter(user_profile=self.user_profile_2)
+        logs_returned = get_requested_user_logs_with_additional_info(self.user_profile_2, None)
+        self.assertEqual(len(logs_returned), 0)
+        self.assertItemsEqual(logs_expected, logs_returned)
+
+    def test_get_requested_user_followers(self):
+        # get user1 followers
+        # should return 0 followers
+        followers_expected = Follower.objects.filter(following_user_profile=self.user_profile_1)
+        followers_returned = get_requested_user_followers(self.user_profile_1, None)
+        self.assertEqual(len(followers_returned), 0)
+        self.assertItemsEqual(followers_expected, followers_returned)
+
+        # get user2 followers
+        # should return 1 follower
+        followers_expected = Follower.objects.filter(following_user_profile=self.user_profile_2)
+        followers_returned = get_requested_user_followers(self.user_profile_2, None)
+        self.assertEqual(len(followers_returned), 1)
+        self.assertItemsEqual(followers_expected, followers_returned)
+
+    def test_get_requested_user_following(self):
+        # get user1 following
+        # should return 1 following
+        followers_expected = Follower.objects.filter(follower_user_profile=self.user_profile_1)
+        followers_returned = get_requested_user_following(self.user_profile_1, None)
+        self.assertEqual(len(followers_returned), 1)
+        self.assertItemsEqual(followers_expected, followers_returned)
+
+        # get user2 following
+        # should return 0 following
+        followers_expected = Follower.objects.filter(follower_user_profile=self.user_profile_2)
+        followers_returned = get_requested_user_following(self.user_profile_2, None)
+        self.assertEqual(len(followers_returned), 0)
+        self.assertItemsEqual(followers_expected, followers_returned)
+
+    def test_is_requested_user_followed_by_current_user(self):
+        # should return false since user2 doesn't follow user1
+        self.assertFalse(is_requested_user_followed_by_current_user(self.user_profile_1, self.user_profile_2))
+
+        # should return true since user1 does follow user2
+        self.assertTrue(is_requested_user_followed_by_current_user(self.user_profile_2, self.user_profile_1))
