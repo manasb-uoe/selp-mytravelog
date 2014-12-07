@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import File
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
@@ -28,7 +29,9 @@ urls = {
     'log_delete_base': '/mytravelog/log/delete/',
     'log_show_base': '/mytravelog/log/',
     'log_get_info_for_map_base': '/mytravelog/log/get_info_for_map/',
-    'log_show_live_feed_base': '/mytravelog/live_feed/'
+    'log_show_live_feed_base': '/mytravelog/live_feed/',
+    'like_create_base': '/mytravelog/like/create/',
+    'like_delete_base': '/mytravelog/like/delete/'
 }
 
 city1_sample_data = {

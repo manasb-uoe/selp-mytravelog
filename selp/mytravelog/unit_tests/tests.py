@@ -9,12 +9,14 @@ from django.test import TestCase
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.home import show_home
+from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
 from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs
@@ -783,3 +785,85 @@ class LogTest(TestCase):
 
         # as all validation checks have been passed, no errors should be returned
         self.assertEqual(len(json.loads(response.content)), 0)
+
+
+class LikeTest(TestCase):
+
+    def test_create_and_delete_like_urls_resolve_to_correct_functions(self):
+        found = resolve(util.urls['like_create_base'] + '0/')
+        self.assertEqual(found.func, like_log)
+
+        found = resolve(util.urls['like_delete_base'] + '0/')
+        self.assertEqual(found.func, dislike_log)
+
+    def test_like_log_view(self):
+        # first we need to create a log since like_log view needs a log id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        log_to_like = Log.objects.all()[0]
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['like_create_base'] + str(log_to_like.id) + '/')
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['like_create_base'] + str(log_to_like.id) + '/',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the user we just created
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, like should be created successfully
+        self.client.post(util.urls['like_create_base'] + str(log_to_like.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Like.objects.filter(log=log_to_like)), 1)
+
+        # if we try to create the same like again, it should not be created since one user can only like a log once
+        self.client.post(util.urls['like_create_base'] + str(log_to_like.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Like.objects.filter(log=log_to_like)), 1)
+
+    def test_dislike_log_view(self):
+        # first we need to create a log since dislike_log view needs a log id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        # now we need to create a like which needs to be deleted
+        log_to_dislike = Log.objects.all()[0]
+        liker_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        Like.objects.create(log=log_to_dislike, liker_user_profile=liker_user_profile)
+        self.assertEqual(len(Like.objects.filter(log=log_to_dislike)), 1)
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['like_delete_base'] + str(log_to_dislike.id) + '/')
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['like_delete_base'] + str(log_to_dislike.id) + '/',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the user we just created
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, like should be deleted successfully
+        self.client.post(util.urls['like_delete_base'] + str(log_to_dislike.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Like.objects.filter(log=log_to_dislike)), 0)
+
+        # if we try to delete the same like again, error should not be raised
+        self.client.post(util.urls['like_delete_base'] + str(log_to_dislike.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Like.objects.filter(log=log_to_dislike)), 0)
+        self.assertEqual(response.status_code, 200)
+
