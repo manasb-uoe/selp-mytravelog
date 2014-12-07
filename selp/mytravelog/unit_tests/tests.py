@@ -9,12 +9,14 @@ from django.test import TestCase
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.comment import Comment
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
+from mytravelog.views.comment import create_log_comment, delete_log_comment
 from mytravelog.views.home import show_home
 from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
@@ -716,7 +718,7 @@ class LogTest(TestCase):
                                           password=util.user1_sample_data['password'])
         self.assertTrue(is_successful)
 
-        # before we can create a lot, we must add a city and album with the log belongs to
+        # before we can create a log, we must add a city and album with the log belongs to
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
 
@@ -867,3 +869,124 @@ class LikeTest(TestCase):
         self.assertEqual(len(Like.objects.filter(log=log_to_dislike)), 0)
         self.assertEqual(response.status_code, 200)
 
+
+class CommentTest(TestCase):
+
+    def test_create_and_delete_comment_urls_resolve_to_currect_functions(self):
+        found = resolve(util.urls['comment_create_base'] + '0/')
+        self.assertEqual(found.func, create_log_comment)
+
+        found = resolve(util.urls['comment_delete_base'] + '0/')
+        self.assertEqual(found.func, delete_log_comment)
+
+    def test_create_log_comment_view(self):
+        # first we need to create a log since create_log_comment view needs a log id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        log_to_comment_on = Log.objects.all()[0]
+
+        # data dict used for comment creation
+        comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                                    data=comment_data_dict)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                                    data=comment_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the user we just created
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, comment should be created successfully
+        self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                         data=comment_data_dict,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+                                                    commenter_user_profile__user__username=util.user1_sample_data['username'])), 1)
+
+    def test_delete_log_comment_view(self):
+        # first we need to create a log since and comment on it since delete_log_comment view needs
+        # a comment id as an argument
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        # data dict used for comment creation
+        comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
+
+        # now we need to create a comment  which needs to be deleted
+        log_to_comment_on = Log.objects.all()[0]
+        commenter_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        comment_to_delete = Comment.objects.create(log=log_to_comment_on,
+                                                   commenter_user_profile=commenter_user_profile,
+                                                   body=comment_data_dict['body'])
+        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on)), 1)
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
+                                    data=comment_data_dict)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
+                                    data=comment_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the user we just created
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, comment should be deleted successfully
+        self.client.post(util.urls['comment_delete_base'] + str(comment_to_delete.id) + '/',
+                         data=comment_data_dict,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+                                                    commenter_user_profile__user__username=util.user1_sample_data['username'])), 0)
+
+    def test_comment_validation(self):
+        # first we need to create a log to comment on
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+        log_to_comment_on = Log.objects.all()[0]
+
+        # sign in the use we just created
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # now that the user is authenticated and we have a log to comment on, we can test all our validation checks
+        # by starting with an empty dict
+        comment_data_dict = {}
+        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                                    data=comment_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], 'Comment cannot be left blank')
+
+        comment_data_dict['body'] = util.comment_sample_bodies['long_comment']
+        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                                    data=comment_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], 'Comment length cannot exceed 150 characters')
+
+        comment_data_dict['body'] = util.comment_sample_bodies['short_comment']
+        response = self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
+                                    data=comment_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        # now that all validation checks have passed, a new comment should successfully be created
+        self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
+                                                    commenter_user_profile__user__username=util.user1_sample_data['username'])), 1)

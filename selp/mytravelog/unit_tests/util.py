@@ -31,7 +31,9 @@ urls = {
     'log_get_info_for_map_base': '/mytravelog/log/get_info_for_map/',
     'log_show_live_feed_base': '/mytravelog/live_feed/',
     'like_create_base': '/mytravelog/like/create/',
-    'like_delete_base': '/mytravelog/like/delete/'
+    'like_delete_base': '/mytravelog/like/delete/',
+    'comment_create_base': '/mytravelog/comment/create/',
+    'comment_delete_base': '/mytravelog/comment/delete/'
 }
 
 city1_sample_data = {
@@ -79,6 +81,11 @@ log2_sample_data = {
     'latitude': 26.0,
     'longitude': 54.0,
     'description': 'desc2'
+}
+
+comment_sample_bodies = {
+    'short_comment': 'this is a short comment',
+    'long_comment': 'But this is a very very very very very very very very very very very very very very very very very very very very very very very very very long comment'
 }
 
 large_image_path = os.path.join(os.path.join(os.path.dirname(__file__), 'test_images'), 'large_image.jpg')
