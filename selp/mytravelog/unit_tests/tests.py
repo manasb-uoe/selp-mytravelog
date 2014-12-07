@@ -11,7 +11,7 @@ from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
-from mytravelog.views.album import show_album, convert_string_to_date, create_album
+from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.home import show_home
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
@@ -306,9 +306,22 @@ class UserAuthenticationTest(TestCase):
 
 class AlbumTest(TestCase):
 
-    def test_album_page_url_resolves_to_correct_function(self):
+    def test_urls_resolve_to_correct_functions(self):
+        # check show album url
         found = resolve(util.urls['album_show_base'] + '0/')
         self.assertEqual(found.func, show_album)
+
+        # check create album url
+        found = resolve(util.urls['album_create'])
+        self.assertEqual(found.func, create_album)
+
+        # check update album url
+        found = resolve(util.urls['album_update_base'] + '0/')
+        self.assertEqual(found.func, update_album)
+
+        # check delete album url
+        found = resolve(util.urls['album_delete_base'] + '0/')
+        self.assertEqual(found.func, delete_album)
 
     def test_show_album_view_returns_correct_html(self):
         # add a new album since show_album view needs an id
@@ -483,4 +496,6 @@ class AlbumTest(TestCase):
                                     data=album_data_dict,
                                     HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(json.loads(response.content)['error'], "You already have an album with the same name")
+
+
 
