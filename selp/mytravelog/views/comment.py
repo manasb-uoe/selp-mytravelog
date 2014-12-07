@@ -22,6 +22,8 @@ def create_log_comment(request, log_id):
             body = request.POST.get('body', '')
             if len(body) == 0:
                 return_data['error'] = 'Comment cannot be left blank'
+            elif len(body) > 150:
+                return_data['error'] = 'Comment length cannot exceed 150 characters'
             else:
                 # create new comment
                 comment = Comment()
