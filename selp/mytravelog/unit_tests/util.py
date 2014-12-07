@@ -33,7 +33,9 @@ urls = {
     'like_create_base': '/mytravelog/like/create/',
     'like_delete_base': '/mytravelog/like/delete/',
     'comment_create_base': '/mytravelog/comment/create/',
-    'comment_delete_base': '/mytravelog/comment/delete/'
+    'comment_delete_base': '/mytravelog/comment/delete/',
+    'follower_create_base': '/mytravelog/follower/create/',
+    'follower_delete_base': '/mytravelog/follower/delete/'
 }
 
 city1_sample_data = {

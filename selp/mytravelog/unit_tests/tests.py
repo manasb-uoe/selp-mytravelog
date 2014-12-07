@@ -10,6 +10,7 @@ from django.test import TestCase
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.comment import Comment
+from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
@@ -17,6 +18,7 @@ from mytravelog.unit_tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.comment import create_log_comment, delete_log_comment
+from mytravelog.views.follower import create_follower, delete_follower
 from mytravelog.views.home import show_home
 from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
@@ -125,7 +127,6 @@ class SearchTest(TestCase):
                                           'query': 'city',
                                           'can_follow': False})
         self.assertEqual(response.content.decode(), expected_html)
-        # print expected_html
 
     def test_correct_search_results_are_returned(self):
         # no cities or user profiles should be returned since they don't exist in the database yet
@@ -1002,8 +1003,89 @@ class CommentTest(TestCase):
 
         comment_data_dict['body'] = util.comment_sample_bodies['short_comment']
         self.client.post(util.urls['comment_create_base'] + str(log_to_comment_on.id) + '/',
-                                    data=comment_data_dict,
-                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+                         data=comment_data_dict,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         # now that all validation checks have passed, a new comment should successfully be created
         self.assertEqual(len(Comment.objects.filter(log=log_to_comment_on,
                                                     commenter_user_profile__user__username=util.user1_sample_data['username'])), 1)
+
+
+class FollowerTest(TestCase):
+
+    def setUp(self):
+        # add 2 new users and user profiles
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+
+    def test_create_and_delete_follower_urls_resolve_to_correct_functions(self):
+        found = resolve(util.urls['follower_create_base'] + '0/')
+        self.assertEqual(found.func, create_follower)
+
+        found = resolve(util.urls['follower_delete_base'] + '0/')
+        self.assertEqual(found.func, delete_follower)
+
+    def test_create_follower_view(self):
+        follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/')
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the follower user (user who will follow another user)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # now that the user is authenticated, a follower should be successfully created
+        self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=following_user_profile,
+                                                     follower_user_profile=follower_user_profile)), 1)
+
+        # if user tries to follow themselves, no new follower should be created
+        self.client.post(util.urls['follower_create_base'] + str(follower_user_profile.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=follower_user_profile,
+                                                     follower_user_profile=follower_user_profile)), 0)
+
+        # if user tries the follow the same user again, no new follow should be created
+        self.client.post(util.urls['follower_create_base'] + str(following_user_profile.id) + '/',
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Follower.objects.filter(following_user_profile=following_user_profile,
+                                                     follower_user_profile=follower_user_profile)), 1)
+
+    def test_delete_follower_view(self):
+        follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
+        # create a follower which needs to be deleted
+        Follower.objects.create(follower_user_profile=follower_user_profile,
+                                following_user_profile=following_user_profile)
+        self.assertEqual(len(Follower.objects.filter(follower_user_profile=follower_user_profile,
+                                                     following_user_profile=following_user_profile)), 1)
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/')
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in the follower user
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # since the user is authenticated, follower should now get deleted successfully
+        self.client.post(util.urls['follower_delete_base'] + str(following_user_profile.id) + '/',
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(Follower.objects.filter(follower_user_profile=follower_user_profile,
+                                                     following_user_profile=following_user_profile)), 0)
