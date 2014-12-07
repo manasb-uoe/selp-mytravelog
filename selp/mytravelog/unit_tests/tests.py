@@ -226,80 +226,74 @@ class UserAuthenticationTest(TestCase):
 
     def test_sign_up_validation(self):
         # test all possible validation errors (including uploaded file size errors)
-        response = self.client.post(util.urls['sign_up'], {})
+        user_data_dict = {}
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'First name is required')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name']})
+        user_data_dict['first_name'] = util.user1_sample_data['first_name']
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Last name is required')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name']})
+        user_data_dict['last_name'] = util.user1_sample_data['last_name']
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Email is required')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': 'email'})
+        user_data_dict['email'] = 'email'
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Email is missing the \'@\' symbol')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email']})
+        user_data_dict['email'] = util.user1_sample_data['email']
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Username is required')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': 'user'})
+        user_data_dict['username'] = 'user'
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Username must be at least 6 characters long')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': 'user user'})
+        user_data_dict['username'] = 'user user'
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Username cannot contain spaces')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': util.user1_sample_data['username']})
+        user_data_dict['username'] = util.user1_sample_data['username']
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Password is required')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': util.user1_sample_data['username'],
-                                                           'password': 'pass'})
+        user_data_dict['password'] = 'pass'
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Password must be at least 6 characters long')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': util.user1_sample_data['username'],
-                                                           'password': util.user1_sample_data['password'],
-                                                           'profile_picture': util.get_large_image()})
-
+        user_data_dict['password'] = util.user1_sample_data['password']
+        user_data_dict['profile_picture'] = util.get_large_image()
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Max image size allowed is 2 mb')
 
-        response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
-                                                           'last_name': util.user1_sample_data['last_name'],
-                                                           'email': util.user1_sample_data['email'],
-                                                           'username': util.user1_sample_data['username'],
-                                                           'password': util.user1_sample_data['password'],
-                                                           'profile_picture': util.get_small_image(),
-                                                           'cover_picture': util.get_large_image()})
+        user_data_dict['profile_picture'] = util.get_small_image()
+        user_data_dict['cover_picture'] = util.get_large_image()
+        response = self.client.post(util.urls['sign_up'], user_data_dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['error'], 'Max image size allowed is 2 mb')
 
+        user_data_dict['cover_picture'] = util.get_small_image()
+        response = self.client.post(util.urls['sign_up'], user_data_dict, follow=True)
+
+        # now that all data is validated, user should be successfully signed up and redirected to user page
+        self.assertRedirects(response,
+                             util.urls['user_base'] + util.user1_sample_data['username'] + '/',
+                             status_code=302,
+                             target_status_code=200)
+
+        # sign out and try to create a new user with the same username
+        self.client.logout()
         response = self.client.post(util.urls['sign_up'], {'first_name': util.user1_sample_data['first_name'],
                                                            'last_name': util.user1_sample_data['last_name'],
                                                            'email': util.user1_sample_data['email'],
@@ -307,10 +301,7 @@ class UserAuthenticationTest(TestCase):
                                                            'password': util.user1_sample_data['password'],
                                                            'profile_picture': util.get_small_image(),
                                                            'cover_picture': util.get_small_image()}, follow=True)
-        self.assertRedirects(response,
-                             util.urls['user_base'] + util.user1_sample_data['username'] + '/',
-                             status_code=302,
-                             target_status_code=200)
+        self.assertEqual(response.context['error'], 'That username is not available')
 
 
 class AlbumTest(TestCase):
