@@ -31,16 +31,16 @@ from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_
 
 class HomeTest(TestCase):
 
-    def test_url_resolves_to_correct_view(self):
+    def test_home_page_url_resolves_to_correct_view(self):
         found = resolve(util.urls['home'])
         self.assertEqual(found.func, show_home)
 
-    def test_if_show_home_returns_correct_html(self):
+    def test_show_home_view_returns_correct_html(self):
         response = self.client.get(util.urls['home'])
         expected_html = render_to_string('mytravelog/home.html', {'csrf_token': self.client.cookies['csrftoken'].value})
         self.assertEqual(response.content, expected_html)
 
-    def test_if_show_home_returns_popular_cities(self):
+    def test_show_home_view_returns_popular_cities(self):
         # add 2 sample cities and check if they are present in the returned html
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_city(util.city2_sample_data)
@@ -61,7 +61,7 @@ class CityTest(TestCase):
         found = resolve(util.urls['city_autocomplete'])
         self.assertEqual(found.func, get_autocomplete_suggestions)
 
-    def test_if_show_city_returns_correct_html(self):
+    def test_show_city_view_returns_correct_html(self):
         # add simple city so that its name can be passed as an argument to show_city
         util.add_sample_city(util.city1_sample_data)
 
@@ -131,7 +131,7 @@ class SearchTest(TestCase):
                                           'can_follow': False})
         self.assertEqual(response.content.decode(), expected_html)
 
-    def test_correct_search_results_are_returned(self):
+    def test_search_results(self):
         # no cities or user profiles should be returned since they don't exist in the database yet
         results = get_search_results(util.city1_sample_data['name'])
         self.assertEqual(len(results['cities']), 0)
@@ -171,7 +171,7 @@ class SearchTest(TestCase):
         self.assertEqual(results['user_profiles'][0].user.username, util.user1_sample_data['username'])
         self.assertEqual(results['user_profiles'][1].user.username, util.user2_sample_data['username'])
 
-    def test_Http404_is_raised_when_no_query_provided(self):
+    def test_Http404_raised_when_no_query_provided(self):
         request = HttpRequest()
         request.GET['query'] = 'city'
         self.assertRaises(Http404, search_for_cities_and_users, HttpRequest())
@@ -1047,24 +1047,6 @@ class LeaderBoardTest(TestCase):
     def test_leaderboard_url_resolves_to_correct_function(self):
         found = resolve(util.urls['leaderboard_show_base'] + 'model/')
         self.assertEqual(found.func, show_leaderboard)
-
-    # def test_show_leaderboard_view_returns_correct_html(self):
-    #     # add 2 cities
-    #     util.add_sample_city(util.city1_sample_data)
-    #     util.add_sample_city(util.city2_sample_data)
-    #
-    #     # paginate all items
-    #     items = City.objects.all()
-    #     paginator = Paginator(items, 10)
-    #     items = paginator.page(1)
-    #
-    #     # check if both the cities that we added appear in cities leaderboard
-    #     response = self.client.get(util.urls['leaderboard_show_base'] + 'cities/')
-    #     expected_html = render_to_string('mytravelog/leaderboard.html', {'csrf_token': self.client.cookies['csrftoken'].value,
-    #                                                                      'requested_page_items': items,
-    #                                                                      'model': 'cities',
-    #                                                                      'query': ''})
-    #     self.assertEqual(smart_str(response.content), smart_str(expected_html))
 
     def test_leaderboard_cities_search(self):
         # add and retrieve two cities
