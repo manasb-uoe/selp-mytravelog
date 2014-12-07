@@ -1,6 +1,4 @@
 import json
-import re
-from unittest.case import skip
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import resolve
@@ -9,9 +7,11 @@ from django.http.response import Http404
 from django.template.loader import render_to_string
 from django.test import TestCase
 
+from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
+from mytravelog.views.album import show_album, convert_string_to_date, create_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.home import show_home
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
@@ -313,4 +313,183 @@ class UserAuthenticationTest(TestCase):
                              target_status_code=200)
 
 
+class AlbumTest(TestCase):
+
+    def test_album_page_url_resolves_to_correct_function(self):
+        found = resolve(util.urls['album_show_base'] + '0/')
+        self.assertEqual(found.func, show_album)
+
+    def test_show_album_view_returns_correct_html(self):
+        # add a new album since show_album view needs an id
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+        user_dict = util.get_user_and_user_profile(util.user1_sample_data)
+        user = user_dict['user']
+        user_profile = user_dict['user_profile']
+
+        response = self.client.get(util.urls['album_show_base'] + str(album.id) + '/')
+        expected_html = render_to_string('mytravelog/user_album.html',
+                                         {'csrf_token': self.client.cookies['csrftoken'].value,
+                                          'requested_album': album,
+                                          'requested_user_albums': [album],
+                                          'requested_album_logs': [],
+                                          'requested_user': user,
+                                          'requested_user_profile': user_profile,
+                                          'can_follow': False,
+                                          'can_edit_profile': False})
+
+        self.assertEqual(response.content.decode(), expected_html)
+
+    def test_create_album_view(self):
+        # non ajax request raises 404 error
+        self.assertRaises(Http404, create_album, HttpRequest())
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['album_create'],
+                                    data=util.album1_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # create and sign in a new user
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, album should be created successfully
+        self.client.post(util.urls['album_create'],
+                         data=util.album1_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # check if all saved data are correct
+        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+        self.assertEqual(album.name, util.album1_sample_data['name'])
+        self.assertEqual(album.start_date, convert_string_to_date(util.album1_sample_data['start_date']))
+        self.assertEqual(album.end_date, convert_string_to_date(util.album1_sample_data['end_date']))
+
+    def test_update_album_view(self):
+        # create and retrieve an album to be edited
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+                                    data=util.album2_sample_data)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+                                    data=util.album2_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in user
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, album should be updated successfully
+        self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+                         data=util.album2_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # check if all saved data are correct
+        album = util.get_album(util.album2_sample_data, util.user1_sample_data)
+        self.assertEqual(album.name, util.album2_sample_data['name'])
+        self.assertEqual(album.start_date, convert_string_to_date(util.album2_sample_data['start_date']))
+        self.assertEqual(album.end_date, convert_string_to_date(util.album2_sample_data['end_date']))
+
+    def test_delete_album_view(self):
+        # create and retrieve an album to be delete
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['album_delete_base'] + str(album.id) + '/',
+                                    data=util.album1_sample_data)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['album_delete_base'] + str(album.id) + '/',
+                                    data=util.album1_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in user
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, album should be deleted successfully
+        self.client.post(util.urls['album_update_base'] + str(album.id) + '/',
+                         data=util.album2_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # check if album was actually deleted
+        self.assertEqual(len(Album.objects.filter(name=util.album1_sample_data['name'],
+                                                  user_profile__user__username=util.user1_sample_data['username'])), 0)
+
+    def test_album_form_validation(self):
+        # create and sign in a new user
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, we can start our validation checks with an empty dict passed to create_album
+        album_data_dict = {
+
+        }
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Album name is required")
+
+        album_data_dict['name'] = 'None'
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Album name cannot be 'None'")
+
+        album_data_dict['name'] = util.album1_sample_data['name']
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Start date is required")
+
+        album_data_dict['start_date'] = util.album1_sample_data['start_date']
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "End date is required")
+
+        album_data_dict['end_date'] = '1900-1-1'
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "End date must come after Start date")
+
+        album_data_dict['end_date'] = util.album1_sample_data['end_date']
+        cover_picture = util.get_large_image()
+        album_data_dict['cover_picture'] = cover_picture
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Max image size allowed is 2 mb")
+
+        cover_picture = util.get_small_image()
+        album_data_dict['cover_picture'] = cover_picture
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(len(json.loads(response.content)), 0)
+
+        # now try to create another album with the same name
+        album_data_dict['cover_picture'] = cover_picture
+        response = self.client.post(util.urls['album_create'],
+                                    data=album_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "You already have an album with the same name")
 

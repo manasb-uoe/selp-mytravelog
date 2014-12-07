@@ -1,5 +1,6 @@
 import os
 from django.contrib.auth.models import User
+from mytravelog.models.album import Album
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.views.city import add_new_city
 
@@ -13,7 +14,11 @@ urls = {
     'user_base': '/mytravelog/user/',
     'city_base': '/mytravelog/city/',
     'city_autocomplete': '/mytravelog/city/autocomplete/',
-    'search_base': '/mytravelog/search/'
+    'search_base': '/mytravelog/search/',
+    'album_create': '/mytravelog/album/create/',
+    'album_update_base': '/mytravelog/album/update/',
+    'album_delete_base': '/mytravelog/album/delete/',
+    'album_show_base': '/mytravelog/album/'
 }
 
 city1_sample_data = {
@@ -37,6 +42,18 @@ user1_sample_data = {
     'first_name': 'user',
     'last_name': '1',
     'email': 'email@email.com'
+}
+
+album1_sample_data = {
+    'name': 'album1',
+    'start_date': '2014-8-24',
+    'end_date': '2014-9-28'
+}
+
+album2_sample_data = {
+    'name': 'album2',
+    'start_date': '2014-8-29',
+    'end_date': '2014-10-22'
 }
 
 large_image_path = os.path.join(os.path.join(os.path.dirname(__file__), 'test_images'), 'large_image.jpg')
@@ -72,3 +89,30 @@ def get_large_image():
 
 def get_small_image():
     return open(small_image_path, 'rb')
+
+
+def get_user_and_user_profile(user_sample_data):
+    sample_user = User.objects.get(username=user_sample_data['username'])
+    sample_user_profile = UserProfile.objects.get(user=sample_user)
+    return {
+        'user': sample_user,
+        'user_profile': sample_user_profile
+    }
+
+
+def add_sample_album(album_sample_data, user_album_data):
+    album = Album()
+    album.name = album_sample_data['name']
+    album.start_date = album_sample_data['start_date']
+    album.end_date = album_sample_data['end_date']
+    user_profile = UserProfile.objects.get(user__username=user_album_data['username'])
+    album.user_profile = user_profile
+    album.save()
+
+
+def get_album(album_sample_data, user_sample_data):
+    album = Album.objects.get(name=album_sample_data['name'],
+                              user_profile__user__username=user_sample_data['username'])
+    album.duration = (album.end_date - album.start_date).days
+    return album
+
