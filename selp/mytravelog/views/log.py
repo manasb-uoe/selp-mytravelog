@@ -73,12 +73,13 @@ def create_log(request):
 
             else:
                 return_data['error'] = error
-
-            return_data = json.dumps(return_data)
-            mimetype = "application/json"
-            return HttpResponse(return_data, mimetype)
         else:
             return_data['redirect_to'] = '/mytravelog/sign_in/'
+
+        return_data = json.dumps(return_data)
+        mimetype = "application/json"
+        return HttpResponse(return_data, mimetype)
+
     else:
         raise Http404
 
@@ -151,12 +152,13 @@ def edit_log(request, log_id):
                     return_data['error'] = error
             else:
                 return_data['error'] = "This log does not belong to you"
-
-            return_data = json.dumps(return_data)
-            mimetype = "application/json"
-            return HttpResponse(return_data, mimetype)
         else:
             return_data['redirect_to'] = '/mytravelog/sign_in/'
+
+        return_data = json.dumps(return_data)
+        mimetype = "application/json"
+        return HttpResponse(return_data, mimetype)
+
     else:
         raise Http404
 
