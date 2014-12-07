@@ -9,13 +9,15 @@ from django.test import TestCase
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
+from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.unit_tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.home import show_home
+from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
-from mytravelog.views.user import sign_up, sign_in, sign_out
+from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs
 
 
 class HomeTest(TestCase):
@@ -498,4 +500,286 @@ class AlbumTest(TestCase):
         self.assertEqual(json.loads(response.content)['error'], "You already have an album with the same name")
 
 
+class LogTest(TestCase):
 
+    def test_urls_resolve_to_correct_functions(self):
+        # check create log url
+        found = resolve(util.urls['log_create'])
+        self.assertEqual(found.func, create_log)
+
+        # check update log url
+        found = resolve(util.urls['log_update_base'] + '0/')
+        self.assertEqual(found.func, edit_log)
+
+        # check delete log url
+        found = resolve(util.urls['log_delete_base'] + '0/')
+        self.assertEqual(found.func, delete_log)
+
+        # check show log url
+        found = resolve(util.urls['log_show_base'] + '0/')
+        self.assertEqual(found.func, show_log)
+
+    def test_show_log_view_returns_correct_html(self):
+        # log data to be used for log creation
+        log_sample_data = util.log1_sample_data
+        log_sample_data['log_picture_1'] = util.get_small_image()
+        log_sample_data['location'] = util.city1_sample_data['name']
+        log_sample_data['album_name'] = util.album1_sample_data['name']
+
+        # first we need to create a log since show_album needs a log id
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        album = util.get_album(util.album1_sample_data, util.user1_sample_data)
+        log = attach_additional_info_to_logs(Log.objects.all(), None)
+
+        # get user and user profile
+        user_dict = util.get_user_and_user_profile(util.user1_sample_data)
+        user = user_dict['user']
+        user_profile = user_dict['user_profile']
+
+        response = self.client.get(util.urls['log_show_base'] + str(log[0].id) + '/')
+        expected_html = render_to_string('mytravelog/user_log.html',
+                                         {'csrf_token': self.client.cookies['csrftoken'].value,
+                                          'requested_log': log,
+                                          'requested_user_albums': [album],
+                                          'requested_user': user,
+                                          'requested_user_profile': user_profile,
+                                          'can_follow': False,
+                                          'can_edit_profile': False})
+
+        self.assertEqual(response.content.decode(), expected_html)
+
+    def test_create_log_view(self):
+        # log data to be used for log creation
+        log_sample_data = util.log1_sample_data
+        log_sample_data['log_picture_1'] = util.get_small_image()
+        log_sample_data['location'] = util.city1_sample_data['name']
+        log_sample_data['album_name'] = util.album1_sample_data['name']
+
+        # non ajax request raises 404 error
+        self.assertRaises(Http404, create_log, HttpRequest())
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # create and sign in a new user
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # before we can create a lot, we must add a city and album with the log belongs to
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+
+        # as the user is now authenticated, album should be created successfully
+        self.client.post(util.urls['log_create'],
+                         data=log_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # check if all saved data is correct
+        log = Log.objects.all()
+        self.assertEqual(len(log), 1)
+        log = log[0]
+        self.assertEqual(log.album.name, log_sample_data['album_name'])
+        self.assertEqual(log.city.name, log_sample_data['location']),
+        self.assertEqual(log.latitude, log_sample_data['latitude'])
+        self.assertEqual(log.longitude, log_sample_data['longitude'])
+        self.assertEqual(log.description, log_sample_data['description'])
+        self.assertEqual(log.user_profile.user.username, util.user1_sample_data['username'])
+
+    def test_update_log_view(self):
+        # log data to be used for log creation
+        log_sample_data = util.log2_sample_data
+        log_sample_data['log_picture_1'] = util.get_small_image()
+        log_sample_data['location'] = util.city1_sample_data['name']
+        log_sample_data['album_name'] = util.album1_sample_data['name']
+
+        # first we need to create a log since update_log view needs a log id
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log2_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        log = Log.objects.all()[0]
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['log_update_base'] + str(log.id) + '/',
+                                    data=log_sample_data)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['log_update_base'] + str(log.id) + '/',
+                                    data=log_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in user
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, log should be updated successfully
+        self.client.post(util.urls['log_update_base'] + str(log.id) + '/',
+                         data=log_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # check if all saved data are correct
+        updated_log = Log.objects.all()[0]
+        self.assertEqual(updated_log.album.name, log_sample_data['album_name'])
+        self.assertEqual(updated_log.city.name, log_sample_data['location']),
+        self.assertEqual(updated_log.latitude, log_sample_data['latitude'])
+        self.assertEqual(updated_log.longitude, log_sample_data['longitude'])
+        self.assertEqual(updated_log.description, log_sample_data['description'])
+        self.assertEqual(updated_log.user_profile.user.username, util.user1_sample_data['username'])
+
+    def test_delete_album_view(self):
+        # log data to be used for log creation
+        log_sample_data = util.log1_sample_data
+        log_sample_data['log_picture_1'] = util.get_small_image()
+        log_sample_data['location'] = util.city1_sample_data['name']
+        log_sample_data['album_name'] = util.album1_sample_data['name']
+
+        # first we need to create a log since update_log view needs a log id
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        log = Log.objects.all()[0]
+
+        # non ajax request raises 404 error
+        response = self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
+                                    data=log_sample_data)
+        self.assertEqual(response.status_code, 404)
+
+        # anon user gets redirected to sign in page
+        response = self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
+                                    data=log_sample_data,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['redirect_to'], util.urls['sign_in'])
+
+        # sign in user
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # as the user is now authenticated, log should be deleted successfully
+        self.client.post(util.urls['log_delete_base'] + str(log.id) + '/',
+                         data=log_sample_data,
+                         HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        self.assertEqual(len(Log.objects.all()), 0)
+
+    def test_get_log_info_for_map_view(self):
+        # log data to be used for log creation
+        log_sample_data = util.log1_sample_data
+        log_sample_data['log_picture_1'] = util.get_small_image()
+        log_sample_data['location'] = util.city1_sample_data['name']
+        log_sample_data['album_name'] = util.album1_sample_data['name']
+
+        # first we need to create a log since get_log_info_for_map returns all logs for a particular user
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        user = util.get_user_and_user_profile(util.user1_sample_data)['user']
+
+        # non ajax request raises 404 error
+        response = self.client.get(util.urls['log_get_info_for_map_base'] + user.username + '/')
+        self.assertEqual(response.status_code, 404)
+
+        # since get_log_info_for_map doesn't require a user to be authenticated, it should now return all logs belonging
+        # to the provided username
+        response = self.client.get(util.urls['log_get_info_for_map_base'] + user.username + '/',
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        log = Log.objects.all()[0]
+        response_dict = json.loads(response.content)['user_logs_info'][str(log.id)]
+        self.assertEqual(response_dict['city'], log.city.name)
+        self.assertEqual(response_dict['date_and_time'], str(log.created_at))
+        self.assertEqual(response_dict['latitude'], str(log.latitude))
+        self.assertEqual(response_dict['longitude'], str(log.longitude))
+        self.assertEqual(response_dict['url'], '/mytravelog/log/' + str(log.id) + '/')
+
+    def test_log_form_validation(self):
+        # create and sign in a new user
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        is_successful = self.client.login(username=util.user1_sample_data['username'],
+                                          password=util.user1_sample_data['password'])
+        self.assertTrue(is_successful)
+
+        # before we can create a lot, we must add a city and album with the log belongs to
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+
+        # as the user is now authenticated, we can start our validation checks with an empty dict passed to create_log
+        log_data_dict = {}
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Your location could not be verified")
+
+        log_data_dict['location'] = util.city1_sample_data['name']
+        log_data_dict['latitude'] = util.log1_sample_data['latitude']
+        log_data_dict['longitude'] = util.log1_sample_data['longitude']
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Description is required")
+
+        long_description = ''
+        while len(long_description) < 1001:
+            long_description += 'd'
+        log_data_dict['description'] = long_description
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Description length cannot exceed 1000 characters")
+
+        log_data_dict['description'] = util.log1_sample_data['description']
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "At least one image is required")
+
+        log_data_dict['log_picture_1'] = util.get_large_image()
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "Max image size allowed is 2 mb")
+
+        log_data_dict['log_picture_1'] = util.get_small_image()
+        fake_city_name = 'not a city'
+        log_data_dict['location'] = fake_city_name
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "No city named '" + fake_city_name + "' in the database")
+
+        log_data_dict['location'] = util.city1_sample_data['name']
+        counter = 1
+        while counter < 12:
+            log_data_dict['log_picture_' + str(counter)] = util.get_small_image()
+            counter += 1
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(json.loads(response.content)['error'], "At most 10 images are allowed")
+
+        # now that all validation checks have tested, try to create a log with valid data
+        log_data_dict = util.log1_sample_data
+        log_data_dict['log_picture_1'] = util.get_small_image()
+        log_data_dict['location'] = util.city1_sample_data['name']
+        log_data_dict['album_name'] = util.album1_sample_data['name']
+        response = self.client.post(util.urls['log_create'],
+                                    data=log_data_dict,
+                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+        # as all validation checks have been passed, no errors should be returned
+        self.assertEqual(len(json.loads(response.content)), 0)

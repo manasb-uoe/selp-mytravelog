@@ -1,6 +1,10 @@
 import os
 from django.contrib.auth.models import User
+from django.core.files.base import File
 from mytravelog.models.album import Album
+from mytravelog.models.city import City
+from mytravelog.models.log import Log
+from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.views.city import add_new_city
 
@@ -18,7 +22,13 @@ urls = {
     'album_create': '/mytravelog/album/create/',
     'album_update_base': '/mytravelog/album/update/',
     'album_delete_base': '/mytravelog/album/delete/',
-    'album_show_base': '/mytravelog/album/'
+    'album_show_base': '/mytravelog/album/',
+    'log_create': '/mytravelog/log/create/',
+    'log_update_base': '/mytravelog/log/edit/',
+    'log_delete_base': '/mytravelog/log/delete/',
+    'log_show_base': '/mytravelog/log/',
+    'log_get_info_for_map_base': '/mytravelog/log/get_info_for_map/',
+    'log_show_live_feed_base': '/mytravelog/live_feed/'
 }
 
 city1_sample_data = {
@@ -54,6 +64,18 @@ album2_sample_data = {
     'name': 'album2',
     'start_date': '2014-8-29',
     'end_date': '2014-10-22'
+}
+
+log1_sample_data = {
+    'latitude': 0.0,
+    'longitude': 0.0,
+    'description': 'desc1'
+}
+
+log2_sample_data = {
+    'latitude': 26.0,
+    'longitude': 54.0,
+    'description': 'desc2'
 }
 
 large_image_path = os.path.join(os.path.join(os.path.dirname(__file__), 'test_images'), 'large_image.jpg')
@@ -100,12 +122,12 @@ def get_user_and_user_profile(user_sample_data):
     }
 
 
-def add_sample_album(album_sample_data, user_album_data):
+def add_sample_album(album_sample_data, user_sample_data):
     album = Album()
     album.name = album_sample_data['name']
     album.start_date = album_sample_data['start_date']
     album.end_date = album_sample_data['end_date']
-    user_profile = UserProfile.objects.get(user__username=user_album_data['username'])
+    user_profile = UserProfile.objects.get(user__username=user_sample_data['username'])
     album.user_profile = user_profile
     album.save()
 
@@ -115,4 +137,21 @@ def get_album(album_sample_data, user_sample_data):
                               user_profile__user__username=user_sample_data['username'])
     album.duration = (album.end_date - album.start_date).days
     return album
+
+
+def add_sample_log(log_sample_data, album_sample_data, city_sample_data, user_sample_data):
+    log = Log()
+    log.city = City.objects.get(name=city_sample_data['name'])
+    log.latitude = log_sample_data['latitude']
+    log.longitude = log_sample_data['longitude']
+    log.description = log_sample_data['description']
+    user_profile = UserProfile.objects.get(user__username=user_sample_data['username'])
+    log.user_profile = user_profile
+    log.album = Album.objects.get(name=album_sample_data['name'], user_profile=user_profile)
+    log.score = 0
+    log.save()
+    log_picture = LogPicture()
+    log_picture.log = log
+    log_picture.picture = File(get_small_image())
+    log_picture.save()
 
