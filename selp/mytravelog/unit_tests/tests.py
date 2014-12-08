@@ -6,6 +6,7 @@ from django.http.request import HttpRequest
 from django.http.response import Http404
 from django.template.loader import render_to_string
 from django.test import TestCase
+from pip.commands import show
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
@@ -22,7 +23,7 @@ from mytravelog.views.follower import create_follower, delete_follower
 from mytravelog.views.home import show_home
 from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
-from mytravelog.views.log import create_log, edit_log, delete_log, show_log
+from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
 from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs, show_user, \
     get_requested_user_albums, get_requested_user_logs_with_additional_info, get_requested_user_followers, \
@@ -538,6 +539,10 @@ class LogTest(TestCase):
     def test_log_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_show_base'] + '0/')
         self.assertEqual(found.func, show_log)
+
+    def test_live_feed_page_url_resolves_to_correct_function(self):
+        found = resolve(util.urls['log_show_live_feed_base'] + 'filter/')
+        self.assertEqual(found.func, show_live_feed)
 
     def test_show_log_view_returns_correct_html(self):
         # first we need to create a log since show_album needs a log id
