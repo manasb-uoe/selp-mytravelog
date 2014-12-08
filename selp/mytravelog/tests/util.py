@@ -8,7 +8,6 @@ from mytravelog.models.city import City
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.city import add_new_city
 
 
 __author__ = 'Manas'
@@ -107,11 +106,11 @@ small_image_path = os.path.join(os.path.join(os.path.dirname(__file__), 'test_im
 
 
 def add_sample_city(city_sample_data):
-    add_new_city(name=city_sample_data['name'],
-                 country_name=city_sample_data['country_name'],
-                 tourist_count=city_sample_data['tourist_count'],
-                 tourist_growth=city_sample_data['tourist_growth'],
-                 description=city_sample_data['description'])
+    City.add_new_city(name=city_sample_data['name'],
+                      country_name=city_sample_data['country_name'],
+                      tourist_count=city_sample_data['tourist_count'],
+                      tourist_growth=city_sample_data['tourist_growth'],
+                      description=city_sample_data['description'])
 
 
 def add_sample_user_and_user_profile(user_sample_data):
