@@ -29,9 +29,8 @@ def search_for_cities_and_users(request):
                 can_follow = True
                 current_user_profile = UserProfile.objects.get(user=user)
                 for user_profile in user_profiles:
-                    user_profile.is_followed = False
-                    if len(Follower.objects.filter(follower_user_profile=current_user_profile, following_user_profile=user_profile)) > 0:
-                        user_profile.is_followed = True
+                    user_profile.is_followed = Follower.objects.is_requested_user_followed_by_current_user(user_profile,
+                                                                                                           current_user_profile)
 
             results_count = len(cities) + len(user_profiles)
             data_dict = {'cities': cities,

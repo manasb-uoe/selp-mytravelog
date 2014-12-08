@@ -25,8 +25,7 @@ from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
 from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs, show_user, \
-    get_requested_user_albums, get_requested_user_logs_with_additional_info, get_requested_user_followers, \
-    get_requested_user_following, is_requested_user_followed_by_current_user
+    get_requested_user_albums, get_requested_user_logs_with_additional_info
 
 
 class HomeTest(TestCase):
@@ -1191,14 +1190,14 @@ class UserTest(TestCase):
         # get user1 followers
         # should return 0 followers
         followers_expected = Follower.objects.filter(following_user_profile=self.user_profile_1)
-        followers_returned = get_requested_user_followers(self.user_profile_1, None)
+        followers_returned = Follower.objects.get_requested_user_followers(self.user_profile_1, None)
         self.assertEqual(len(followers_returned), 0)
         self.assertItemsEqual(followers_expected, followers_returned)
 
         # get user2 followers
         # should return 1 follower
         followers_expected = Follower.objects.filter(following_user_profile=self.user_profile_2)
-        followers_returned = get_requested_user_followers(self.user_profile_2, None)
+        followers_returned = Follower.objects.get_requested_user_followers(self.user_profile_2, None)
         self.assertEqual(len(followers_returned), 1)
         self.assertItemsEqual(followers_expected, followers_returned)
 
@@ -1206,20 +1205,20 @@ class UserTest(TestCase):
         # get user1 following
         # should return 1 following
         followers_expected = Follower.objects.filter(follower_user_profile=self.user_profile_1)
-        followers_returned = get_requested_user_following(self.user_profile_1, None)
+        followers_returned = Follower.objects.get_requested_user_following(self.user_profile_1, None)
         self.assertEqual(len(followers_returned), 1)
         self.assertItemsEqual(followers_expected, followers_returned)
 
         # get user2 following
         # should return 0 following
         followers_expected = Follower.objects.filter(follower_user_profile=self.user_profile_2)
-        followers_returned = get_requested_user_following(self.user_profile_2, None)
+        followers_returned = Follower.objects.get_requested_user_following(self.user_profile_2, None)
         self.assertEqual(len(followers_returned), 0)
         self.assertItemsEqual(followers_expected, followers_returned)
 
     def test_is_requested_user_followed_by_current_user(self):
         # should return false since user2 doesn't follow user1
-        self.assertFalse(is_requested_user_followed_by_current_user(self.user_profile_1, self.user_profile_2))
+        self.assertFalse(Follower.objects.is_requested_user_followed_by_current_user(self.user_profile_1, self.user_profile_2))
 
         # should return true since user1 does follow user2
-        self.assertTrue(is_requested_user_followed_by_current_user(self.user_profile_2, self.user_profile_1))
+        self.assertTrue(Follower.objects.is_requested_user_followed_by_current_user(self.user_profile_2, self.user_profile_1))

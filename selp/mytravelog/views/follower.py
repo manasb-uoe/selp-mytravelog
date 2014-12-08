@@ -16,7 +16,8 @@ def create_follower(request, following_user_profile_id):
             following_user_profile = UserProfile.objects.get(id=following_user_profile_id)
 
             # create new follower only if it does not already exist AND the user is not trying to follow themselves
-            if len(Follower.objects.filter(follower_user_profile=follower_user_profile, following_user_profile=following_user_profile)) == 0:
+            existing_follower = Follower.objects.get_follower(follower_user_profile, following_user_profile)
+            if existing_follower is None:
                 if follower_user_profile != following_user_profile:
                     new_follower = Follower()
                     new_follower.follower_user_profile = follower_user_profile
@@ -44,8 +45,8 @@ def delete_follower(request, following_user_profile_id):
             following_user_profile = UserProfile.objects.get(id=following_user_profile_id)
 
             # delete follower if it exists
-            follower_to_delete = Follower.objects.filter(follower_user_profile=follower_user_profile, following_user_profile=following_user_profile)
-            if len(follower_to_delete) != 0:
+            follower_to_delete = Follower.objects.get_follower(follower_user_profile, following_user_profile)
+            if follower_to_delete is not None:
                 follower_to_delete.delete()
         else:
             return_data['redirect_to'] = "/mytravelog/sign_in/"

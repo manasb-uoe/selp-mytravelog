@@ -125,8 +125,8 @@ def show_user(request, username):
     requested_user_logs = get_requested_user_logs_with_additional_info(requested_user_profile, current_user_profile)
 
     # get user followers and following
-    requested_user_followers = get_requested_user_followers(requested_user_profile, current_user_profile)
-    requested_user_following = get_requested_user_following(requested_user_profile, current_user_profile)
+    requested_user_followers = Follower.objects.get_requested_user_followers(requested_user_profile, current_user_profile)
+    requested_user_following = Follower.objects.get_requested_user_following(requested_user_profile, current_user_profile)
 
     # check if requested user can be followed by current user
     # if yes, then check if requested user is being followed by current user
@@ -134,7 +134,7 @@ def show_user(request, username):
     is_followed = False
     if current_user != requested_user and current_user_profile is not None:
         can_follow = True
-        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
+        is_followed = Follower.objects.is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
     # check if current user can edit profile
     can_edit_profile = False
@@ -232,42 +232,6 @@ def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
     return requested_user_logs
 
 
-def get_requested_user_followers(requested_user_profile, current_user_profile):
-    requested_user_followers = Follower.objects.filter(following_user_profile=requested_user_profile)
-    for follower in requested_user_followers:
-        follower.is_followed = False
-        if current_user_profile is not None:
-            if len(Follower.objects.filter(follower_user_profile=current_user_profile,
-                                           following_user_profile=follower.follower_user_profile)) > 0:
-                follower.is_followed = True
-            if follower.follower_user_profile != current_user_profile:
-                follower.can_follow = True
-            else:
-                follower.can_follow = False
-    return requested_user_followers
-
-
-def get_requested_user_following(requested_user_profile, current_user_profile):
-    requested_user_following = Follower.objects.filter(follower_user_profile=requested_user_profile)
-    if current_user_profile is not None:
-        for following in requested_user_following:
-            following.is_followed = True
-            if following.following_user_profile != current_user_profile:
-                following.can_follow = True
-            else:
-                following.can_follow = False
-    return requested_user_following
-
-
-def is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile):
-    is_followed = False
-    if current_user_profile is not None:
-        if len(Follower.objects.filter(follower_user_profile=current_user_profile,
-                                       following_user_profile=requested_user_profile)) > 0:
-            is_followed = True
-    return is_followed
-
-
 def update_user_travel_stats(user_profile):
     city_set = set()
     country_set = set()
@@ -306,7 +270,7 @@ def get_user_score(user_profile):
         sum_city_ranks += city.rank
 
     # get a count of followers
-    follower_count = Follower.objects.filter(following_user_profile=user_profile).count()
+    follower_count = Follower.objects.get_follower_count(user_profile)
 
     # finally, compute user score
     score = sum_city_ranks + 2*log_count + 0.5*comment_count + 0.5*like_count + follower_count

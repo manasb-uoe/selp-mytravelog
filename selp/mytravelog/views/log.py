@@ -14,8 +14,7 @@ from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user, \
-    update_user_travel_stats
+from mytravelog.views.user import attach_additional_info_to_logs, update_user_travel_stats
 
 __author__ = 'Manas'
 
@@ -189,7 +188,7 @@ def show_log(request, log_id):
     is_followed = False
     if current_user != requested_user and current_user_profile is not None:
         can_follow = True
-        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
+        is_followed = Follower.objects.is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
     # check if current user can edit profile
     can_edit_profile = False
@@ -246,7 +245,7 @@ def show_live_feed(request, feed_filter):
         # check if user is authenticated
         if current_user_profile is not None:
             # only get logs of users followed by current user
-            current_user_following = Follower.objects.filter(follower_user_profile=current_user_profile).values('following_user_profile')
+            current_user_following = Follower.objects.get_requested_user_following(current_user_profile, None).values('following_user_profile')
             requested_logs = Log.objects.filter(user_profile__in=current_user_following).order_by('-score')
         else:
             return HttpResponseRedirect('/mytravelog/sign_in')

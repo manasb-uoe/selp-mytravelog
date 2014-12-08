@@ -6,9 +6,10 @@ from django.http.response import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
 from mytravelog.models.album import Album
+from mytravelog.models.follower import Follower
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, is_requested_user_followed_by_current_user
+from mytravelog.views.user import attach_additional_info_to_logs
 
 
 __author__ = 'Manas'
@@ -89,7 +90,7 @@ def show_album(request, album_id):
     is_followed = False
     if current_user != requested_user and current_user_profile is not None:
         can_follow = True
-        is_followed = is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
+        is_followed = Follower.objects.is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
 
     # check if current user can edit profile
     can_edit_profile = False

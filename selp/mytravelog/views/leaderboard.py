@@ -78,5 +78,5 @@ def attach_log_and_follower_count(results):
     # get no. of logs and followers for each user_profile
     for user_profile in results:
         user_profile.log_count = Log.objects.filter(user_profile=user_profile).count()
-        user_profile.follower_count = Follower.objects.filter(following_user_profile=user_profile).count()
+        user_profile.follower_count = Follower.objects.get_follower_count(user_profile)
     return results
