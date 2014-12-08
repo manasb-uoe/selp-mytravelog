@@ -24,7 +24,10 @@ class FollowerManager(models.Manager):
         requested_user_following = self.filter(follower_user_profile=requested_user_profile)
         if current_user_profile is not None:
             for following in requested_user_following:
-                following.is_followed = True
+                following.is_followed = False
+                if len(self.filter(follower_user_profile=current_user_profile,
+                                   following_user_profile=following.following_user_profile)) > 0:
+                    following.is_followed = True
                 if following.following_user_profile != current_user_profile:
                     following.can_follow = True
                 else:
