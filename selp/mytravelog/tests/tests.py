@@ -1211,7 +1211,7 @@ class UserTest(TestCase):
 
         # attach comment and like to user_profile_1's log
         log = Log.objects.all()[0]
-        Comment.objects.create(commenter_user_profile=self.user_profile_1,
+        Comment.objects.create(commenter_user_profile=self.user_profile_2,
                                log=log,
                                body=util.comment_sample_bodies['short_comment'])
         Like.objects.create(liker_user_profile=self.user_profile_2, log=log)
@@ -1255,6 +1255,36 @@ class UserTest(TestCase):
         logs_returned = Log.objects.get_user_logs(self.user_profile_2)
         self.assertEqual(len(logs_returned), 0)
         self.assertItemsEqual(logs_expected, logs_returned)
+
+    def test_user_score_computation(self):
+        # test scoring and ranking for user_profile_1
+        expected_score = City.objects.get(name=util.city1_sample_data['name']).rank + 2*Log.objects.all().count() + \
+                         0.5*Like.objects.all().count() + 0.5*Comment.objects.all().count() + \
+                         Follower.objects.filter(following_user_profile=self.user_profile_1).count()
+        returned_score = self.user_profile_1.compute_and_get_user_score()
+        self.assertEqual(expected_score, returned_score)
+
+        # test scoring and ranking for user_profile_2
+        expected_score = 0 + 2*0 + 0.5*0 + 0.5*0 + Follower.objects.filter(following_user_profile=self.user_profile_2).count()
+        returned_score = self.user_profile_2.compute_and_get_user_score()
+        self.assertEqual(expected_score, returned_score)
+
+    def test_update_user_stats(self):
+        # since the update function has not been called yet, city and country counts should be 0 for both users
+        self.assertEqual(self.user_profile_1.city_count, 0)
+        self.assertEqual(self.user_profile_1.country_count, 0)
+        self.assertEqual(self.user_profile_2.city_count, 0)
+        self.assertEqual(self.user_profile_2.country_count, 0)
+
+        self.user_profile_1.update_user_travel_stats()
+        self.user_profile_2.update_user_travel_stats()
+
+        # now that we've called the update method, city and country count for user_profile_1 should be 1 while for
+        # user_profile_2 it they should be 0
+        self.assertEqual(self.user_profile_1.city_count, 1)
+        self.assertEqual(self.user_profile_1.country_count, 1)
+        self.assertEqual(self.user_profile_2.city_count, 0)
+        self.assertEqual(self.user_profile_2.country_count, 0)
 
 
 class FollowerManagerTest(TestCase):
