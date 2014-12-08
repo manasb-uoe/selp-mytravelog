@@ -178,6 +178,10 @@ class SearchTest(TestCase):
 
 
 class UserAuthenticationTest(TestCase):
+
+    def tearDown(self):
+        util.delete_all_test_image_files()
+
     def test_sign_up_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['sign_up'])
         self.assertEqual(found.func, sign_up)
@@ -522,6 +526,9 @@ class LogTest(TestCase):
         self.log_sample_data['location'] = util.city1_sample_data['name']
         self.log_sample_data['album_name'] = util.album1_sample_data['name']
 
+    def tearDown(self):
+        util.delete_all_test_image_files()
+
     def test_create_log_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_create'])
         self.assertEqual(found.func, create_log)
@@ -649,7 +656,7 @@ class LogTest(TestCase):
         self.assertEqual(updated_log.description, log_sample_data['description'])
         self.assertEqual(updated_log.user_profile.user.username, util.user1_sample_data['username'])
 
-    def test_delete_album_view(self):
+    def test_delete_log_view(self):
         # first we need to create a log since update_log view needs a log id
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_user_and_user_profile(util.user1_sample_data)
@@ -824,6 +831,9 @@ class LikeTest(TestCase):
         util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
         util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
 
+    def tearDown(self):
+        util.delete_all_test_image_files()
+
     def test_create_and_delete_like_urls_resolve_to_correct_functions(self):
         found = resolve(util.urls['like_create_base'] + '0/')
         self.assertEqual(found.func, like_log)
@@ -903,6 +913,9 @@ class CommentTest(TestCase):
 
         # data dict used for comment creation
         self.comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
+
+    def tearDown(self):
+        util.delete_all_test_image_files()
 
     def test_create_comment_url_resolves_to_correct_function(self):
         found = resolve(util.urls['comment_create_base'] + '0/')
@@ -1077,6 +1090,9 @@ class FollowerTest(TestCase):
 
 class LeaderBoardTest(TestCase):
 
+    def tearDown(self):
+        util.delete_all_test_image_files()
+
     def test_leaderboard_url_resolves_to_correct_function(self):
         found = resolve(util.urls['leaderboard_show_base'] + 'model/')
         self.assertEqual(found.func, show_leaderboard)
@@ -1215,6 +1231,9 @@ class UserTest(TestCase):
                                log=log,
                                body=util.comment_sample_bodies['short_comment'])
         Like.objects.create(liker_user_profile=self.user_profile_2, log=log)
+
+    def tearDown(self):
+        util.delete_all_test_image_files()
 
     def test_user_page_url_resolves_to_correct_functiona(self):
         found = resolve(util.urls['user_base'] + 'username/')

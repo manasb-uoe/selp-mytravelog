@@ -177,3 +177,18 @@ def add_sample_log(log_sample_data, album_sample_data, city_sample_data, user_sa
     log_picture.picture = File(get_small_image())
     log_picture.save()
 
+
+def delete_all_test_image_files():
+    log_pictures_dir = os.path.join(os.path.join(os.path.join(os.path.join(os.path.dirname(
+        os.path.dirname(os.path.dirname(__file__))), 'selp'), 'media'), 'mytravelog'), 'log_pictures')
+    cover_pictures_dir = os.path.join(os.path.dirname(log_pictures_dir), 'cover_pictures')
+    profile_pictures_dir = os.path.join(os.path.dirname(log_pictures_dir), 'profile_pictures')
+
+    dirs = [log_pictures_dir, cover_pictures_dir, profile_pictures_dir]
+
+    for d in dirs:
+        for f in os.listdir(d):
+            if 'small_image' in f:
+                path = os.path.join(d, f)
+                if os.path.isfile(path):
+                    os.remove(path)
