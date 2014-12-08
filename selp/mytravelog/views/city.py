@@ -7,7 +7,6 @@ from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs
 
 __author__ = 'Manas'
 
@@ -28,7 +27,8 @@ def show_city(request, city_url_name):
     current_user_albums = Album.objects.filter(user_profile=current_user_profile)
 
     # get all city logs
-    requested_city_logs = attach_additional_info_to_logs(Log.objects.filter(city=requested_city), current_user_profile)
+    requested_city_logs = Log.objects.attach_additional_info_to_logs(Log.objects.get_city_logs(requested_city),
+                                                                     current_user_profile)
 
     data_dict = {
         'requested_city': requested_city,

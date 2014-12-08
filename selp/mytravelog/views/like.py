@@ -13,7 +13,7 @@ def like_log(request, log_id):
     if request.is_ajax():
         if user.is_authenticated():
             # get user profile of liker and the log that they liked
-            log = Log.objects.get(id=log_id)
+            log = Log.objects.get_log_by_id(log_id)
             user_profile = UserProfile.objects.get(user=user)
 
             # create new like only if it does not already exist
@@ -42,7 +42,7 @@ def dislike_log(request, log_id):
     if request.is_ajax():
         if user.is_authenticated():
             # get user profile of disliker and the log that they disliked
-            log = Log.objects.get(id=log_id)
+            log = Log.objects.get_log_by_id(log_id)
             user_profile = UserProfile.objects.get(user=user)
 
             # delete like if it exists

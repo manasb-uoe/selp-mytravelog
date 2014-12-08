@@ -9,7 +9,6 @@ from mytravelog.models.album import Album
 from mytravelog.models.follower import Follower
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs
 
 
 __author__ = 'Manas'
@@ -74,7 +73,7 @@ def show_album(request, album_id):
     requested_user = requested_user_profile.user
 
     # get all album logs and pictures
-    requested_album_logs = attach_additional_info_to_logs(Log.objects.filter(album=requested_album),
+    requested_album_logs = Log.objects.attach_additional_info_to_logs(Log.objects.get_album_logs(requested_album),
                                                           current_user_profile)
     album_pictures = []
     for log in requested_album_logs:

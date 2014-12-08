@@ -9,7 +9,6 @@ from mytravelog.models.comment import Comment
 from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
-from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 
 
@@ -122,7 +121,8 @@ def show_user(request, username):
     requested_user_albums = get_requested_user_albums(requested_user_profile)
 
     # get user logs along with pictures, likes and comments for each log
-    requested_user_logs = get_requested_user_logs_with_additional_info(requested_user_profile, current_user_profile)
+    requested_user_logs = Log.objects.attach_additional_info_to_logs(Log.objects.get_user_logs(requested_user_profile),
+                                                                     current_user_profile)
 
     # get user followers and following
     requested_user_followers = Follower.objects.get_requested_user_followers(requested_user_profile, current_user_profile)
@@ -196,46 +196,10 @@ def get_requested_user_albums(requested_user_profile):
     return requested_user_albums
 
 
-def get_requested_user_logs_with_additional_info(requested_user_profile, current_user_profile):
-    # get user logs along with pictures, likes and comments for each log
-    requested_user_logs = Log.objects.filter(user_profile=requested_user_profile)
-    requested_user_logs = attach_additional_info_to_logs(requested_user_logs, current_user_profile)
-    return requested_user_logs
-
-
-def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
-    for log in requested_user_logs:
-        # attach pictures
-        log_pictures = LogPicture.objects.filter(log=log)
-        log.pictures = log_pictures
-        # attach likes and check if current user liked a log or not
-        likes = Like.objects.filter(log=log)
-        log.likes = likes
-        log.liked = False
-        for like in likes:
-            if current_user_profile is not None:
-                if like.liker_user_profile == current_user_profile:
-                    log.liked = True
-        # attach comments and check if current user can delete it or not
-        comments = Comment.objects.filter(log=log)
-        log.comments = comments
-        for comment in comments:
-            comment.can_delete = False
-            if current_user_profile is not None:
-                if comment.commenter_user_profile == current_user_profile:
-                    comment.can_delete = True
-        # attach edit permission
-        if log.user_profile == current_user_profile:
-            log.can_edit = True
-        else:
-            log.can_edit = False
-    return requested_user_logs
-
-
 def update_user_travel_stats(user_profile):
     city_set = set()
     country_set = set()
-    all_user_logs = Log.objects.filter(user_profile=user_profile)
+    all_user_logs = Log.objects.get_user_logs(user_profile)
     for log in all_user_logs:
         city_set.add(log.city.id)
         country_set.add(log.city.country_name)
@@ -246,7 +210,7 @@ def update_user_travel_stats(user_profile):
 
 def get_user_score(user_profile):
     # get all user logs
-    all_logs = Log.objects.filter(user_profile=user_profile)
+    all_logs = Log.objects.get_user_logs(user_profile)
     log_count = len(all_logs)
 
     city_set = set()

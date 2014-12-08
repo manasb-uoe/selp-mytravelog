@@ -1,11 +1,13 @@
 import json
 import datetime
+import math
+
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models.query_utils import Q
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-import math
+
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
 from mytravelog.models.comment import Comment
@@ -14,7 +16,8 @@ from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import attach_additional_info_to_logs, update_user_travel_stats
+from mytravelog.views.user import update_user_travel_stats
+
 
 __author__ = 'Manas'
 
@@ -88,7 +91,7 @@ def delete_log(request, log_id):
     return_data = {}
     if request.is_ajax():
         if user.is_authenticated():
-            log_to_delete = Log.objects.get(id=log_id)
+            log_to_delete = Log.objects.get_log_by_id(log_id)
             # check if log belongs to current user
             if log_to_delete.user_profile.user == user:
                 # delete log and update user travel stats
@@ -120,7 +123,7 @@ def edit_log(request, log_id):
             delete_picture_ids.pop()
 
             # get log that has to be edited along with all the pictures associated with it
-            log_to_edit = Log.objects.get(id=log_id)
+            log_to_edit = Log.objects.get_log_by_id(log_id)
             if log_to_edit.user_profile.user == user:
                 log_pictures = LogPicture.objects.filter(log=log_to_edit)
 
@@ -177,7 +180,7 @@ def show_log(request, log_id):
     requested_user = requested_user_profile.user
 
     # attach additional info to the requested log (likes, comments and pictures)
-    attach_additional_info_to_logs(requested_log, current_user_profile)
+    Log.objects.attach_additional_info_to_logs(requested_log, current_user_profile)
 
     # get all requested albums in order to populate the Albums drop-down list while editing a log (EditLogModal)
     requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
@@ -246,7 +249,7 @@ def show_live_feed(request, feed_filter):
         if current_user_profile is not None:
             # only get logs of users followed by current user
             current_user_following = Follower.objects.get_requested_user_following(current_user_profile, None).values('following_user_profile')
-            requested_logs = Log.objects.filter(user_profile__in=current_user_following).order_by('-score')
+            requested_logs = Log.objects.get_users_logs(current_user_following).order_by('-score')
         else:
             return HttpResponseRedirect('/mytravelog/sign_in')
     else:
@@ -265,7 +268,7 @@ def show_live_feed(request, feed_filter):
         requested_page_logs = paginator.page(paginator.num_pages)
 
     # attach additional info (likes, comments and pictures) to page logs
-    requested_page_logs = attach_additional_info_to_logs(requested_page_logs, current_user_profile)
+    requested_page_logs = Log.objects.attach_additional_info_to_logs(requested_page_logs, current_user_profile)
 
     # get all albums for the current user in order to populate the Albums drop-down list while
     # editing a log (EditLogModal)

@@ -17,7 +17,7 @@ def create_log_comment(request, log_id):
     if request.is_ajax():
         if user.is_authenticated():
             # get user profile of commenter, the log that they commented on and comment body
-            log = Log.objects.get(id=log_id)
+            log = Log.objects.get_log_by_id(log_id)
             user_profile = UserProfile.objects.get(user=user)
             body = request.POST.get('body', '')
             if len(body) == 0:

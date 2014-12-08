@@ -24,8 +24,7 @@ from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
-from mytravelog.views.user import sign_up, sign_in, sign_out, attach_additional_info_to_logs, show_user, \
-    get_requested_user_albums, get_requested_user_logs_with_additional_info
+from mytravelog.views.user import sign_up, sign_in, sign_out, show_user, get_requested_user_albums
 
 
 class HomeTest(TestCase):
@@ -550,7 +549,7 @@ class LogTest(TestCase):
         util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
 
         album = util.get_album(util.album1_sample_data, util.user1_sample_data)
-        log = attach_additional_info_to_logs(Log.objects.all(), None)
+        log = Log.objects.attach_additional_info_to_logs(Log.objects.all(), None)
 
         # get user and user profile
         user_dict = util.get_user_and_user_profile(util.user1_sample_data)
@@ -1175,14 +1174,14 @@ class UserTest(TestCase):
         # get user1 logs
         # should return 1 log
         logs_expected = Log.objects.filter(user_profile=self.user_profile_1)
-        logs_returned = get_requested_user_logs_with_additional_info(self.user_profile_1, None)
+        logs_returned = Log.objects.get_user_logs(self.user_profile_1)
         self.assertEqual(len(logs_returned), 1)
         self.assertItemsEqual(logs_expected, logs_returned)
 
         # get user2 logs
         # should return 0 logs
         logs_expected = Log.objects.filter(user_profile=self.user_profile_2)
-        logs_returned = get_requested_user_logs_with_additional_info(self.user_profile_2, None)
+        logs_returned = Log.objects.get_user_logs(self.user_profile_2)
         self.assertEqual(len(logs_returned), 0)
         self.assertItemsEqual(logs_expected, logs_returned)
 
