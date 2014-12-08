@@ -1,6 +1,7 @@
-from django.http.response import HttpResponse
 from django.shortcuts import render
+
 from mytravelog.models.city import City
+
 
 __author__ = 'Manas'
 

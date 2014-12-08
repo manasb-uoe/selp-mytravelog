@@ -1,10 +1,11 @@
-from django.contrib.auth.models import User
 from django.db.models.query_utils import Q
 from django.http.response import HttpResponseRedirect, Http404
 from django.shortcuts import render
+
 from mytravelog.models.city import City
 from mytravelog.models.follower import Follower
 from mytravelog.models.user_profile import UserProfile
+
 
 __author__ = 'Manas'
 

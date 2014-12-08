@@ -6,7 +6,6 @@ from django.http.request import HttpRequest
 from django.http.response import Http404
 from django.template.loader import render_to_string
 from django.test import TestCase
-from pip.commands import show
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City

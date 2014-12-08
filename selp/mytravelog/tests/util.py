@@ -1,13 +1,15 @@
 import os
+
 from django.contrib.auth.models import User
 from django.core.files.base import File
+
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
-from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.views.city import add_new_city
+
 
 __author__ = 'Manas'
 
