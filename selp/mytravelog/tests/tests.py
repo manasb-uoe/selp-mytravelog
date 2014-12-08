@@ -15,7 +15,7 @@ from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.unit_tests import util
+from mytravelog.tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
 from mytravelog.views.city import show_city, get_autocomplete_suggestions
 from mytravelog.views.comment import create_log_comment, delete_log_comment
