@@ -24,7 +24,7 @@ from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
 from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
-from mytravelog.views.user import sign_up, sign_in, sign_out, show_user, get_requested_user_albums
+from mytravelog.views.user import sign_up, sign_in, sign_out, show_user
 
 
 class HomeTest(TestCase):
@@ -1159,14 +1159,14 @@ class UserTest(TestCase):
         # get user1 albums
         # should return 1 album
         albums_expected = Album.objects.filter(user_profile=self.user_profile_1)
-        albums_returned = get_requested_user_albums(self.user_profile_1)
+        albums_returned = Album.objects.get_user_albums_with_duration(self.user_profile_1)
         self.assertEqual(len(albums_returned), 1)
         self.assertItemsEqual(albums_expected, albums_returned)
 
         # get user2 albums
         # should return 0 albums
         albums_expected = Album.objects.filter(user_profile=self.user_profile_2)
-        albums_returned = get_requested_user_albums(self.user_profile_2)
+        albums_returned = Album.objects.get_user_albums_with_duration(self.user_profile_2)
         self.assertEqual(len(albums_returned), 0)
         self.assertItemsEqual(albums_expected, albums_returned)
 

@@ -115,15 +115,17 @@ def show_user(request, username):
     requested_user_profile = UserProfile.objects.get(user=requested_user)
 
     # get user albums and attach duration to each album
-    requested_user_albums = get_requested_user_albums(requested_user_profile)
+    requested_user_albums = Album.objects.get_user_albums_with_duration(requested_user_profile)
 
     # get user logs along with pictures, likes and comments for each log
     requested_user_logs = Log.objects.attach_additional_info_to_logs(Log.objects.get_user_logs(requested_user_profile),
                                                                      current_user_profile)
 
     # get user followers and following
-    requested_user_followers = Follower.objects.get_requested_user_followers(requested_user_profile, current_user_profile)
-    requested_user_following = Follower.objects.get_requested_user_following(requested_user_profile, current_user_profile)
+    requested_user_followers = Follower.objects.get_requested_user_followers(requested_user_profile,
+                                                                             current_user_profile)
+    requested_user_following = Follower.objects.get_requested_user_following(requested_user_profile,
+                                                                             current_user_profile)
 
     # check if requested user can be followed by current user
     # if yes, then check if requested user is being followed by current user
@@ -131,7 +133,8 @@ def show_user(request, username):
     is_followed = False
     if current_user != requested_user and current_user_profile is not None:
         can_follow = True
-        is_followed = Follower.objects.is_requested_user_followed_by_current_user(requested_user_profile, current_user_profile)
+        is_followed = Follower.objects.is_requested_user_followed_by_current_user(requested_user_profile,
+                                                                                  current_user_profile)
 
     # check if current user can edit profile
     can_edit_profile = False
@@ -185,12 +188,6 @@ def validate_sign_up_form(first_name, last_name, email, username, password, prof
     return None
 
 
-def get_requested_user_albums(requested_user_profile):
-    requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
-    for album in requested_user_albums:
-        duration = (album.end_date - album.start_date).days
-        album.duration = duration
-    return requested_user_albums
 
 
 

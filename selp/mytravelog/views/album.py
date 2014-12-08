@@ -81,7 +81,7 @@ def show_album(request, album_id):
     requested_album.pictures = album_pictures
 
     # get all requested albums in order to populate the Albums drop-down list while editing a log (EditLogModal)
-    requested_user_albums = Album.objects.filter(user_profile=requested_user_profile)
+    requested_user_albums = Album.objects.get_user_albums_with_duration(requested_user_profile)
 
     # check if requested user can be followed by current user
     # if yes, then check if requested user is being followed by current user

@@ -24,7 +24,7 @@ def show_city(request, city_url_name):
 
     # get all albums for the current user in order to populate the Albums drop-down list while
     # editing a log (EditLogModal)
-    current_user_albums = Album.objects.filter(user_profile=current_user_profile)
+    current_user_albums = Album.objects.get_user_albums_with_duration(current_user_profile)
 
     # get all city logs
     requested_city_logs = Log.objects.attach_additional_info_to_logs(Log.objects.get_city_logs(requested_city),
