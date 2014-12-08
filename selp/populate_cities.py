@@ -1,5 +1,3 @@
-from mytravelog.models.user_profile import UserProfile
-
 __author__ = 'Manas'
 
 import os
