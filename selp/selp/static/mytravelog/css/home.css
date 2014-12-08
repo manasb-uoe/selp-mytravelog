@@ -87,7 +87,6 @@
     width: 395px;
     box-shadow: 10px 10px 13px -5px rgba(0,0,0,0.36);
     z-index: 9000;
-    position: fixed;
 }
 
 .jumbotron-home .mask .title-and-search-container .form-city-search  .suggestion-light {
