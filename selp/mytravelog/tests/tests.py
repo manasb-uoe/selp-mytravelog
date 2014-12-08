@@ -782,6 +782,38 @@ class LogTest(TestCase):
         # as all validation checks have been passed, no errors should be returned
         self.assertEqual(len(json.loads(response.content)), 0)
 
+    def test_logs_appear_in_live_feed(self):
+        response = self.client.get(util.urls['log_show_live_feed_base'] + 'all/')
+        self.assertNotIn(util.log1_sample_data['description'], response.content)
+        self.assertNotIn(util.city1_sample_data['name'], response.content)
+        self.assertNotIn(util.city1_sample_data['country_name'], response.content)
+        self.assertNotIn(util.user1_sample_data['username'], response.content)
+
+        response = self.client.get(util.urls['log_show_live_feed_base'] + 'followers/')
+        self.assertNotIn(util.log1_sample_data['description'], response.content)
+        self.assertNotIn(util.city1_sample_data['name'], response.content)
+        self.assertNotIn(util.city1_sample_data['country_name'], response.content)
+        self.assertNotIn(util.user1_sample_data['username'], response.content)
+
+        # now add a user, city, album and log
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
+        util.add_sample_log(util.log1_sample_data, util.album1_sample_data, util.city1_sample_data, util.user1_sample_data)
+
+        response = self.client.get(util.urls['log_show_live_feed_base'] + 'all/')
+        self.assertIn(util.log1_sample_data['description'], response.content)
+        self.assertIn(util.city1_sample_data['name'], response.content)
+        self.assertIn(util.city1_sample_data['country_name'], response.content)
+        self.assertIn(util.user1_sample_data['username'], response.content)
+
+        response = self.client.get(util.urls['log_show_live_feed_base'] + 'followers/')
+        self.assertNotIn(util.log1_sample_data['description'], response.content)
+        self.assertNotIn(util.city1_sample_data['name'], response.content)
+        self.assertNotIn(util.city1_sample_data['country_name'], response.content)
+        self.assertNotIn(util.user1_sample_data['username'], response.content)
+
+
 class LikeTest(TestCase):
 
     def setUp(self):
@@ -1047,6 +1079,32 @@ class LeaderBoardTest(TestCase):
     def test_leaderboard_url_resolves_to_correct_function(self):
         found = resolve(util.urls['leaderboard_show_base'] + 'model/')
         self.assertEqual(found.func, show_leaderboard)
+
+    def test_registered_users_appear_in_leaderboard_table(self):
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+
+        response = self.client.get(util.urls['leaderboard_show_base'] + 'users/')
+
+        self.assertIn(util.user1_sample_data['first_name'], response.content)
+        self.assertIn(util.user1_sample_data['last_name'], response.content)
+        self.assertIn(util.user1_sample_data['username'], response.content)
+        self.assertIn(util.user2_sample_data['first_name'], response.content)
+        self.assertIn(util.user2_sample_data['last_name'], response.content)
+        self.assertIn(util.user2_sample_data['username'], response.content)
+
+    def test_cities_appear_in_leaderboard_table(self):
+        util.add_sample_city(util.city1_sample_data)
+        util.add_sample_city(util.city2_sample_data)
+
+        response = self.client.get(util.urls['leaderboard_show_base'] + 'cities/')
+
+        self.assertIn(util.city1_sample_data['name'], response.content)
+        self.assertIn(util.city1_sample_data['country_name'], response.content)
+        self.assertIn(str(util.city1_sample_data['tourist_growth']), response.content)
+        self.assertIn(util.city2_sample_data['name'], response.content)
+        self.assertIn(util.city2_sample_data['country_name'], response.content)
+        self.assertIn(str(util.city2_sample_data['tourist_growth']), response.content)
 
     def test_leaderboard_cities_search(self):
         # add and retrieve two cities
