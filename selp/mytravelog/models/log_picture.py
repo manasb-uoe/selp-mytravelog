@@ -11,3 +11,13 @@ class LogPicture(models.Model):
 
     def __unicode__(self):
         return self.log.city.name + ": " + str(self.id)
+
+
+# auto delete file when imagefield is deleted
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
+
+@receiver(post_delete, sender=LogPicture)
+def auto_delete_file(sender, instance, **kwargs):
+    # Pass false so ImageField doesn't save the model.
+    instance.picture.delete(False)

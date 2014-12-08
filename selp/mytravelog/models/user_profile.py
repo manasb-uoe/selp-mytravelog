@@ -1,3 +1,4 @@
+import os
 from django.db.models.query_utils import Q
 
 __author__ = 'Manas'
@@ -68,3 +69,16 @@ class UserProfile(models.Model):
         # finally, compute user score
         score = sum_city_ranks + 2*log_count + 0.5*comment_count + 0.5*like_count + follower_count
         return round(score, 5)
+
+
+# auto delete non-default file when imagefield is deleted
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
+
+@receiver(post_delete, sender=UserProfile)
+def auto_delete_file(sender, instance, **kwargs):
+    # Pass false so ImageField doesn't save the model.
+    if os.path.basename(instance.profile_picture.name) != 'default_profile_picture.png':
+        instance.profile_picture.delete(False)
+    if os.path.basename(instance.cover_picture.name) != 'default_cover_picture.png':
+        instance.cover_picture.delete(False)

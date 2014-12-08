@@ -1,5 +1,10 @@
+import os
+
 from django.db import models
+from django.dispatch.dispatcher import receiver
+
 from mytravelog.models.user_profile import UserProfile
+
 
 __author__ = 'Manas'
 
@@ -38,3 +43,12 @@ class Album(models.Model):
         ordering = ['-created_at']
 
 
+# auto delete non-default file when imagefield is deleted
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
+
+@receiver(post_delete, sender=Album)
+def auto_delete_file(sender, instance, **kwargs):
+    # Pass false so ImageField doesn't save the model.
+    if os.path.basename(instance.cover_picture.name) != 'default_cover_picture.png':
+        instance.cover_picture.delete(False)
