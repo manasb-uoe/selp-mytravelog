@@ -1,13 +1,10 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.db.models.query_utils import Q
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 
 from mytravelog.models.album import Album
-from mytravelog.models.comment import Comment
 from mytravelog.models.follower import Follower
-from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
 
@@ -195,49 +192,5 @@ def get_requested_user_albums(requested_user_profile):
         album.duration = duration
     return requested_user_albums
 
-
-def update_user_travel_stats(user_profile):
-    city_set = set()
-    country_set = set()
-    all_user_logs = Log.objects.get_user_logs(user_profile)
-    for log in all_user_logs:
-        city_set.add(log.city.id)
-        country_set.add(log.city.country_name)
-    user_profile.city_count = len(city_set)
-    user_profile.country_count = len(country_set)
-    user_profile.save()
-
-
-def get_user_score(user_profile):
-    # get all user logs
-    all_logs = Log.objects.get_user_logs(user_profile)
-    log_count = len(all_logs)
-
-    city_set = set()
-    country_set = set()
-    like_count = 0
-    comment_count = 0
-    for log in all_logs:
-        # get unique cities and countries visited
-        city_set.add(log.city)
-        country_set.add(log.city.country_name)
-
-        # count non-self likes
-        like_count += Like.objects.filter(Q(log=log) & ~Q(liker_user_profile=user_profile)).count()
-
-        # count non-self comments
-        comment_count += Comment.objects.filter(Q(log=log) & ~Q(commenter_user_profile=user_profile)).count()
-
-    # get sum of a visited city ranks
-    sum_city_ranks = 0
-    for city in city_set:
-        sum_city_ranks += city.rank
-
-    # get a count of followers
-    follower_count = Follower.objects.get_follower_count(user_profile)
-
-    # finally, compute user score
-    score = sum_city_ranks + 2*log_count + 0.5*comment_count + 0.5*like_count + follower_count
-    return round(score, 5)
 
 

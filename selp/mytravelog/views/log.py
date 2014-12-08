@@ -16,7 +16,6 @@ from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
-from mytravelog.views.user import update_user_travel_stats
 
 
 __author__ = 'Manas'
@@ -71,7 +70,7 @@ def create_log(request):
                     new_log_picture.save()
 
                 # finally, update user travel stats
-                update_user_travel_stats(user_profile)
+                user_profile.update_user_travel_stats()
 
             else:
                 return_data['error'] = error
@@ -96,7 +95,7 @@ def delete_log(request, log_id):
             if log_to_delete.user_profile.user == user:
                 # delete log and update user travel stats
                 log_to_delete.delete()
-                update_user_travel_stats(UserProfile.objects.get(user=user))
+                UserProfile.objects.get(user=user).update_user_travel_stats()
             else:
                 return_data['error'] = "This log does not belong to you"
         else:
