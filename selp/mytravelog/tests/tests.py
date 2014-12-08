@@ -13,6 +13,7 @@ from mytravelog.models.comment import Comment
 from mytravelog.models.follower import Follower
 from mytravelog.models.like import Like
 from mytravelog.models.log import Log
+from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
 from mytravelog.tests import util
 from mytravelog.views.album import show_album, convert_string_to_date, create_album, update_album, delete_album
@@ -1208,6 +1209,13 @@ class UserTest(TestCase):
         # attach follower to user_profile_2
         Follower.objects.create(following_user_profile=self.user_profile_2, follower_user_profile=self.user_profile_1)
 
+        # attach comment and like to user_profile_1's log
+        log = Log.objects.all()[0]
+        Comment.objects.create(commenter_user_profile=self.user_profile_1,
+                               log=log,
+                               body=util.comment_sample_bodies['short_comment'])
+        Like.objects.create(liker_user_profile=self.user_profile_2, log=log)
+
     def test_user_page_url_resolves_to_correct_functiona(self):
         found = resolve(util.urls['user_base'] + 'username/')
         self.assertEqual(found.func, show_user)
@@ -1234,6 +1242,12 @@ class UserTest(TestCase):
         logs_returned = Log.objects.get_user_logs(self.user_profile_1)
         self.assertEqual(len(logs_returned), 1)
         self.assertItemsEqual(logs_expected, logs_returned)
+
+        # now attach additional info to the returned log and check if 1 comment, 1 like and 1 picture is attached to it
+        additonal_info_logs = Log.objects.attach_additional_info_to_logs(logs_returned, None)
+        self.assertItemsEqual(Comment.objects.all(), additonal_info_logs[0].comments)
+        self.assertItemsEqual(Like.objects.all(), additonal_info_logs[0].likes)
+        self.assertItemsEqual(LogPicture.objects.all(), additonal_info_logs[0].pictures)
 
         # get user2 logs
         # should return 0 logs
