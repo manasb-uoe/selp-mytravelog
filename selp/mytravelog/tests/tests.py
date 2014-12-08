@@ -782,7 +782,6 @@ class LogTest(TestCase):
         # as all validation checks have been passed, no errors should be returned
         self.assertEqual(len(json.loads(response.content)), 0)
 
-
 class LikeTest(TestCase):
 
     def setUp(self):
@@ -1185,6 +1184,19 @@ class UserTest(TestCase):
         self.assertEqual(len(logs_returned), 0)
         self.assertItemsEqual(logs_expected, logs_returned)
 
+
+class FollowerManagerTest(TestCase):
+
+    def setUp(self):
+        # add 2 new users and retrieve their user profiles
+        util.add_sample_user_and_user_profile(util.user1_sample_data)
+        util.add_sample_user_and_user_profile(util.user2_sample_data)
+        self.user_profile_1 = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
+        self.user_profile_2 = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
+
+        # attach follower to user_profile_2
+        Follower.objects.create(following_user_profile=self.user_profile_2, follower_user_profile=self.user_profile_1)
+
     def test_get_requested_user_followers(self):
         # get user1 followers
         # should return 0 followers
@@ -1221,3 +1233,25 @@ class UserTest(TestCase):
 
         # should return true since user1 does follow user2
         self.assertTrue(Follower.objects.is_requested_user_followed_by_current_user(self.user_profile_2, self.user_profile_1))
+
+    def test_get_follower_count(self):
+        expected_count = Follower.objects.filter(following_user_profile=self.user_profile_1).count()
+        returned_count = Follower.objects.get_follower_count(self.user_profile_1)
+        self.assertEqual(expected_count, 0)
+        self.assertEqual(expected_count, returned_count)
+
+        expected_count = Follower.objects.filter(following_user_profile=self.user_profile_2).count()
+        returned_count = Follower.objects.get_follower_count(self.user_profile_2)
+        self.assertEqual(expected_count, 1)
+        self.assertEqual(expected_count, returned_count)
+
+    def test_get_follower(self):
+        expected_follower = Follower.objects.filter(follower_user_profile=self.user_profile_1,
+                                                    following_user_profile=self.user_profile_2)
+        expected_follower = expected_follower[0] if len(expected_follower) == 1 else None
+        self.assertEqual(expected_follower, Follower.objects.get_follower(self.user_profile_1, self.user_profile_2))
+
+        expected_follower = Follower.objects.filter(follower_user_profile=self.user_profile_2,
+                                                    following_user_profile=self.user_profile_1)
+        expected_follower = expected_follower[0] if len(expected_follower) == 1 else None
+        self.assertEqual(expected_follower, Follower.objects.get_follower(self.user_profile_2, self.user_profile_1))
