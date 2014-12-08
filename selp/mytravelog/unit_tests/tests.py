@@ -54,10 +54,11 @@ class HomeTest(TestCase):
 
 class CityTest(TestCase):
 
-    def test_all_city_related_urls_resolves_to_correct_functions(self):
+    def test_city_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['city_base'] + 'Test' + '/')
         self.assertEqual(found.func, show_city)
 
+    def test_city_autocomplete_suggestions_url_resolves_to_correct_function(self):
         found = resolve(util.urls['city_autocomplete'])
         self.assertEqual(found.func, get_autocomplete_suggestions)
 
@@ -121,7 +122,7 @@ class SearchTest(TestCase):
         found = resolve(util.urls['search_base'])
         self.assertEqual(found.func, search_for_cities_and_users)
 
-    def test_search_for_cities_and_users_returns_correct_html(self):
+    def test_search_for_cities_and_users_view_returns_correct_html(self):
         response = self.client.get(util.urls['search_base'], {'query': 'city'})
         expected_html = render_to_string('mytravelog/search.html',
                                          {'csrf_token': self.client.cookies['csrftoken'].value,
@@ -178,26 +179,24 @@ class SearchTest(TestCase):
 
 
 class UserAuthenticationTest(TestCase):
-    def test_urls_resolve_to_current_functions(self):
-        # check sign up url
+    def test_sign_up_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['sign_up'])
         self.assertEqual(found.func, sign_up)
 
-        # check sign in url
+    def test_sign_in_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['sign_in'])
         self.assertEqual(found.func, sign_in)
 
-        # check sign out url
+    def test_sign_out_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['sign_out'])
         self.assertEqual(found.func, sign_out)
 
-    def test_views_return_correct_html(self):
-        # check sign_up view
+    def test_sign_up_view_return_correct_html(self):
         response = self.client.get(util.urls['sign_up'])
         expected_html = render_to_string('mytravelog/sign_up.html', {'csrf_token': self.client.cookies['csrftoken'].value})
         self.assertEqual(response.content, expected_html)
 
-        # check sign_in view
+    def test_sign_in_view_return_correct_html(self):
         response = self.client.get(util.urls['sign_in'])
         expected_html = render_to_string('mytravelog/sign_in.html', {'csrf_token': self.client.cookies['csrftoken'].value})
         self.assertEqual(response.content, expected_html)
@@ -334,25 +333,24 @@ class UserAuthenticationTest(TestCase):
 class AlbumTest(TestCase):
 
     def setUp(self):
-        # add a new album
+        # add a user and then create a new album for them
         util.add_sample_user_and_user_profile(util.user1_sample_data)
         util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
         self.album = util.get_album(util.album1_sample_data, util.user1_sample_data)
 
-    def test_urls_resolve_to_correct_functions(self):
-        # check show album url
+    def test_album_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['album_show_base'] + '0/')
         self.assertEqual(found.func, show_album)
 
-        # check create album url
+    def test_create_album_url_resolves_to_correct_function(self):
         found = resolve(util.urls['album_create'])
         self.assertEqual(found.func, create_album)
 
-        # check update album url
+    def test_update_album_url_resolves_to_correct_function(self):
         found = resolve(util.urls['album_update_base'] + '0/')
         self.assertEqual(found.func, update_album)
 
-        # check delete album url
+    def test_delete_album_url_resolves_to_correct_function(self):
         found = resolve(util.urls['album_delete_base'] + '0/')
         self.assertEqual(found.func, delete_album)
 
@@ -525,20 +523,19 @@ class LogTest(TestCase):
         self.log_sample_data['location'] = util.city1_sample_data['name']
         self.log_sample_data['album_name'] = util.album1_sample_data['name']
 
-    def test_urls_resolve_to_correct_functions(self):
-        # check create log url
+    def test_create_log_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_create'])
         self.assertEqual(found.func, create_log)
 
-        # check update log url
+    def test_update_log_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_update_base'] + '0/')
         self.assertEqual(found.func, edit_log)
 
-        # check delete log url
+    def test_delete_log_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_delete_base'] + '0/')
         self.assertEqual(found.func, delete_log)
 
-        # check show log url
+    def test_log_page_url_resolves_to_correct_function(self):
         found = resolve(util.urls['log_show_base'] + '0/')
         self.assertEqual(found.func, show_log)
 
@@ -863,7 +860,7 @@ class LikeTest(TestCase):
 class CommentTest(TestCase):
 
     def setUp(self):
-        # create a log since create_log_comment and delete_log_comment views needs a log id as an argument
+        # add a new user and create an and album and a log for them
         util.add_sample_city(util.city1_sample_data)
         util.add_sample_user_and_user_profile(util.user1_sample_data)
         util.add_sample_album(util.album1_sample_data, util.user1_sample_data)
@@ -873,10 +870,11 @@ class CommentTest(TestCase):
         # data dict used for comment creation
         self.comment_data_dict = {'body': util.comment_sample_bodies['short_comment']}
 
-    def test_create_and_delete_comment_urls_resolve_to_currect_functions(self):
+    def test_create_comment_url_resolves_to_correct_function(self):
         found = resolve(util.urls['comment_create_base'] + '0/')
         self.assertEqual(found.func, create_log_comment)
 
+    def test_delete_comment_url_resolves_to_correct_function(self):
         found = resolve(util.urls['comment_delete_base'] + '0/')
         self.assertEqual(found.func, delete_log_comment)
 
@@ -967,17 +965,18 @@ class CommentTest(TestCase):
 class FollowerTest(TestCase):
 
     def setUp(self):
-        # add 2 new users and user profiles
+        # add 2 new users and retrieve their user profiles
         util.add_sample_user_and_user_profile(util.user1_sample_data)
         util.add_sample_user_and_user_profile(util.user2_sample_data)
 
         self.follower_user_profile = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
         self.following_user_profile = util.get_user_and_user_profile(util.user2_sample_data)['user_profile']
 
-    def test_create_and_delete_follower_urls_resolve_to_correct_functions(self):
+    def test_create_follower_url_resolves_to_correct_function(self):
         found = resolve(util.urls['follower_create_base'] + '0/')
         self.assertEqual(found.func, create_follower)
 
+    def test_delete_follower_url_resolves_to_correct_function(self):
         found = resolve(util.urls['follower_delete_base'] + '0/')
         self.assertEqual(found.func, delete_follower)
 
@@ -1136,7 +1135,7 @@ class LeaderBoardTest(TestCase):
 class UserTest(TestCase):
 
     def setUp(self):
-        # add and retrieve two user profiles
+        # add 2 new users and retrieve their user profiles
         util.add_sample_user_and_user_profile(util.user1_sample_data)
         util.add_sample_user_and_user_profile(util.user2_sample_data)
         self.user_profile_1 = util.get_user_and_user_profile(util.user1_sample_data)['user_profile']
