@@ -63,7 +63,7 @@ var WorldMapModal = (function () {
         showOnMapButton: $('#show-on-map-button'),
         modal: $('#world-map-modal'),
         mapContainer: $('#world-map-modal-map-container'),
-        getInfoForMapBaseUrl: 'mytravelog/log/get_info_for_map/',
+        getInfoForMapBaseUrl: '/mytravelog/log/get_info_for_map/',
         usernameAttr: 'data-requested-user-username',
         firstNameAttr: 'data-requested-user-first-name'
     };
