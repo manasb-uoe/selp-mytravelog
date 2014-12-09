@@ -1,5 +1,8 @@
+import datetime
 from django.db import models
 from django.db.models.fields.related import ForeignKey
+import math
+from django.db.models.query_utils import Q
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
@@ -32,6 +35,7 @@ class LogManager(models.Manager):
 
     @staticmethod
     def attach_additional_info_to_logs(requested_user_logs, current_user_profile):
+        # imported inside method to prevent circular dependencies
         from mytravelog.models.log_picture import LogPicture
         from mytravelog.models.like import Like
         from mytravelog.models.comment import Comment
@@ -87,3 +91,21 @@ class Log(models.Model):
 
     class Meta():
         ordering = ['-created_at']
+
+    # score function: log_score = log10(z) + (creation_time_since_epoch/45000)
+    # where z = num_likes + num_comments (z=1 if (num_likes + num_comments) == 0)
+    def get_log_score(self):
+        # imported inside method to prevent circular dependencies
+        from mytravelog.models.like import Like
+        from mytravelog.models.comment import Comment
+
+        # only consider likes and comments made my other users, and not the user who created the log
+        num_comments = Comment.objects.filter(Q(log=self) & ~Q(commenter_user_profile=self.user_profile)).count()
+        num_likes = Like.objects.filter(Q(log=self) & ~Q(liker_user_profile=self.user_profile)).count()
+        log_created_at = self.created_at.replace(tzinfo=None)  # remove time zone awareness
+        creation_time_since_epoch = (log_created_at - datetime.datetime(1970, 1, 1)).total_seconds() / 45000
+        z = (num_likes + num_comments)
+        if z == 0:
+            z = 1
+        score = round(math.log(z, 10) + creation_time_since_epoch, 7)
+        return score

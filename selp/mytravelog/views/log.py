@@ -1,18 +1,13 @@
 import json
-import datetime
-import math
 
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models.query_utils import Q
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 
 from mytravelog.models.album import Album
 from mytravelog.models.city import City
-from mytravelog.models.comment import Comment
 from mytravelog.models.follower import Follower
-from mytravelog.models.like import Like
 from mytravelog.models.log import Log
 from mytravelog.models.log_picture import LogPicture
 from mytravelog.models.user_profile import UserProfile
@@ -59,7 +54,7 @@ def create_log(request):
                 new_log.save()
 
                 # now that we have created_at, update the log score and re-save
-                new_log.score = get_log_score(new_log)
+                new_log.score = new_log.get_log_score()
                 new_log.save()
 
                 # create new log picture for every image submitted by user
@@ -320,17 +315,5 @@ def validate_edit_log_form(description, number_of_pictures_to_delete, file_data,
     return None
 
 
-# score function: log_score = log10(z) + (time_since_epoch/45000)
-# where z = num_likes + num_comments (z=1 if (num_likes + num_comments) == 0)
-def get_log_score(log_to_score):
-    # only consider likes and comments made my other users, and not the user who created the log
-    num_comments = Comment.objects.filter(Q(log=log_to_score) & ~Q(commenter_user_profile=log_to_score.user_profile)).count()
-    num_likes = Like.objects.filter(Q(log=log_to_score) & ~Q(liker_user_profile=log_to_score.user_profile)).count()
-    log_created_at = log_to_score.created_at.replace(tzinfo=None)  # remove time zone awareness
-    time_since_epoch = (log_created_at - datetime.datetime(1970, 1, 1)).total_seconds() / 45000
-    z = (num_likes + num_comments)
-    if z == 0:
-        z = 1
-    score = round(math.log(z, 10) + time_since_epoch, 7)
-    return score
+
 
