@@ -5,6 +5,13 @@
 
 //-----Base-----
 
+/**
+ * Handles tab navigation on user page by extracting the hash part of the URL
+ * and using it to generate a class name for the active tab. The appropriate tab is selected
+ * using this class name, and active tab class is added to it. To deselect all the other tabs,
+ * active tab class is removed from all the sibling tabs of the active tab. The hash is also used
+ * to show the contents of the right div under the tabs.
+ */
 var UserTabNavigationHandler = (function () {
 
     var _config = {
@@ -57,6 +64,12 @@ var UserTabNavigationHandler = (function () {
 
 }());
 
+/**
+ * Handles a modal containing a map as its body content. Once the modal
+ * is visible, info about all user logs is retrieved from the server
+ * using the username of the current user. This info is used to mark
+ * all log locations on the map with their corresponding timestamps.
+ */
 var WorldMapModal = (function () {
 
     var _config = {
@@ -79,6 +92,13 @@ var WorldMapModal = (function () {
         _getUserLogsInfoFromServer();
     }
 
+    /**
+     * Uses the log info response from the server and user's first name
+     * to mark all location on the map
+     * @param userLogsInfo
+     * @param firstName
+     * @private
+     */
     function _showOnMap(userLogsInfo, firstName) {
         var centerLatLng = new google.maps.LatLng(51.4800, 0.0000);
 
@@ -154,6 +174,9 @@ var WorldMapModal = (function () {
 
 //-----Albums------
 
+/**
+ * Initializes all the modules related to albums.
+ */
 function handleAlbums() {
     // go to album page when user clicks on an album
     $('.album').click(function () {
@@ -165,6 +188,15 @@ function handleAlbums() {
     DeleteAlbumModal.init();
 }
 
+/**
+ * Handles a modal which allows a user to add or edit an
+ * album. Every time a new album is created, all input fields are reset.
+ * If an album is being edited, then all the data about a specific album
+ * is retrieved from the custom attributes defined on a delete album
+ * button and set on the input fields. When the user clicks on Add or Save,
+ * the form is submitted to the server as a POST request. On success,
+ * the page is reloaded, else, an error message is displayed.
+ */
 var AddOrEditAlbumModal = (function() {
 
     var _config = {
@@ -240,6 +272,14 @@ var AddOrEditAlbumModal = (function() {
     };
 }());
 
+/**
+ * Handles a modal which allows a user to delete an existing
+ * album. When the modal is shown, info about the album being deleted
+ * is retrieved from the custom attributes defined on the delete album
+ * button. When the user clicks on Delete, a POST request is sent to the
+ * server. On success, the page is reloaded, else, an error message is
+ * displayed.
+ */
 var DeleteAlbumModal = (function () {
 
     var _config = {
@@ -333,6 +373,9 @@ var DeleteAlbumModal = (function () {
 
 //-----Logs-----
 
+/**
+ * Initializes all the modules related to logs.
+ */
 function handleLogs() {
     // go to log page when user clicks on an dropdown item: view
     $('.log-dropdown-item-view').click(function () {
@@ -350,6 +393,18 @@ function handleLogs() {
     ShareLogModal.init();
 }
 
+/**
+* Handles a modal which allows the user to add a new log. Every
+* time this modal is shown, all input fields are reset and a new
+* file input field is added. A map at the top of the modal
+* showing the current position of the user, is also reset.
+* If user clicks on 'Add another image' button, a new file field
+* with an incremented name (eg: if log_picture_1 already exists,
+* then log_picture_2 is added) is added. When the user clicks on
+* Add, the form is submitted to the server as a POST request.
+* On success, the page is reloaded, else, an error message is
+* displayed.
+*/
 var AddLogModal = (function () {
 
     var _config = {
@@ -512,6 +567,13 @@ var AddLogModal = (function () {
 
 // this module handles the picture viewer modal showing the selected picture
 // it is used for viewing pictures within a log AND pictures on the album page
+/**
+ * Handles a modal which allows the user to view an enlarged version of
+ * the log picture they click on. Every time this modal is shown, a list
+ * of all urls of the neighbouring pictures is obtained, and the index of
+ * the selected picture is calculated. This index is used to navigate between
+ * the list of images.
+ */
 var LogPicturesViewer = (function () {
 
     var _config = {
@@ -628,6 +690,14 @@ var LogPicturesViewer = (function () {
     };
 })();
 
+/**
+ * Handles a modal which allows a user to delete an existing
+ * log. When the modal is shown, info about the log being deleted
+ * is retrieved from the custom attributes defined on the log div
+ * When the user clicks on Delete, a POST request is sent to the
+ * server. On success, the page is reloaded, else, an error message is
+ * displayed.
+ */
 var DeleteLogModal = (function () {
     var _config = {
         logLocation: $('#delete-log-modal-location'),
@@ -711,6 +781,19 @@ var DeleteLogModal = (function () {
     };
 }());
 
+/**
+ * Handles a modal which allows the user to edit an existing log.
+ * Every time this modal is shown, all input fields are reset and a new
+ * file input field is added. A map at the top of the modal
+ * showing the position of the user when the where the log was create,
+ * is also reset. If user clicks on 'Add another image' button,
+ *  a new file field with an incremented name (eg: if log_picture_1
+ * already exists, then log_picture_2 is added) is added. Previously
+ * saved log images are also displayed. Whenever the user clicks on any of these
+ * images, their id is appended to a hidden input field. When the user clicks on
+ * Save, the form is submitted to the server as a POST request.
+ * On success, the page is reloaded, else, an error message is displayed.
+ */
 var EditLogModal = (function () {
 
     var _config = {
@@ -861,6 +944,18 @@ var EditLogModal = (function () {
 
 }());
 
+/**
+ * Handles clicks on like button that are present on every log.
+ * Whenever a log is liked, a POST request is sent the server along
+ * with the id of the log in the url. On success, the profile picture
+ * of the liker is added to a liker-profile-pictures container, and the like
+ * count is incremented. At most 14 pictures of the most recent likers are
+ * allowed in this container. Since each picture gets appended to this container,
+ * any picture after the first 14, gets removed. If a post is disliked, a
+ * POST request is sent again, and the disliker's profile picture is removed
+ * on getting a successful response from the server. The like count is decremented
+ * as well.
+ */
 var LikeHandler = (function () {
 
     var _config = {
@@ -966,6 +1061,17 @@ var LikeHandler = (function () {
 
 }());
 
+/**
+ * Handles ENTER key presses on the comment input field which is present
+ * on each log. When the user presses enter, a POST request is sent to
+ * the server along with the comment body and id of the log on which
+ * the comment is posted. On success, the comment is added to the body
+ * of the log along with a time stamp and user details, and the comment count
+ * is incremented. A delete button is also added under the comment,
+ * allowing the user to delete their comments. If the delete button is
+ * clicked, the comment is removed from the log body and comment count
+ * is decremented.
+ */
 var CommentHandler = (function () {
 
     var _config = {
@@ -1090,6 +1196,18 @@ var CommentHandler = (function () {
 
 }());
 
+/**
+ * Handles a modal which allows the user to share the selected log
+ * on other social networking websites: Facebook, Twitter and
+ * Google Plus. When the modal is shown, the selected log's location
+ * and creation time are retrieved using the custom attributes defined
+ * on the log itself. This info is just used to let the user know
+ * what they are about to share. When the user clicks on any of the
+ * icons representing each website, they are navigated to the sharing
+ * page of that particular website along with the url they were trying
+ * to share. This final url is generated by appending the url of the selected
+ * log to the base url of each of the websites.
+ */
 var ShareLogModal = (function () {
 
     var _config = {
@@ -1148,7 +1266,15 @@ var ShareLogModal = (function () {
 }());
 
 //-----Followers-----
-
+/**
+ * Handles clicks on follow buttons that are present on search and
+ * user pages. Whenever such a button is clicked, the id of the person who the
+ * user wants to follow, is retrieved from a custom attribute on the button
+ * itself. This id is appended to the url and sent to the server as a POST request.
+ * On success, active class is added to the button, indicating the the operation
+ * was successful. If the use tries to un-follow another user, a similar POST request
+ * is sent again, but this time the active class is removed from the button.
+ */
 var FollowerHandler = (function () {
 
     var _config = {
@@ -1266,6 +1392,13 @@ function submitForm(form, errorContainer, url) {
 
 //--------------------City page modules/functions go here------------------------
 
+/**
+ * Handles tab navigation on city page by extracting the hash part of the URL
+ * and using it to generate a class name for the active tab. The appropriate tab is selected
+ * using this class name, and active tab class is added to it. To deselect all the other tabs,
+ * active tab class is removed from all the sibling tabs of the active tab. The hash is also used
+ * to show the contents of the right div under the tabs.
+ */
 var CityTabNavigationHandler = (function () {
 
     function init() {
@@ -1300,6 +1433,16 @@ var CityTabNavigationHandler = (function () {
     };
 }());
 
+/**
+ * Handles the fetching, parsing and displaying the weekly weather forecast
+ * for a particular city. First, the city name is retrieved and then it is appended
+ * to the base URL of the Weather API. The JSON response is parsed, and then the
+ * parsed data is used to generate HTML for each of the 7 days in the week. This
+ * HTML is then added to the weather container and presented to the user. Also,
+ * while the data is being fetched and parsed, a progress bar is displayed, which
+ * is then hidden once the process is complete.
+ *
+ */
 var CityWeatherForecastHandler = (function () {
 
     var _config = {
@@ -1429,6 +1572,16 @@ function scrollToPopularCities() {
     });
 }
 
+/**
+ * Handles the the display of autocomplete suggestions under the search
+ * input field on the home page. Whenever the user presses a key, the search term
+ * is retrieved from the input field and a GET request is sent to the server. The
+ * JSON response is then used to generate html for the suggestions, which is then
+ * appended to the suggestions container. This module also handles clicks on suggestions.
+ * Whenever a user clicks on a suggestion, a search term is formed using the full city
+ * name this time, and sent to the server again (as a GET request). But this time, since
+ * the search matches exactly one city, the user is directly navigated to it.
+ */
 var CityAutocompleteSuggestionsHandler = (function () {
 
     var _config = {
@@ -1495,6 +1648,16 @@ var CityAutocompleteSuggestionsHandler = (function () {
 
 //--------------------Leaderboard modules go here------------------------
 
+/**
+ * Handles the sorting of fields in the leaderboard table on the leaderboard
+ * page. Whenever a field heading is clicked, the order in which the fields
+ * should be sorted is retrieved by checking if a down or up caret exists in the
+ * heading. If it's a down caret, order is ascending, else, the order is descending.
+ * Then all the other parameters (query, orderBy and page) are retrieved from the
+ * current url and a new url is generated using them. The user is eventually redirected
+ * to this new url. This module also handles clicks on pagination buttons, by going
+ * through the same process.
+ */
 var LeaderBoardHandler = (function () {
 
     var _config = {
