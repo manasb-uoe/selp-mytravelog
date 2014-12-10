@@ -1,0 +1,4 @@
+Django==1.7.1
+Pillow==2.6.1
+beautifulsoup4==4.3.2
+coverage==3.7.1
