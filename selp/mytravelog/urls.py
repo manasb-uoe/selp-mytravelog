@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, url
 from mytravelog.views import search, album, log, like, comment, follower, leaderboard
+from mytravelog.views.live_feed import show_live_feed
 from views import home, user, city
 
 __author__ = 'Manas'
@@ -29,6 +30,6 @@ urlpatterns = patterns(
     url(r'^comment/delete/(?P<comment_id>\w+)/$', comment.delete_log_comment),
     url(r'^follower/create/(?P<following_user_profile_id>\w+)/$', follower.create_follower),
     url(r'^follower/delete/(?P<following_user_profile_id>\w+)/$', follower.delete_follower),
-    url(r'^live_feed/(?P<feed_filter>\w+)/$', log.show_live_feed),
+    url(r'^live_feed/(?P<feed_filter>\w+)/$', show_live_feed),
     url(r'^leaderboard/(?P<model>\w+)/$', leaderboard.show_leaderboard)
 )

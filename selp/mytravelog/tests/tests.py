@@ -23,7 +23,8 @@ from mytravelog.views.follower import create_follower, delete_follower
 from mytravelog.views.home import show_home
 from mytravelog.views.leaderboard import show_leaderboard, get_results
 from mytravelog.views.like import like_log, dislike_log
-from mytravelog.views.log import create_log, edit_log, delete_log, show_log, show_live_feed
+from mytravelog.views.live_feed import show_live_feed
+from mytravelog.views.log import create_log, edit_log, delete_log, show_log
 from mytravelog.views.search import search_for_cities_and_users, get_search_results
 from mytravelog.views.user import sign_up, sign_in, sign_out, show_user
 
