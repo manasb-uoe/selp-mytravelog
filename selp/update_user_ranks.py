@@ -3,10 +3,10 @@ import django
 
 __author__ = 'Manas'
 
-if __name__ == "__main__":
+
+def update_user_ranks():
     # setup django environment
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "selp.settings")
-
     from mytravelog.models.user_profile import UserProfile
     django.setup()
 
@@ -23,4 +23,7 @@ if __name__ == "__main__":
         user_profile.save()
         rank += 1
 
+if __name__ == "__main__":
+
+    update_user_ranks()
     print "End of user ranking script."

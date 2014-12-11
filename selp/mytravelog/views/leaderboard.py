@@ -7,6 +7,7 @@ from mytravelog.models.city import City
 from mytravelog.models.follower import Follower
 from mytravelog.models.log import Log
 from mytravelog.models.user_profile import UserProfile
+from update_user_ranks import update_user_ranks
 
 __author__ = 'Manas'
 
@@ -19,6 +20,11 @@ def show_leaderboard(request, model):
     order = get_data.get('order', 'asc')
 
     if model == 'users':
+        # rank all users on every page load - this is only a temporary solution
+        # in production, update_users_ranks script should be scheduled to run
+        # every few hours/minutes
+        update_user_ranks()
+
         # get all user profiles and sort them by increasing order of rank
         items = get_results(query, model, order_by, order)
     elif model == 'cities':
