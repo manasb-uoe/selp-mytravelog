@@ -16,20 +16,23 @@ def show_live_feed(request, feed_filter):
     if current_user.is_authenticated():
         current_user_profile = UserProfile.objects.get(user=current_user)
 
-    # filter logs based on feed filter and sort them by decreasing order of score
+    # filter logs based on feed filter
     if feed_filter == 'all':
         # get all logs
-        requested_logs = Log.objects.order_by('-score')
+        requested_logs = Log.objects.all()
     elif feed_filter == 'following':
         # check if user is authenticated
         if current_user_profile is not None:
             # only get logs of users followed by current user
             current_user_following = Follower.objects.get_requested_user_following(current_user_profile, None).values('following_user_profile')
-            requested_logs = Log.objects.get_users_logs(current_user_following).order_by('-score')
+            requested_logs = Log.objects.get_users_logs(current_user_following)
         else:
             return HttpResponseRedirect('/mytravelog/sign_in')
     else:
         raise Http404
+
+    # sort logs by descending order of score
+    requested_logs = score_and_sort_logs(requested_logs)
 
     # paginate the logs
     paginator = Paginator(requested_logs, 10)
@@ -57,3 +60,10 @@ def show_live_feed(request, feed_filter):
         'requested_filter': feed_filter
     }
     return render(request, 'mytravelog/live_feed.html', data_dict)
+
+
+def score_and_sort_logs(logs):
+    for log_to_score in logs:
+        log_to_score.score = log_to_score.get_log_score()
+        log_to_score.save()
+    return sorted(logs, key=lambda x: x.score, reverse=True)
