@@ -32,6 +32,7 @@
         </form>
 
         {% if requested_page_items|length != 0 %}
+            <p class="help-text">Note: Click on any column heading to sort the results by that column</p>
             <table class="table table-bordered table-custom table-striped table-hover extra-box-shadow">
                 {% if model == 'users' %}
                     <thead>

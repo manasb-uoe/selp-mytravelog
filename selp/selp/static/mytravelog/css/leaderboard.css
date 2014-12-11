@@ -23,6 +23,11 @@ body {
     width: 170px;
 }
 
+.main-leaderboard-container .help-text {
+    color: gray;
+    text-align: center;
+}
+
 .main-leaderboard-container .table-custom {
     margin-top: 20px;
     margin-bottom: 20px;
