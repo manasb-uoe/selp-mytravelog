@@ -446,6 +446,7 @@ body {
     border-bottom: none;
     text-decoration: none;
     transition: all .15s ease-in-out;
+    vertical-align: top;
 }
 
 .tabs-or-stats-bar .tabs-or-stats-container .stat:hover,
