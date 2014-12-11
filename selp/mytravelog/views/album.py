@@ -15,6 +15,14 @@ __author__ = 'Manas'
 
 
 def create_album(request):
+    """
+    Uses create_or_update_album helper function in order to
+    create a new album. It passes 'create' operation to this
+    function along with the request and id of the album. Although,
+    since an album is being created, an id of -1 is passed instead.
+    Also note that this view only accepts ajax requests, else a 404
+    error is raised.
+    """
     if request.is_ajax():
         return_data = create_or_update_album(request, 'create', -1)
         return_data = json.dumps(return_data)
@@ -25,6 +33,13 @@ def create_album(request):
 
 
 def update_album(request, album_id):
+    """
+    Uses create_or_update_album helper function in order to
+    update an existing album. It passes 'update' operation to this
+    function along with the request and id of the album being updated.
+    Also note that this view only accepts ajax requests, else a 404
+    error is raised.
+    """
     if request.is_ajax():
         return_data = create_or_update_album(request, 'update', album_id)
         return_data = json.dumps(return_data)
@@ -35,6 +50,14 @@ def update_album(request, album_id):
 
 
 def delete_album(request, album_id):
+    """
+    Deletes an album with the provided album_id. It first
+    checks if the album actually belongs to the user
+    who sent the request. If this is not the case, then
+    an error is sent back. Else, the album is successfully
+    deleted. Also note that this view only accepts ajax
+    requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
@@ -57,6 +80,10 @@ def delete_album(request, album_id):
 
 
 def show_album(request, album_id):
+    """
+    Renders user_album template using the the data of the
+    album with the provided album_id.
+    """
     # get requested user album and attach duration to it
     requested_album = get_object_or_404(Album, id=album_id)
     duration = (requested_album.end_date - requested_album.start_date).days
@@ -112,6 +139,13 @@ def show_album(request, album_id):
 
 # -------------------HELPER FUNCTIONS--------------------
 def create_or_update_album(request, operation, album_id):
+    """
+    Creates or updates an album based on the provided operation.
+    :param request: HttpRequest instance received by the view
+    :param operation: Takes two values: 'create' or 'update'
+    :param album_id: Id of the album that needs to be updated. Id will be ignored if operation = 'create'
+    :return: Dict containing an error message or a redirection url. If no errors occur, then this dict is empty
+    """
     user = request.user
     return_data = {}
     if user.is_authenticated():
@@ -169,6 +203,17 @@ def create_or_update_album(request, operation, album_id):
 
 
 def validate_album_form(operation, user_profile, name, start_date, end_date, album_to_update, cover_picture):
+    """
+    Validates all the album data provided. Returns an error message if any error occurs, else None is returned
+    :param operation: Takes two values: 'create' or 'update'
+    :param user_profile: UserProfile instance for the current user
+    :param name: Name of the album
+    :param start_date: Start data of the album as a String
+    :param end_date: End date of the album as a String
+    :param album_to_update: Album instance to update. Only needed when operation = 'update'
+    :param cover_picture: cover picture file instance from request.FILES
+    :return: error message as a String if an error occurs, else None
+    """
     if len(name) == 0:
         return "Album name is required"
     if name.lower() == "none":
@@ -198,6 +243,11 @@ def validate_album_form(operation, user_profile, name, start_date, end_date, alb
 
 
 def convert_string_to_date(string_date):
+    """
+    Converts a string date into datetime date instance
+    :param string_date: Date as a string
+    :return: datetime date instance
+    """
     split = string_date.split("-")
     date = datetime.date(int(split[0]), int(split[1]), int(split[2]))  # format: year-month-date
     return date

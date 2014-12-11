@@ -8,6 +8,12 @@ __author__ = 'Manas'
 
 
 def like_log(request, log_id):
+    """
+    Creates a new like for the log with the provided id. It first checks
+    if a like with the same user and log_id already exists. If not, then
+    a like is created, else, nothing is created. Also note that this view
+    only accepts ajax requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
@@ -37,6 +43,13 @@ def like_log(request, log_id):
 
 
 def dislike_log(request, log_id):
+    """
+    Deletes a like for the log with the provided id. It first checks
+    if a like with the same user and log_id exists. If not, then
+    nothing is deleted, else, the like is deleted successfully. Also
+    note that this view only accepts ajax requests, else a 404 error
+    is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():

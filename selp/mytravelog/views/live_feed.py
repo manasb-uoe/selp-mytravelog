@@ -10,6 +10,17 @@ __author__ = 'Manas'
 
 
 def show_live_feed(request, feed_filter):
+    """
+    Renders the live_feed template based on the results queried
+    using the provided fieed filter. feed_filter only takes two
+    values: 'all' or 'following'. If 'all' is provided, then logs
+    from all users are returned sorted in descending order of their
+    scores. if 'following' is provided, then logs from only those
+    users are returned, which are being followed by the current user.
+    The results are first paginated, and then only those results
+    belonging to the requested page number are used while rendering
+    the template.
+    """
     # get current user and user profile
     current_user = request.user
     current_user_profile = None
@@ -63,6 +74,11 @@ def show_live_feed(request, feed_filter):
 
 
 def score_and_sort_logs(logs):
+    """
+    Scores each log provided, sorts them, and then returns the sorted list.
+    :param logs: a list of logs to be scored and sorted
+    :return: a list of logs sorted by descending order of their scores
+    """
     for log_to_score in logs:
         log_to_score.score = log_to_score.get_log_score()
         log_to_score.save()

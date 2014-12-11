@@ -13,6 +13,13 @@ __author__ = 'Manas'
 
 
 def sign_up(request):
+    """
+    Renders the sign up template. Creates a new user and user profile using the POST data provided.
+    It first validates all the provided data. If no error message is returned by the validation
+    function, then the user and user profile are created successfully and user is signed in. Else,
+     the sign up template is rendered with the error message. Also, every time an error occurs,
+     the previous data input by the user is also used while rendering the template (except password).
+    """
     user = request.user
     if user.is_authenticated():
         return HttpResponseRedirect('/mytravelog/user/' + user.username + '/')
@@ -64,6 +71,12 @@ def sign_up(request):
 
 
 def sign_in(request):
+    """
+    Renders the sign in template. Uses the POST data provided to sign in
+    the user. If any incorrect details are provided, then the sign in template
+    is rendered using an error message. Once the sign in is successful, user is
+    navigated to their user page.
+    """
     user = request.user
     if user.is_authenticated():
         return HttpResponseRedirect('/mytravelog/user/' + user.username + '/')
@@ -95,6 +108,11 @@ def sign_in(request):
 
 
 def sign_out(request):
+    """
+    Signs out an authenticated user, and redirects them to
+    the home page. If the user is already signed out, they are
+    redirected to the sign in page.
+    """
     user = request.user
     if user.is_authenticated():
         logout(request)
@@ -104,6 +122,10 @@ def sign_out(request):
 
 
 def show_user(request, username):
+    """
+    Renders the user_main template using the data of the user with the
+    provided username.
+    """
     # get current user and user profile
     current_user = request.user
     current_user_profile = None
@@ -159,6 +181,17 @@ def show_user(request, username):
 # ----------------------Helper functions------------------------
 
 def validate_sign_up_form(first_name, last_name, email, username, password, profile_picture, cover_picture):
+    """
+    Validates the user data provided.
+    :param first_name: first name of the user
+    :param last_name: last name of the user
+    :param email: email address of the user
+    :param username: username of the user
+    :param password: password of the user
+    :param profile_picture: profile picture file of the user
+    :param cover_picture: cover picture file of the user
+    :return: an error message if any error occurs, else, None is returned
+    """
     if len(first_name) == 0:
         return "First name is required"
     if len(last_name) == 0:

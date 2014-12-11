@@ -16,6 +16,14 @@ __author__ = 'Manas'
 
 
 def create_log(request):
+    """
+    Creates a new log using the provided POST data. First, the
+    provided POST data is validated, if no errors are returned,
+    then a log is created successfully. Also, new LogPicture is
+    created for each of the pictures in the POST data. Also note
+    that this view only accepts ajax requests, else a 404 error
+    is raised.
+    """
     if request.is_ajax():
         user = request.user
         return_data = {}
@@ -80,6 +88,13 @@ def create_log(request):
 
 
 def delete_log(request, log_id):
+    """
+    Deletes the log with the provided log_id. It first
+    checks if the log actually belongs to the current user.
+    If this is not the case, then an error message is returned.
+    Else, the log is successfully deleted. Also note that this
+    view only accepts ajax requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
@@ -103,6 +118,14 @@ def delete_log(request, log_id):
 
 
 def edit_log(request, log_id):
+    """
+    Updates the log with the provided id, using the POST data provided.
+    It also checks if the log actually belongs to the current user. If
+    this is not the case, then an error message is returned. Else, the
+    log is updated successfully. Also, the LogPicture instances are deleted
+    based on the on the delete_picture_ids list in POST data. Also note that
+    this view only accepts ajax requests, else a 404 error is raised.
+    """
     if request.is_ajax():
         user = request.user
         return_data = {}
@@ -159,6 +182,10 @@ def edit_log(request, log_id):
 
 
 def show_log(request, log_id):
+    """
+    Renders the user_log template using the data of the log with the
+    provided log_id.
+    """
     # get requested user log and put it in a list, since logs template and helper functions only accept a list of logs
     requested_log = [get_object_or_404(Log, id=log_id)]
 
@@ -205,6 +232,11 @@ def show_log(request, log_id):
 
 
 def get_log_info_for_map(request, username):
+    """
+    Returns a dict where each log id is mapped to their info. The log info
+    that is returned in filtered using the username provided. Also note that
+    this view only accepts ajax requests, else a 404 error is raised.
+    """
     return_data = {}
     if request.is_ajax():
         all_user_logs = Log.objects.filter(user_profile__user=get_object_or_404(User, username=username))
@@ -229,6 +261,15 @@ def get_log_info_for_map(request, username):
 # ---------------Helper functions----------------
 
 def validate_add_log_form(location, latitude, longitude, description, file_data):
+    """
+    Validates the provided log data and returns an error message, if any error occurs, else, None is returned.
+    :param location: name of the city where the log is created
+    :param latitude: latitude of the location
+    :param longitude: longitude of the location
+    :param description: description of the log
+    :param file_data: dict of all files in POST data, i.e. request.FILES
+    :return: an error message if any error occurs, else, None is returned.
+    """
     if len(location) == 0 or len(latitude) == 0 or len(longitude) == 0:
         return "Your location could not be verified"
     if len(description) == 0:
@@ -248,6 +289,14 @@ def validate_add_log_form(location, latitude, longitude, description, file_data)
 
 
 def validate_edit_log_form(description, number_of_pictures_to_delete, file_data, total_number_of_pictures):
+    """
+    Validates the log data provided.
+    :param description: description of the log
+    :param number_of_pictures_to_delete: total number of picture to be deleted
+    :param file_data: dict of all files in POST data, i.e. request.FILES
+    :param total_number_of_pictures: total number of existing log pictures
+    :return: an error message if any error occurs, else, None is returned
+    """
     if len(description) == 0:
         return "Description is required"
     if len(description) > 1000:

@@ -11,6 +11,12 @@ __author__ = 'Manas'
 
 
 def search_for_cities_and_users(request):
+    """
+    Renders the search template using the results based on the query provided
+    in the GET request (using the helper function get_search_results). If exactly
+    1 city matches the query, the the user is redirected to its city page.
+    Else, the search results are shown.
+    """
     search_query = request.GET.get('query', None)
     if search_query is not None:
         # if query exactly matches a city, go directly to its city page
@@ -46,6 +52,11 @@ def search_for_cities_and_users(request):
 # ---------Helper functions-----------
 
 def get_search_results(query):
+    """
+    Queries the models based on the query provided.
+    :param query: the search term
+    :return: a dict containing the filtered cities and user profiles
+    """
     cities = City.objects.filter(Q(name__startswith=query) |
                                  Q(country_name__startswith=query))
     user_profiles = UserProfile.objects.filter(Q(user__username__startswith=query) |

@@ -12,6 +12,12 @@ __author__ = 'Manas'
 
 
 def create_log_comment(request, log_id):
+    """
+    Creates a new comment on the log with the provided
+    log_id. It also validates the comment body provided
+    in the POST request. Also note that this view only
+    accepts ajax requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
@@ -50,6 +56,13 @@ def create_log_comment(request, log_id):
 
 
 def delete_log_comment(request, comment_id):
+    """
+    Deletes a comment with the comment id provided. It first
+    checks whether the comment actually belongs the current
+    user. If this is not that the case, then an error is returned.
+    Else, the comment is successfully deleted. Also note that
+    this view only accepts ajax requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():

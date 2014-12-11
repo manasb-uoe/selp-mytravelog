@@ -14,6 +14,11 @@ __author__ = 'Manas'
 
 
 def show_city(request, city_url_name):
+    """
+    Renders city template using the data of the city with
+    the url_name provided. If no city matches this name,
+    404 error is raised.
+    """
     # get city using the url name provided
     # else, show 404 error
     requested_city = get_object_or_404(City, url_name=city_url_name)
@@ -42,6 +47,12 @@ def show_city(request, city_url_name):
 
 
 def get_autocomplete_suggestions(request):
+    """
+    Returns a dict of all city names with their corresponding country
+    names matching the search term provided in the GET request. Also
+    note that this view only accepts ajax requests, else a 404
+    error is raised.
+    """
     if request.is_ajax():
         search_term = request.GET.get('search_term', None)
         if search_term is not None:

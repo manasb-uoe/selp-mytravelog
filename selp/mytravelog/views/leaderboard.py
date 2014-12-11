@@ -13,6 +13,14 @@ __author__ = 'Manas'
 
 
 def show_leaderboard(request, model):
+    """
+    Renders the leaderboard template using the results based
+    on the model provided. The results are obtained using the
+    helper function: get_results. Model can only take two values:
+    'users' or 'cities'. The results are first paginated,
+    and then only those results belonging to the requested page
+    number are used while rendering the template.
+    """
     get_data = request.GET
     page_num = get_data.get('page', 1)
     query = get_data.get('query', '')
@@ -54,6 +62,14 @@ def show_leaderboard(request, model):
 # ---------------Helper functions------------------
 
 def get_results(query, model, order_by, order):
+    """
+    Returns filtered results based on the parameters provided.
+    :param query: the search term
+    :param model: tells the function which model to query on. Can only take two values: 'users' or 'cities'
+    :param order_by: the field name by which the results should be sorted
+    :param order: the order in which the results should be sorted. Can only take two values: 'asc' or 'desc'
+    :return: List of cities or user profiles (depends on the model provided)
+    """
     if model == 'users':
         results = UserProfile.objects.filter(
             Q(user__username__startswith=query) |
@@ -81,6 +97,12 @@ def get_results(query, model, order_by, order):
 
 
 def attach_log_and_follower_count(results):
+    """
+    Attaches log and followe counts on each of the user profiles
+    provided in the results list
+    :param results: list of user profiles
+    :return: list of user profiles, log_count and follower_count has been attached to each user profile
+    """
     # get no. of logs and followers for each user_profile
     for user_profile in results:
         user_profile.log_count = Log.objects.filter(user_profile=user_profile).count()

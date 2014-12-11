@@ -7,6 +7,15 @@ __author__ = 'Manas'
 
 
 def create_follower(request, following_user_profile_id):
+    """
+    Creates a new follower instance with follower being the
+    current user, and the user being followed is queried using
+    the provided following_user_following_user_profile_id. It also
+    checks if the current user is trying to follow themselves. If
+    this is the case, then an error is returned. Else, a follower
+    is created successfully. Also note that this view only accepts
+    ajax requests, else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
@@ -36,6 +45,13 @@ def create_follower(request, following_user_profile_id):
 
 
 def delete_follower(request, following_user_profile_id):
+    """
+    Deleted a follower instance with follower being the
+    current user, and the user being followed is queried using
+    the provided following_user_following_user_profile_id.
+    Also note that this view only accepts ajax requests,
+    else a 404 error is raised.
+    """
     user = request.user
     return_data = {}
     if request.is_ajax():
