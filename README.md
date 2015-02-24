@@ -1,23 +1,25 @@
+# MyTravelog - Social Networking Travel Website 
+A social networking travel website developed using Django Web Framework, where users can share and log their beautiful moments to help others plan their trips. The website also incorporates a ranking system, where each user gets ranked based on their travel and social statistics, motivation them to be more active in order to compete with other users. 
 
-
-MyTravelog Documentation
-========================
+## Developer Documentation
 
 [TOC]
-
-----------
 
 
 Geting Started 
 --------------------
 All you need to get started: 
 
-**Tools**:
- 1. Python 2.7.x or Python 3.4.x
- 2. Pip (Python package management tool)
- 3. virtualenv (tool to create isolated Python environments)
+**Tools:**
+
+1. Python 2.7.x or Python 3.4.x
+
+2. Pip (Python package management tool)
+
+3. virtualenv (tool to create isolated Python environments)
 
 **Dependencies:**
+
  1. Django Web Framework
  2. Pillow Imaging Library
  3. beatifulsoup4 - HTML Scraping Library
@@ -441,4 +443,8 @@ To enable debugging in Django, you simply have to set `DEBUG` attribute's value 
 > **Note**: 
 > Do not deploy the site into production with `DEBUG` turned on! When `DEBUG`=TRUE, Django will remember every `SQL` query it executes, rapidly consuming memory on a production server. 
 
-If such an exception is raised during an `AJAX` request, then you can view it in the `JavaScript` console of the browser. 
+If such an exception is raised during an `AJAX` request, then you can view it in the `JavaScript` console of the browser.
+
+## Developed by 
+
+*  Manas Bajaj - <manas.bajaj94@gmail.com>
