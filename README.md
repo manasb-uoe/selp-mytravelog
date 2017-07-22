@@ -1,5 +1,5 @@
 # MyTravelog - Social Networking Travel Website 
-A social networking travel website developed using Django Web Framework, where users can share and log their beautiful moments to help others plan their trips. The website also incorporates a ranking system, where each user gets ranked based on their travel and social statistics, motivation them to be more active in order to compete with other users. 
+A social networking travel website developed using Django Web Framework, where users can share and log their beautiful moments to help others plan their trips. The website also incorporates a ranking system, where each user gets ranked based on their travel and social statistics, motivating them to be more active in order to compete with other users. 
 
 ## Developer Documentation
 
